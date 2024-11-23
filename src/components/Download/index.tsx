@@ -4,9 +4,10 @@ import { Button } from 'react-bootstrap';
 type DownloadProps = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	data: any;
+	disabled: boolean;
 };
 
-const Download = ({ data }: DownloadProps) => {
+const Download = ({ data, disabled }: DownloadProps) => {
 	const handleDownload = () => {
 		const fileName = prompt('Digite o nome do arquivo', 'meu-treinamento');
 		const json = JSON.stringify(data, null, 2);
@@ -22,7 +23,7 @@ const Download = ({ data }: DownloadProps) => {
 	};
 
 	return (
-		<Button variant="success" onClick={handleDownload}>
+		<Button variant="success" onClick={handleDownload} disabled={disabled}>
 			Salvar
 		</Button>
 	);

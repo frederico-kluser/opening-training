@@ -9,6 +9,11 @@ import './App.css';
 import Download from './components/Download';
 import Upload from './components/Upload';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type TypeTraining = {
+	[key: string]: Move[];
+};
+
 function App() {
 	const [invertedBoard, setInvertedBoard] = useState(false);
 	const [game, setGame] = useState(new Chess());
@@ -65,15 +70,15 @@ function App() {
 		<Gap size={16}>
 			<Gap size={16} horizontal>
 				<Button
-					variant="primary"
+					variant="secondary"
 					onClick={() => {
 						setInvertedBoard(!invertedBoard);
 					}}
 				>
 					Inverter tabuleiro
 				</Button>
-				<Button variant="secondary" onClick={() => {}}>
-					Replay
+				<Button variant="primary" onClick={() => {}} disabled={!history.length}>
+					Treinar
 				</Button>
 				<Button
 					variant="light"
@@ -93,7 +98,7 @@ function App() {
 				>
 					Next
 				</Button>
-				<Download data={history} />
+				<Download data={history} disabled={!history.length} />
 				<Upload onFileUpload={setHistory} />
 			</Gap>
 			<Chessboard
