@@ -19,6 +19,7 @@ function App() {
 	const [game, setGame] = useState(new Chess());
 	const [history, setHistory] = useState<Move[]>([]);
 	const [actualPosition, setActualPosition] = useState<number>(-1);
+	const [isTraining, setIsTraining] = useState<boolean>(false);
 
 	useEffect(() => {
 		console.log('history :', history);
@@ -66,8 +67,32 @@ function App() {
 		setGame(newGame);
 	};
 
-	return (
-		<Gap size={16}>
+	const getButton = () => {
+		if (isTraining) {
+			return (
+				<Gap size={16} horizontal>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							setInvertedBoard(!invertedBoard);
+						}}
+					>
+						Inverter tabuleiro
+					</Button>
+					<Button
+						variant="danger"
+						onClick={() => {
+							setIsTraining(false);
+						}}
+						disabled={!history.length}
+					>
+						Parar Treinamento
+					</Button>
+				</Gap>
+			);
+		}
+
+		return (
 			<Gap size={16} horizontal>
 				<Button
 					variant="secondary"
@@ -77,7 +102,13 @@ function App() {
 				>
 					Inverter tabuleiro
 				</Button>
-				<Button variant="primary" onClick={() => {}} disabled={!history.length}>
+				<Button
+					variant="success"
+					onClick={() => {
+						setIsTraining(true);
+					}}
+					disabled={!history.length}
+				>
 					Treinar
 				</Button>
 				<Button
@@ -101,6 +132,12 @@ function App() {
 				<Download data={history} disabled={!history.length} />
 				<Upload onFileUpload={setHistory} />
 			</Gap>
+		);
+	};
+
+	return (
+		<Gap size={16}>
+			{getButton()}
 			<Chessboard
 				id="BasicBoard"
 				boardOrientation={invertedBoard ? 'black' : 'white'}
