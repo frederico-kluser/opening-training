@@ -27,6 +27,10 @@ function App() {
 	}, [history]);
 
 	useEffect(() => {
+		if (actualIndex === history.length) {
+			return;
+		}
+
 		if (actualIndex === -1) {
 			setGame(new Chess());
 		} else {
@@ -36,6 +40,21 @@ function App() {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [actualIndex]);
+
+	useEffect(() => {
+		if (isTraining) {
+			if (isNotMyTurn()) {
+				handleNavigatePosition(1);
+			}
+
+			if (actualIndex === history.length - 1) {
+				setTimeout(() => {
+					alert('Treinamento finalizado!');
+				}, 500);
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [game]);
 
 	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
 
@@ -85,14 +104,6 @@ function App() {
 
 			if (rightMove.to === move.to && rightMove.from === move.from) {
 				setActualIndex(nextIndex);
-
-				if (nextIndex === history.length - 1) {
-					alert('Treinamento finalizado!');
-					handleTraining(false);
-				} else {
-					//
-				}
-
 				return true;
 			}
 
@@ -120,33 +131,29 @@ function App() {
 	};
 
 	const handleNavigatePosition = (index: 1 | -1) => {
-		const newActualPosition = actualIndex + index;
-		const newGame = new Chess();
-
-		if (newActualPosition >= 0) {
-			newGame.load(history[newActualPosition].after);
-		}
-
-		setActualIndex(newActualPosition);
+		const newIndexPosition = actualIndex + index;
+		setActualIndex(newIndexPosition);
 	};
 
 	const handleTraining = (trainingMode: boolean) => {
 		setIsTraining(trainingMode);
 		cleanChessboard();
+
+		if (!trainingMode) {
+			return;
+		}
+
+		if (invertedBoard && trainingMode) {
+			setTimeout(() => {
+				handleNavigatePosition(1);
+			}, 500);
+		}
 	};
 
 	const getButton = () => {
 		if (isTraining) {
 			return (
 				<Gap size={16} horizontal>
-					<Button
-						variant="secondary"
-						onClick={() => {
-							setInvertedBoard(!invertedBoard);
-						}}
-					>
-						Inverter tabuleiro
-					</Button>
 					<Button
 						variant="danger"
 						onClick={() => {
