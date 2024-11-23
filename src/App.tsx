@@ -18,13 +18,36 @@ function App() {
 	const [invertedBoard, setInvertedBoard] = useState(false);
 	const [game, setGame] = useState(new Chess());
 	const [history, setHistory] = useState<Move[]>([]);
-	const [actualPosition, setActualPosition] = useState<number>(-1);
+	const [actualIndex, setActualIndex] = useState<number>(-1);
 	const [isTraining, setIsTraining] = useState<boolean>(false);
 
 	useEffect(() => {
 		console.log('history :', history);
-		console.log('actualPosition :', actualPosition);
+		console.log('actualPosition :', actualIndex);
 	}, [history]);
+
+	useEffect(() => {
+		if (actualIndex === -1) {
+			setGame(new Chess());
+		} else {
+			const newGame = new Chess();
+			newGame.load(history[actualIndex].after);
+			setGame(newGame);
+		}
+	}, [actualIndex]);
+
+	const cleanChessboard = () => {
+		setActualIndex(-1);
+	};
+
+	const getMove = (move: any) => {
+		const gameCopy = new Chess();
+		gameCopy.load(game.fen());
+
+		const result = gameCopy.move(move);
+
+		return result;
+	};
 
 	const makeAMove = (move: any) => {
 		const gameCopy = new Chess();
@@ -37,34 +60,66 @@ function App() {
 	};
 
 	const onDrop = (sourceSquare: string, targetSquare: string) => {
-		const move = makeAMove({
-			from: sourceSquare,
-			to: targetSquare,
-			promotion: 'q',
-		});
+		const nextIndex = actualIndex + 1;
 
-		if (move === null) return false;
+		if (isTraining) {
+			const move = getMove({
+				from: sourceSquare,
+				to: targetSquare,
+				promotion: 'q',
+			});
 
-		// Truncate the history if we have undone moves
-		const newHistory = history.slice(0, actualPosition + 1);
-		newHistory.push(move);
+			if (move === null) return false;
 
-		setHistory(newHistory);
-		setActualPosition(newHistory.length - 1);
+			const rightMove = history[nextIndex];
 
-		return true;
+			if (rightMove.to === move.to && rightMove.from === move.from) {
+				setActualIndex(nextIndex);
+
+				if (nextIndex === history.length - 1) {
+					alert('Treinamento finalizado!');
+					handleTraining(false);
+				}
+				return true;
+			}
+
+			alert('Errado!');
+			cleanChessboard();
+			return false;
+		} else {
+			const move = makeAMove({
+				from: sourceSquare,
+				to: targetSquare,
+				promotion: 'q',
+			});
+
+			if (move === null) return false;
+
+			// Truncate the history if we have undone moves
+			const newHistory = history.slice(0, nextIndex);
+			newHistory.push(move);
+
+			setHistory(newHistory);
+			setActualIndex(newHistory.length - 1);
+
+			return true;
+		}
 	};
 
 	const handleNavigatePosition = (index: number) => {
-		const newActualPosition = actualPosition + index;
+		const newActualPosition = actualIndex + index;
 		const newGame = new Chess();
 
 		if (newActualPosition >= 0) {
 			newGame.load(history[newActualPosition].after);
 		}
 
-		setActualPosition(newActualPosition);
-		setGame(newGame);
+		setActualIndex(newActualPosition);
+	};
+
+	const handleTraining = (trainingMode: boolean) => {
+		setIsTraining(trainingMode);
+		cleanChessboard();
 	};
 
 	const getButton = () => {
@@ -82,7 +137,7 @@ function App() {
 					<Button
 						variant="danger"
 						onClick={() => {
-							setIsTraining(false);
+							handleTraining(false);
 						}}
 						disabled={!history.length}
 					>
@@ -105,7 +160,7 @@ function App() {
 				<Button
 					variant="success"
 					onClick={() => {
-						setIsTraining(true);
+						handleTraining(true);
 					}}
 					disabled={!history.length}
 				>
@@ -116,7 +171,7 @@ function App() {
 					onClick={() => {
 						handleNavigatePosition(-1);
 					}}
-					disabled={!history.length || actualPosition === -1}
+					disabled={!history.length || actualIndex === -1}
 				>
 					Undo
 				</Button>
@@ -125,12 +180,18 @@ function App() {
 					onClick={() => {
 						handleNavigatePosition(1);
 					}}
-					disabled={!history.length || history.length - 1 === actualPosition}
+					disabled={!history.length || history.length - 1 === actualIndex}
 				>
 					Next
 				</Button>
 				<Download data={history} disabled={!history.length} />
-				<Upload onFileUpload={setHistory} />
+				<Upload
+					onFileUpload={(data) => {
+						setHistory(data);
+						cleanChessboard();
+						alert('Treinamento carregado com sucesso!');
+					}}
+				/>
 			</Gap>
 		);
 	};
