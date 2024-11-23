@@ -34,7 +34,12 @@ function App() {
 			newGame.load(history[actualIndex].after);
 			setGame(newGame);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [actualIndex]);
+
+	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
+
+	const isBlackTurn = () => game.turn() === 'b';
 
 	const cleanChessboard = () => {
 		setActualIndex(-1);
@@ -63,6 +68,11 @@ function App() {
 		const nextIndex = actualIndex + 1;
 
 		if (isTraining) {
+			if (isNotMyTurn()) {
+				alert('Não é a sua vez!');
+				return false;
+			}
+
 			const move = getMove({
 				from: sourceSquare,
 				to: targetSquare,
@@ -79,7 +89,10 @@ function App() {
 				if (nextIndex === history.length - 1) {
 					alert('Treinamento finalizado!');
 					handleTraining(false);
+				} else {
+					//
 				}
+
 				return true;
 			}
 
@@ -106,7 +119,7 @@ function App() {
 		}
 	};
 
-	const handleNavigatePosition = (index: number) => {
+	const handleNavigatePosition = (index: 1 | -1) => {
 		const newActualPosition = actualIndex + index;
 		const newGame = new Chess();
 
