@@ -6,6 +6,8 @@ import { Chess, Move } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 
 import './App.css';
+import Download from './components/Download';
+import Upload from './components/Upload';
 
 function App() {
 	const [invertedBoard, setInvertedBoard] = useState(false);
@@ -37,9 +39,12 @@ function App() {
 
 		if (move === null) return false;
 
-		// TODO: preciso melhorar aqui, pra quando eu voltar com Undo e fizer outro movimento, não continue incrementando no history a reveria
-		setActualPosition(history.length);
-		setHistory([...history, move]);
+		// Truncate the history if we have undone moves
+		const newHistory = history.slice(0, actualPosition + 1);
+		newHistory.push(move);
+
+		setHistory(newHistory);
+		setActualPosition(newHistory.length - 1);
 
 		return true;
 	};
@@ -88,6 +93,8 @@ function App() {
 				>
 					Next
 				</Button>
+				<Download data={history} />
+				<Upload onFileUpload={setHistory} />
 			</Gap>
 			<Chessboard
 				id="BasicBoard"
