@@ -108,7 +108,6 @@ function App() {
 			}
 
 			alert('Errado!');
-			cleanChessboard();
 			return false;
 		} else {
 			const move = makeAMove({
