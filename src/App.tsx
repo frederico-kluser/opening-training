@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
 import { Button } from 'react-bootstrap';
+import Register from './components/Register';
 
 type TypeMove = {
 	after: string; //  'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2';
@@ -52,7 +53,7 @@ function App() {
 		);
 	}
 
-	return <ChessGame />;
+	return <Register />;
 }
 
 export default App;
