@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Form } from 'react-bootstrap';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import Gap from '../Gap';
@@ -41,6 +41,24 @@ function ChessGame() {
 		return true;
 	};
 
+	const pieces = ['wP', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'];
+	const customPieces = useMemo(() => {
+		const pieceComponents: any = {};
+		pieces.forEach((piece) => {
+			pieceComponents[piece] = ({ squareWidth }: any) => (
+				<div
+					style={{
+						width: squareWidth,
+						height: squareWidth,
+						backgroundImage: `url(src/assets/${piece}.png)`,
+						backgroundSize: '100%',
+					}}
+				/>
+			);
+		});
+		return pieceComponents;
+	}, []);
+
 	return (
 		<Gap size={16} padding={16}>
 			<Gap size={16} horizontal>
@@ -71,6 +89,17 @@ function ChessGame() {
 				boardOrientation={invertedBoard ? 'black' : 'white'}
 				position={game.fen()}
 				onPieceDrop={onDrop}
+				customPieces={customPieces}
+				customBoardStyle={{
+					borderRadius: '4px',
+					boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+				}}
+				customDarkSquareStyle={{
+					backgroundColor: '#779952',
+				}}
+				customLightSquareStyle={{
+					backgroundColor: '#edeed1',
+				}}
 			/>
 			<Form>
 				<Form.Label
