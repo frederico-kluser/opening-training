@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 import Gap from '../Gap';
+import { FaRedo, FaSave, FaUndo } from 'react-icons/fa';
+import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
+import { ImExit } from 'react-icons/im';
 
 function ChessGame() {
 	const [invertedBoard, setInvertedBoard] = useState(false);
@@ -41,14 +44,20 @@ function ChessGame() {
 	return (
 		<Gap size={16} padding={16}>
 			<Gap size={16} horizontal>
-				<Button variant="light" onClick={() => {}}>
-					Voltar
+				<Button variant="danger" onClick={() => {}}>
+					<ImExit color="white" />
 				</Button>
-				<Button variant="primary" onClick={() => setInvertedBoard(!invertedBoard)}>
-					Inverter tabuleiro
+				<Button variant="light" onClick={() => {}} disabled>
+					<FaUndo />
 				</Button>
-				<Button variant="light" onClick={() => {}}>
-					Avançar
+				<Button variant="secondary" onClick={() => setInvertedBoard(!invertedBoard)}>
+					{!invertedBoard ? <RiFlipVerticalLine /> : <RiFlipVerticalFill />}
+				</Button>
+				<Button variant="light" onClick={() => {}} disabled>
+					<FaRedo />
+				</Button>
+				<Button variant="primary" onClick={() => {}} disabled>
+					<FaSave />
 				</Button>
 			</Gap>
 			{/* <Form.Select aria-label="Default select example">
