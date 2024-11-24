@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Form } from 'react-bootstrap';
+import ChessGame from './components/ChessGame';
+import './App.css';
 import { useState } from 'react';
 import Gap from './components/Gap';
-import { Chess } from 'chess.js';
-import { Chessboard } from 'react-chessboard';
-
-import './App.css';
+import Upload from './components/Upload';
+import { Button } from 'react-bootstrap';
 
 type TypeMove = {
 	after: string; //  'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2';
@@ -30,58 +28,31 @@ type TypeStorage = {
 };
 
 function App() {
-	const [invertedBoard, setInvertedBoard] = useState(false);
-	const [game, setGame] = useState(new Chess());
 	const [storage, setStorage] = useState<TypeStorage>({});
+	const [variant, setVariant] = useState<string>('');
 
-	const isBlackTurn = () => game.turn() === 'b';
-
-	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
-
-	const makeAMove = (move: any) => {
-		const gameCopy = new Chess();
-		gameCopy.load(game.fen());
-
-		const result = gameCopy.move(move);
-		if (result) setGame(gameCopy);
-
-		return result;
-	};
-
-	const onDrop = (sourceSquare: string, targetSquare: string) => {
-		const move = makeAMove({
-			from: sourceSquare,
-			to: targetSquare,
-			promotion: 'q',
-		});
-
-		if (move === null) return false;
-
-		console.log('move :', move);
-
-		return true;
-	};
-
-	return (
-		<Gap size={16} padding={16}>
-			<Chessboard
-				id="BasicBoard"
-				boardOrientation={invertedBoard ? 'black' : 'white'}
-				position={game.fen()}
-				onPieceDrop={onDrop}
-			/>
-			<Form>
-				<Form.Label
-					style={{
-						color: 'white',
+	if (Object.keys(storage).length === 0 && !variant) {
+		return (
+			<Gap size={16} padding={32} centralize>
+				<Upload
+					onFileUpload={(data) => {
+						console.log('data :', data);
+					}}
+				/>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						const trainingName = prompt('Digite o nome do que quer treinar', 'caro-kann');
+						setVariant(trainingName || '');
 					}}
 				>
-					Comentários
-				</Form.Label>
-				<Form.Control type="email" placeholder="Comente sobre a posição atual" as="textarea" rows={3} />
-			</Form>
-		</Gap>
-	);
+					Novo Treinamento
+				</Button>
+			</Gap>
+		);
+	}
+
+	return <ChessGame />;
 }
 
 export default App;
