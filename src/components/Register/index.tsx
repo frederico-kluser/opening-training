@@ -9,24 +9,18 @@ import ChessGame from '../ChessGame';
 
 type TypeMove = {
 	after: string; //  'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2';
-	before: string; // 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1';
-	color: string; //  'b';
-	flags: string; //  'b';
-	from: string; //   'e7';
 	lan: string; //    'e7e5';
-	piece: string; //  'p';
-	san: string; //    'e5';
-	to: string; //     'e5';
 };
 
 type TypeItem = {
 	move: TypeMove;
 	comment: string;
-	nextMoves: TypeItem[];
 };
 
 export type TypeStorage = {
-	[variant: string]: TypeItem;
+	[variant: string]: {
+		[fen: string]: TypeItem[];
+	};
 };
 
 interface RegisterProps {
@@ -36,31 +30,20 @@ interface RegisterProps {
 const Register = ({ variant }: RegisterProps): JSX.Element => {
 	const [save, setSave] = useState<TypeStorage>({});
 
-	useEffect(() => {
-		setSave({
-			[variant]: {
-				move: {
-					after: '',
-					before: '',
-					color: '',
-					flags: '',
-					from: '',
-					lan: '',
-					piece: '',
-					san: '',
-					to: '',
-				},
-				comment: '',
-				nextMoves: [],
-			},
-		});
-	}, []);
-
 	const [invertedBoard, setInvertedBoard] = useState(false);
 	const [game, setGame] = useState(new Chess());
 	const [comment, setComment] = useState('');
+	const [actualMove, setActualMove] = useState<TypeMove[]>([]);
 
 	const isBlackTurn = () => game.turn() === 'b';
+
+	useEffect(() => {
+		console.log('actualMove :', actualMove);
+	}, [actualMove]);
+
+	useEffect(() => {
+		console.log('save :', save);
+	}, [save]);
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
@@ -97,8 +80,43 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 					const gameCopy = new Chess();
 					gameCopy.load(game.fen());
 
-					const result = gameCopy.move(move);
-					if (result) setGame(gameCopy);
+					const newMove = gameCopy.move(move);
+					if (newMove) {
+						const fen = gameCopy.fen();
+						const move = {
+							after: gameCopy.fen(),
+							lan: newMove.lan,
+						};
+
+						const saveCopy = { ...save };
+						if (!saveCopy[variant]) {
+							saveCopy[variant] = {};
+						}
+
+						if (!saveCopy[variant][fen]) {
+							saveCopy[variant][fen] = [];
+						} else if (!saveCopy[variant][fen].find((item) => item.move.lan === move.lan)) {
+							saveCopy[variant][fen].push({
+								move,
+								comment,
+							});
+						} else {
+							saveCopy[variant][fen] = saveCopy[variant][fen].map((item) => {
+								if (item.move.lan === move.lan) {
+									return {
+										...item,
+										comment,
+									};
+								}
+								return item;
+							});
+						}
+
+						setActualMove((prev) => [...prev, move]);
+						setSave(saveCopy);
+						setGame(gameCopy);
+						setComment('');
+					}
 				}}
 			/>
 			<Form>
