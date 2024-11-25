@@ -10,6 +10,7 @@ import ChessGame from '../ChessGame';
 type TypeMove = {
 	after: string; //  'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2';
 	lan: string; //    'e7e5';
+	wasWhiteMove: boolean;
 };
 
 type TypeItem = {
@@ -86,6 +87,7 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 						const move = {
 							after: gameCopy.fen(),
 							lan: newMove.lan,
+							wasWhiteMove: gameCopy.turn() === 'w',
 						};
 
 						const saveCopy = { ...save };
