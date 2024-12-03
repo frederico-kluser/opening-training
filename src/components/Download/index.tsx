@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { FaSave } from 'react-icons/fa';
 
 type DownloadProps = {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,8 +24,8 @@ const Download = ({ data, disabled }: DownloadProps) => {
 	};
 
 	return (
-		<Button variant="success" onClick={handleDownload} disabled={disabled}>
-			Salvar
+		<Button variant="primary" onClick={handleDownload} disabled={disabled}>
+			<FaSave />
 		</Button>
 	);
 };
