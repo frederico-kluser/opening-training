@@ -12,7 +12,7 @@ const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 export type TypeStorage = {
 	[variant: string]: {
 		[fen: string]: {
-			prevFen: string[];
+			prevFen: string;
 			comment: string;
 			nextFen: string[];
 		};
@@ -43,8 +43,10 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 			if (!newSave[variant]) {
 				newSave[variant] = {};
 			}
+			const prevFen = newSave[variant][actualFen]?.prevFen || '';
+
 			newSave[variant][actualFen] = {
-				prevFen: [],
+				prevFen,
 				comment,
 				nextFen: [],
 			};
@@ -56,8 +58,30 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 	useEffect(() => {
 		if (actualFen !== initialFen) {
 			setGame(new Chess(actualFen));
+			setComment(save[variant][actualFen]?.comment || '');
 		}
 	}, [actualFen]);
+
+	const updateActualFen = (newFen: string) => {
+		setSave((prevSave) => {
+			const newSave = { ...prevSave };
+
+			if (newSave[variant][actualFen].nextFen.indexOf(newFen) === -1) {
+				newSave[variant][actualFen].nextFen.push(newFen);
+			}
+
+			if (!newSave[variant][newFen]) {
+				newSave[variant][newFen] = {
+					prevFen: actualFen,
+					comment: '',
+					nextFen: [],
+				};
+			}
+
+			return newSave;
+		});
+		setActualFen(newFen);
+	};
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
@@ -68,15 +92,7 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 
 		const newMove = gameCopy.move(move);
 		if (newMove) {
-			const fen = gameCopy.fen();
-			setSave((prevSave) => {
-				const newSave = { ...prevSave };
-				if (newSave[variant][actualFen].nextFen.indexOf(fen) === -1) {
-					newSave[variant][actualFen].nextFen.push(fen);
-				}
-				return newSave;
-			});
-			setActualFen(fen);
+			updateActualFen(gameCopy.fen());
 		} else {
 			console.log('Invalid move');
 		}
