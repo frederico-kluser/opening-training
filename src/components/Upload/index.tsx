@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import { ChangeEvent } from 'react';
 import { Button } from 'react-bootstrap';
 
 type UploadProps = {
