@@ -2,10 +2,11 @@ import { Button, Form } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { Chess, Move } from 'chess.js';
 import Gap from '../Gap';
-import { FaRedo, FaSave, FaUndo } from 'react-icons/fa';
+import { FaRedo, FaUndo } from 'react-icons/fa';
 import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
 import { ImExit } from 'react-icons/im';
 import ChessGame from '../ChessGame';
+import Download from '../Download';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -44,11 +45,12 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 				newSave[variant] = {};
 			}
 			const prevFen = newSave[variant][actualFen]?.prevFen || '';
+			const nextFen = newSave[variant][actualFen]?.nextFen || [];
 
 			newSave[variant][actualFen] = {
 				prevFen,
 				comment,
-				nextFen: [],
+				nextFen,
 			};
 			return newSave;
 		});
@@ -56,10 +58,14 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 	}, [comment, variant]);
 
 	useEffect(() => {
-		if (actualFen !== initialFen) {
-			setGame(new Chess(actualFen));
-			setComment(save[variant][actualFen]?.comment || '');
+		setGame(new Chess(actualFen));
+		let comment = '';
+
+		if (save[variant] && save[variant][actualFen]) {
+			comment = save[variant][actualFen]?.comment || '';
 		}
+
+		setComment(comment);
 	}, [actualFen]);
 
 	const updateActualFen = (newFen: string) => {
@@ -111,9 +117,9 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 							setActualFen(save[variant][actualFen]?.prevFen);
 						} else if (actualFen !== initialFen) {
 							setActualFen(initialFen);
+						} else {
+							throw new Error('Not implemented');
 						}
-
-						throw new Error('Not implemented');
 					}}
 					disabled={actualFen === initialFen}
 				>
@@ -128,17 +134,15 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 						if (save[variant][actualFen]?.nextFen.length > 0) {
 							// TODO: Implementar a seleção de variações
 							setActualFen(save[variant][actualFen]?.nextFen[0]);
+						} else {
+							throw new Error('Not implemented');
 						}
-
-						throw new Error('Not implemented');
 					}}
-					disabled={save[variant][actualFen]?.nextFen.length === 0}
+					disabled={save[variant] && save[variant][actualFen]?.nextFen.length === 0}
 				>
 					<FaRedo />
 				</Button>
-				<Button variant="primary" onClick={() => {}} disabled>
-					<FaSave />
-				</Button>
+				<Download data={save} disabled={Object.keys(save).length === 0} />
 			</Gap>
 			{/* <Form.Select aria-label="Default select example">
 				<option>Selecionar variante</option>
