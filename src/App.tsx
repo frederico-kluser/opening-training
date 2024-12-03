@@ -34,7 +34,7 @@ function App() {
 		);
 	}
 
-	return <Register variant={variant} data={data} />;
+	return <Register variant={variant} save={data} setSave={setData} />;
 }
 
 export default App;

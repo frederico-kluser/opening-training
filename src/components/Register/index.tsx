@@ -1,5 +1,5 @@
 import { Button, Form } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Chess, Move } from 'chess.js';
 import Gap from '../Gap';
 import { FaRedo, FaUndo } from 'react-icons/fa';
@@ -22,11 +22,11 @@ export type TypeStorage = {
 
 interface RegisterProps {
 	variant: string;
-	data: TypeStorage;
+	save: TypeStorage;
+	setSave: Dispatch<SetStateAction<TypeStorage>>;
 }
 
-const Register = ({ variant, data }: RegisterProps): JSX.Element => {
-	const [save, setSave] = useState<TypeStorage>(data);
+const Register = ({ variant, save, setSave }: RegisterProps): JSX.Element => {
 	const [actualFen, setActualFen] = useState(initialFen);
 
 	const [invertedBoard, setInvertedBoard] = useState(false);
