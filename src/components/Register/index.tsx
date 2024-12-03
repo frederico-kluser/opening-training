@@ -104,13 +104,36 @@ const Register = ({ variant }: RegisterProps): JSX.Element => {
 				<Button variant="danger" onClick={() => {}}>
 					<ImExit color="white" />
 				</Button>
-				<Button variant="light" onClick={() => {}} disabled>
+				<Button
+					variant="light"
+					onClick={() => {
+						if (save[variant][actualFen]?.prevFen) {
+							setActualFen(save[variant][actualFen]?.prevFen);
+						} else if (actualFen !== initialFen) {
+							setActualFen(initialFen);
+						}
+
+						throw new Error('Not implemented');
+					}}
+					disabled={actualFen === initialFen}
+				>
 					<FaUndo />
 				</Button>
 				<Button variant="secondary" onClick={() => setInvertedBoard(!invertedBoard)}>
 					{!invertedBoard ? <RiFlipVerticalLine /> : <RiFlipVerticalFill />}
 				</Button>
-				<Button variant="light" onClick={() => {}} disabled>
+				<Button
+					variant="light"
+					onClick={() => {
+						if (save[variant][actualFen]?.nextFen.length > 0) {
+							// TODO: Implementar a seleção de variações
+							setActualFen(save[variant][actualFen]?.nextFen[0]);
+						}
+
+						throw new Error('Not implemented');
+					}}
+					disabled={save[variant][actualFen]?.nextFen.length === 0}
+				>
 					<FaRedo />
 				</Button>
 				<Button variant="primary" onClick={() => {}} disabled>
