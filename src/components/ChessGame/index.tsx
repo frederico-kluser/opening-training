@@ -45,7 +45,7 @@ const ChessGame = ({ invertedBoard, game, onDropCallback }: ChessGameProps) => {
 					style={{
 						width: squareWidth,
 						height: squareWidth,
-						backgroundImage: `url(src/assets/${piece}.png)`,
+						backgroundImage: `url(/assets/${piece}.png)`,
 						backgroundSize: '100%',
 					}}
 				/>
