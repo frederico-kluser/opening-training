@@ -7,18 +7,9 @@ import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
 import { ImExit } from 'react-icons/im';
 import ChessGame from '../ChessGame';
 import Download from '../Download';
+import TypeStorage from '../../types/TypeStorage';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-export type TypeStorage = {
-	[variant: string]: {
-		[fen: string]: {
-			prevFen: string;
-			comment: string;
-			nextFen: string[];
-		};
-	};
-};
 
 interface RegisterProps {
 	variant: string;

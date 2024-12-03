@@ -3,7 +3,8 @@ import { useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
 import { Button } from 'react-bootstrap';
-import Register, { TypeStorage } from './components/Register';
+import Register from './components/Register';
+import TypeStorage from './types/TypeStorage';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
