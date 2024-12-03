@@ -24,7 +24,7 @@ const Register = ({ variant, save, setSave }: RegisterProps): JSX.Element => {
 	const [game, setGame] = useState(new Chess());
 	const [comment, setComment] = useState('');
 
-	const isBlackTurn = () => game.turn() === 'b';
+	// const isBlackTurn = () => game.turn() === 'b';
 
 	useEffect(() => {
 		console.log('save :', save);
@@ -81,8 +81,7 @@ const Register = ({ variant, save, setSave }: RegisterProps): JSX.Element => {
 		setActualFen(newFen);
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
+	// const isNotMyTurn = () => (isBlackTurn() && !invertedBoard) || (!isBlackTurn() && invertedBoard);
 
 	const handleDrop = (move: Move) => {
 		const gameCopy = new Chess();
