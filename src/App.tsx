@@ -3,17 +3,22 @@ import { useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
 import { Button } from 'react-bootstrap';
-import Register from './components/Register';
+import Register, { TypeStorage } from './components/Register';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
+	const [data, setData] = useState<TypeStorage>({});
 
 	if (!variant) {
 		return (
 			<Gap size={16} padding={32} centralize>
 				<Upload
 					onFileUpload={(data) => {
+						// TODO: criar um data validation
 						console.log('data :', data);
+						setData(data);
+						// TODO: criar um seletor de variant
+						setVariant(Object.keys(data)[0]);
 					}}
 				/>
 				<Button
@@ -29,7 +34,7 @@ function App() {
 		);
 	}
 
-	return <Register variant={variant} />;
+	return <Register variant={variant} data={data} />;
 }
 
 export default App;

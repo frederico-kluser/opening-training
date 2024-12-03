@@ -22,10 +22,11 @@ export type TypeStorage = {
 
 interface RegisterProps {
 	variant: string;
+	data: TypeStorage;
 }
 
-const Register = ({ variant }: RegisterProps): JSX.Element => {
-	const [save, setSave] = useState<TypeStorage>({});
+const Register = ({ variant, data }: RegisterProps): JSX.Element => {
+	const [save, setSave] = useState<TypeStorage>(data);
 	const [actualFen, setActualFen] = useState(initialFen);
 
 	const [invertedBoard, setInvertedBoard] = useState(false);

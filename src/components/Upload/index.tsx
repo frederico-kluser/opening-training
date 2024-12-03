@@ -43,7 +43,7 @@ const Upload = ({ onFileUpload }: UploadProps) => {
 				id="upload-json"
 				onChange={handleFileChange}
 			/>
-			<Button variant="primary" as="span">
+			<Button variant="primary" as="span" onClick={() => document.getElementById('upload-json')?.click()}>
 				Carregar Treinamento
 			</Button>
 		</>
