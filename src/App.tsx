@@ -29,6 +29,11 @@ function App() {
 		}
 	};
 
+	const handleExist = () => {
+		setVariant('');
+		setData({});
+	};
+
 	if (!variant) {
 		return (
 			<Gap size={16} padding={32} centralize>
@@ -59,7 +64,7 @@ function App() {
 		);
 	}
 
-	return <Register variant={variant} save={data} setSave={setData} />;
+	return <Register variant={variant} save={data} setSave={setData} handleExist={handleExist} />;
 }
 
 export default App;
