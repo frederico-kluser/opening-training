@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 import Register from './components/Register';
 import TypeStorage from './types/TypeStorage';
 import './App.css';
+import isValidTypeStorage from './utils/isValidTypeStorage';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -19,8 +20,13 @@ function App() {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleLoadData = (data: any) => {
 		console.log('data :', data);
-		setData(data);
-		setVariant(Object.keys(data)[0]);
+
+		if (isValidTypeStorage(data)) {
+			setData(data);
+			setVariant(Object.keys(data)[0]);
+		} else {
+			alert('Invalid data');
+		}
 	};
 
 	if (!variant) {
