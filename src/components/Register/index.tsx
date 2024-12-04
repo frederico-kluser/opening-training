@@ -15,9 +15,10 @@ interface RegisterProps {
 	variant: string;
 	save: TypeStorage;
 	setSave: Dispatch<SetStateAction<TypeStorage>>;
+	handleExist: () => void;
 }
 
-const Register = ({ variant, save, setSave }: RegisterProps): JSX.Element => {
+const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.Element => {
 	const [actualFen, setActualFen] = useState(initialFen);
 
 	const [invertedBoard, setInvertedBoard] = useState(false);
@@ -98,7 +99,7 @@ const Register = ({ variant, save, setSave }: RegisterProps): JSX.Element => {
 	return (
 		<Gap size={16} padding={16}>
 			<Gap size={16} horizontal>
-				<Button variant="danger" onClick={() => {}}>
+				<Button variant="danger" onClick={handleExist}>
 					<ImExit color="white" />
 				</Button>
 				<Button
