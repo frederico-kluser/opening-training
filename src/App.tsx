@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
 import { Button } from 'react-bootstrap';
-import Register from './components/Register';
 import TypeStorage from './types/TypeStorage';
 import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
+import Register from './Pages/Register';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
