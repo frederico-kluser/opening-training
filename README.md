@@ -27,63 +27,65 @@ Sistema de treinamento de xadrez com duas vertentes principais: **treino de aber
 
 ## 📊 Status Atual do Projeto
 
-### ✅ Base Sólida Implementada:
-- **Interface de xadrez funcional** com react-chessboard
-- **Lógica de xadrez completa** com chess.js
-- **Sistema de armazenamento** de posições e comentários
-- **Navegação entre posições** (undo/redo)
-- **Persistência local** via localStorage
-- **Upload/Download** de dados JSON
+### ✅ Sistema Completo de Análise e Treinamento:
+- **Stockfish 17 integrado** - Análise profunda de posições (depth 18)
+- **Analisador de Partidas** - Detecta blunders, mistakes e inaccuracies
+- **Gerador de Puzzles** - Cria exercícios dos próprios erros
+- **Puzzle Trainer** - Interface interativa com feedback visual
+- **Sistema de Pontuação** - Streak, estatísticas e progresso
+- **Persistência Completa** - Todos os dados salvos localmente
 
-### 🚀 Pronto para Implementar (com código exemplo):
-- **Engine Stockfish** preparado mas não integrado
-- **GameAnalyzer Component** com análise completa
-- **Detecção de blunders** e classificação de movimentos
-- **Geração de puzzles** a partir dos erros
+### 🎯 Funcionalidades Principais:
+- **Análise PGN** com classificação de movimentos (6 categorias)
+- **ACPL** (Average Centipawn Loss) por cor
+- **Detecção automática** de blunders (>300 centipawns)
+- **Feedback visual** instantâneo (verde/vermelho)
+- **Timer de sessão** e contador de streak
+- **Estatísticas globais** persistentes
 
-### ⚠️ Próximas Implementações:
-- **PuzzleTrainer Component** para resolver puzzles
+### 📈 Próximas Implementações:
 - **Integração Chess.com API** para importar partidas
 - **Sistema de spaced repetition** para otimizar aprendizado
-- **Dashboard de estatísticas** e progresso
+- **Dashboard avançado** com gráficos e insights
+- **Modo multiplayer** para desafios entre usuários
 
-## 🚀 NOVO ROADMAP - Foco em Análise de Erros
+## 🚀 ROADMAP - Sistema de Análise e Treinamento
 
-### **FASE 1: Integração do Stockfish** ✅ [1-2 dias]
+### **FASE 1: Integração do Stockfish** ✅ **[CONCLUÍDA]**
 **Objetivo**: Ter o engine funcionando e analisando posições
 
-- [ ] Baixar e configurar Stockfish WASM em `/public`
-- [ ] Criar `StockfishService.ts` com singleton pattern
-- [ ] Implementar comunicação UCI via Web Workers
-- [ ] Adicionar hook `useStockfish` para componentes
-- [ ] Testar análise básica de posições
+- ✅ Stockfish WASM configurado em `/public`
+- ✅ `StockfishService.ts` com singleton pattern
+- ✅ Comunicação UCI via Web Workers
+- ✅ Hook `useStockfish` para componentes
+- ✅ Análise básica de posições testada
 
-### **FASE 2: Analisador de Partidas** 🚀 [2-3 dias]
+### **FASE 2: Analisador de Partidas** ✅ **[CONCLUÍDA]**
 **Objetivo**: Analisar PGN e detectar erros automaticamente
 
-- [ ] Implementar `GameAnalyzer` component (código fornecido)
-- [ ] Parser de PGN com chess.js
-- [ ] Análise lance a lance com classificação
-- [ ] Cálculo de ACPL (Average Centipawn Loss)
-- [ ] Interface para mostrar estatísticas
+- ✅ `GameAnalyzer` component implementado
+- ✅ Parser de PGN com chess.js
+- ✅ Análise lance a lance com classificação
+- ✅ Cálculo de ACPL (Average Centipawn Loss)
+- ✅ Interface com estatísticas detalhadas
 
-### **FASE 3: Geração de Puzzles** 🎮 [2-3 dias]
+### **FASE 3: Geração de Puzzles** ✅ **[CONCLUÍDA]**
 **Objetivo**: Criar puzzles dos erros detectados
 
-- [ ] Detectar blunders (>300 centipawns loss)
-- [ ] Gerar estrutura de puzzle com solução
-- [ ] Salvar puzzles no localStorage
-- [ ] Interface para listar puzzles gerados
-- [ ] Exportar puzzles para compartilhar
+- ✅ Detecção de blunders (>300 centipawns loss)
+- ✅ Estrutura de puzzle com solução
+- ✅ Salvamento no localStorage
+- ✅ PuzzleService para gerenciamento
+- ✅ Sistema de UUID único por puzzle
 
-### **FASE 4: Puzzle Trainer** 🧩 [3-4 dias]
+### **FASE 4: Puzzle Trainer** ✅ **[CONCLUÍDA]**
 **Objetivo**: Interface para resolver puzzles
 
-- [ ] Componente `PuzzleTrainer`
-- [ ] Sistema de feedback visual (verde/vermelho)
-- [ ] Contador de acertos/erros
-- [ ] Timer e pontuação
-- [ ] Modo "Rush" com puzzles em sequência
+- ✅ Componente `PuzzleTrainer` completo
+- ✅ Feedback visual (verde/vermelho)
+- ✅ Contador de acertos/erros e streak
+- ✅ Timer com formatação mm:ss
+- ✅ Estatísticas globais em tempo real
 
 ### **FASE 5: Integração Chess.com** 🌐 [3-4 dias]
 **Objetivo**: Importar partidas automaticamente
@@ -124,50 +126,44 @@ Sistema de treinamento de xadrez com duas vertentes principais: **treino de aber
 - **react-chessboard**: Tabuleiro interativo
 - **Stockfish WASM**: Engine de análise (a ser integrado)
 
-## 🚀 Setup Imediato - Passo a Passo
+## 🚀 Como Usar o Sistema Completo
 
-### 1️⃣ **Instalar Dependências** (2 minutos)
+### 1️⃣ **Setup Rápido** (Sistema já configurado!)
 ```bash
-# Clone e instale
-git clone https://github.com/seu-usuario/opening-training.git
+# Clone e execute
+git clone https://github.com/frederico-kluser/opening-training.git
 cd opening-training
 npm install
-
-# Dependências adicionais para análise
-npm install events uuid
-npm install --save-dev @types/events @types/uuid
-```
-
-### 2️⃣ **Baixar Stockfish WASM** (5 minutos)
-```bash
-# Na pasta public
-cd public
-wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm
-wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm.js
-cd ..
-```
-
-### 3️⃣ **Criar Estrutura de Pastas** (1 minuto)
-```bash
-mkdir -p src/services
-mkdir -p src/hooks
-mkdir -p src/components/GameAnalyzer
-```
-
-### 4️⃣ **Iniciar Desenvolvimento** (Imediato)
-```bash
 npm run dev
-# Acesse http://localhost:5173
 ```
 
-## ✅ Checklist de Validação da POC
+### 2️⃣ **Fluxo de Uso Completo**
 
-**O sistema está funcionando quando:**
-- [ ] Stockfish carrega sem erros no console
-- [ ] Consegue colar PGN e analisar
-- [ ] Detecta blunders corretamente
-- [ ] Gera puzzles dos erros
-- [ ] Salva puzzles no localStorage
+#### **Passo 1: Analisar uma Partida**
+1. Acesse http://localhost:5173
+2. Clique em **"Analisar Partidas"** (botão azul)
+3. Cole um PGN ou use **"Carregar Exemplo"**
+4. Clique **"Analisar Partida"**
+5. Veja os blunders detectados e estatísticas
+
+#### **Passo 2: Treinar com Puzzles**
+1. Clique em **"Treinar Puzzles"** (botão primário)
+2. Resolva os puzzles gerados dos seus erros
+3. Veja o feedback visual instantâneo:
+   - ✅ Verde = Movimento correto
+   - ❌ Vermelho = Movimento incorreto
+4. Acompanhe seu streak e estatísticas
+
+### 3️⃣ **Recursos Disponíveis**
+
+| Feature | Status | Como Acessar |
+|---------|--------|-------------|
+| Análise de Partidas | ✅ Completo | Botão "Analisar Partidas" |
+| Detecção de Erros | ✅ Completo | Automático na análise |
+| Geração de Puzzles | ✅ Completo | Automático ao detectar blunders |
+| Puzzle Trainer | ✅ Completo | Botão "Treinar Puzzles" |
+| Estatísticas | ✅ Completo | Visível no Puzzle Trainer |
+| Teste Stockfish | ✅ Completo | Botão "Testar Stockfish" |
 
 ## 💻 Código de Exemplo - StockfishService.ts
 
