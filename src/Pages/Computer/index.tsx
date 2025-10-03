@@ -59,7 +59,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 
 		setComment(comment);
-	}, [actualFen]);
+	}, [actualFen, save, variant]);
 
 	const updateActualFen = (newFen: string) => {
 		setSave((prevSave) => {
