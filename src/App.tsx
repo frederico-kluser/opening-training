@@ -7,6 +7,7 @@ import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
 import Register from './Pages/Register';
 import StockfishTest from './components/StockfishTest';
+import GameAnalyzer from './components/GameAnalyzer';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -79,12 +80,22 @@ function App() {
 				>
 					Testar Stockfish
 				</Button>
+				<Button
+					variant="info"
+					onClick={() => setVariant('game-analyzer')}
+				>
+					Analisar Partidas
+				</Button>
 			</Gap>
 		);
 	}
 
 	if (variant === 'stockfish-test') {
 		return <StockfishTest />;
+	}
+
+	if (variant === 'game-analyzer') {
+		return <GameAnalyzer />;
 	}
 
 	return <Register variant={variant} save={data} setSave={setData} handleExist={handleExist} />;
