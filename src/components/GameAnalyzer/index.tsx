@@ -402,7 +402,7 @@ const GameAnalyzer: React.FC = () => {
               )}
             </Card.Title>
 
-            {blunders.map((blunder, idx) => (
+            {blunders.map((blunder) => (
               <Alert key={blunder.id} variant="danger">
                 <strong>Lance {blunder.moveNumber} ({blunder.color}):</strong> {blunder.blunderMove}
                 <br />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Chess, Move } from 'chess.js';
+import { Chess } from 'chess.js';
 import { Button, Card, Alert, Badge, ProgressBar, Row, Col } from 'react-bootstrap';
 import { Chessboard } from 'react-chessboard';
 import puzzleService from '../../services/PuzzleService';
@@ -210,21 +210,21 @@ const PuzzleTrainer: React.FC = () => {
     nextPuzzle();
   };
 
-  // Modo Rush
-  const startRushMode = () => {
-    setSession(prev => ({
-      ...prev,
-      isRushMode: true,
-      startTime: new Date(),
-      puzzleIndex: 0,
-      correctCount: 0,
-      incorrectCount: 0,
-      streak: 0,
-      maxStreak: 0,
-      attemptCount: 0
-    }));
-    loadPuzzles();
-  };
+  // Modo Rush - Funcionalidade futura
+  // const startRushMode = () => {
+  //   setSession(prev => ({
+  //     ...prev,
+  //     isRushMode: true,
+  //     startTime: new Date(),
+  //     puzzleIndex: 0,
+  //     correctCount: 0,
+  //     incorrectCount: 0,
+  //     streak: 0,
+  //     maxStreak: 0,
+  //     attemptCount: 0
+  //   }));
+  //   loadPuzzles();
+  // };
 
   // Resetar sessão
   const resetSession = () => {
@@ -364,7 +364,7 @@ const PuzzleTrainer: React.FC = () => {
               </Alert>
             )}
 
-            <Gap size={8} horizontal className="mt-3">
+            <Gap size={8} horizontal>
               <Button
                 variant="secondary"
                 onClick={skipPuzzle}
