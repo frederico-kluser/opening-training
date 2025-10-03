@@ -8,6 +8,7 @@ import isValidTypeStorage from './utils/isValidTypeStorage';
 import Register from './Pages/Register';
 import StockfishTest from './components/StockfishTest';
 import GameAnalyzer from './components/GameAnalyzer';
+import PuzzleTrainer from './components/PuzzleTrainer';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -86,6 +87,12 @@ function App() {
 				>
 					Analisar Partidas
 				</Button>
+				<Button
+					variant="primary"
+					onClick={() => setVariant('puzzle-trainer')}
+				>
+					Treinar Puzzles
+				</Button>
 			</Gap>
 		);
 	}
@@ -96,6 +103,10 @@ function App() {
 
 	if (variant === 'game-analyzer') {
 		return <GameAnalyzer />;
+	}
+
+	if (variant === 'puzzle-trainer') {
+		return <PuzzleTrainer />;
 	}
 
 	return <Register variant={variant} save={data} setSave={setData} handleExist={handleExist} />;
