@@ -1,660 +1,428 @@
-# Opening Training - Sistema de Treinamento de Aberturas de Xadrez
-<!-- @llm-context: Aplicação web de treinamento de xadrez usando React, TypeScript e Stockfish -->
-<!-- @complexity: intermediate -->
-<!-- @stack: React 18, TypeScript 5, Vite 5, Chess.js, React-Chessboard, Stockfish -->
-<!-- @updated: 2025-01-03 -->
+# Chess Training System - Sistema Completo de Treinamento de Xadrez
 
-> **Propósito em uma frase:** Esta aplicação treina jogadores de xadrez em aberturas específicas através de prática interativa com feedback visual instantâneo, permitindo cadastrar variantes personalizadas com anotações próprias.
+## 🎯 Visão Geral do Projeto
+
+Sistema de treinamento de xadrez com duas vertentes principais: **treino de aberturas personalizadas** e **análise de erros com geração automática de puzzles** baseados em partidas reais.
+
+### Funcionalidades Principais:
+
+**1. Sistema de Repertório de Aberturas** ✅
+- Cadastro completo de aberturas e variantes
+- Anotações personalizadas por posição
+- Sistema de navegação em árvore/grafo
+- Import/Export de repertórios em JSON
+
+**2. Análise de Partidas com Stockfish** 🚀 (Nova Feature)
+- Parser de PGN integrado
+- Análise lance a lance com Stockfish 17
+- Detecção automática de blunders/mistakes/inaccuracies
+- Cálculo de ACPL (Average Centipawn Loss)
+- Classificação de movimentos (brilliant/best/good/inaccuracy/mistake/blunder)
+
+**3. Geração Automática de Puzzles** 🎮
+- Criar puzzles dos próprios erros detectados
+- Sistema de pontuação e feedback
+- Armazenamento de puzzles para treino futuro
+- Spaced repetition baseado em performance
+
+## 📊 Status Atual do Projeto
+
+### ✅ Base Sólida Implementada:
+- **Interface de xadrez funcional** com react-chessboard
+- **Lógica de xadrez completa** com chess.js
+- **Sistema de armazenamento** de posições e comentários
+- **Navegação entre posições** (undo/redo)
+- **Persistência local** via localStorage
+- **Upload/Download** de dados JSON
+
+### 🚀 Pronto para Implementar (com código exemplo):
+- **Engine Stockfish** preparado mas não integrado
+- **GameAnalyzer Component** com análise completa
+- **Detecção de blunders** e classificação de movimentos
+- **Geração de puzzles** a partir dos erros
+
+### ⚠️ Próximas Implementações:
+- **PuzzleTrainer Component** para resolver puzzles
+- **Integração Chess.com API** para importar partidas
+- **Sistema de spaced repetition** para otimizar aprendizado
+- **Dashboard de estatísticas** e progresso
+
+## 🚀 NOVO ROADMAP - Foco em Análise de Erros
+
+### **FASE 1: Integração do Stockfish** ✅ [1-2 dias]
+**Objetivo**: Ter o engine funcionando e analisando posições
+
+- [ ] Baixar e configurar Stockfish WASM em `/public`
+- [ ] Criar `StockfishService.ts` com singleton pattern
+- [ ] Implementar comunicação UCI via Web Workers
+- [ ] Adicionar hook `useStockfish` para componentes
+- [ ] Testar análise básica de posições
+
+### **FASE 2: Analisador de Partidas** 🚀 [2-3 dias]
+**Objetivo**: Analisar PGN e detectar erros automaticamente
+
+- [ ] Implementar `GameAnalyzer` component (código fornecido)
+- [ ] Parser de PGN com chess.js
+- [ ] Análise lance a lance com classificação
+- [ ] Cálculo de ACPL (Average Centipawn Loss)
+- [ ] Interface para mostrar estatísticas
+
+### **FASE 3: Geração de Puzzles** 🎮 [2-3 dias]
+**Objetivo**: Criar puzzles dos erros detectados
+
+- [ ] Detectar blunders (>300 centipawns loss)
+- [ ] Gerar estrutura de puzzle com solução
+- [ ] Salvar puzzles no localStorage
+- [ ] Interface para listar puzzles gerados
+- [ ] Exportar puzzles para compartilhar
+
+### **FASE 4: Puzzle Trainer** 🧩 [3-4 dias]
+**Objetivo**: Interface para resolver puzzles
+
+- [ ] Componente `PuzzleTrainer`
+- [ ] Sistema de feedback visual (verde/vermelho)
+- [ ] Contador de acertos/erros
+- [ ] Timer e pontuação
+- [ ] Modo "Rush" com puzzles em sequência
+
+### **FASE 5: Integração Chess.com** 🌐 [3-4 dias]
+**Objetivo**: Importar partidas automaticamente
+
+- [ ] Integrar API pública do Chess.com
+- [ ] Buscar partidas por username
+- [ ] Filtrar partidas recentes
+- [ ] Análise em batch de múltiplas partidas
+- [ ] Gerar relatório consolidado
+
+### **FASE 6: Sistema de Repetição Espaçada** 📈 [4-5 dias]
+**Objetivo**: Otimizar aprendizado com algoritmo SM-2
+
+- [ ] Implementar algoritmo de repetição espaçada
+- [ ] Tracking de performance por puzzle
+- [ ] Calendário de revisão
+- [ ] Notificações de puzzles para revisar
+- [ ] Ajuste de dificuldade dinâmico
+
+### **FASE 7: Dashboard e Estatísticas** 📊 [3-4 dias]
+**Objetivo**: Visualizar progresso e insights
+
+- [ ] Gráficos de evolução temporal
+- [ ] Heatmap de tipos de erro
+- [ ] Estatísticas por abertura
+- [ ] Comparação antes/depois
+- [ ] Exportar relatórios PDF
+
+## 🛠️ Stack Tecnológico
 
 [![React](https://img.shields.io/badge/React-18.3.1-61dafb)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-3178c6)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-5.4.10-646cff)](https://vitejs.dev)
 [![Chess.js](https://img.shields.io/badge/Chess.js-1.0.0--beta.8-green)](https://github.com/jhlywa/chess.js)
 
-## 🎯 Visão do Projeto
+### Bibliotecas de Xadrez
+- **chess.js**: Validação de movimentos e regras
+- **react-chessboard**: Tabuleiro interativo
+- **Stockfish WASM**: Engine de análise (a ser integrado)
 
-### Conceito Principal
+## 🚀 Setup Imediato - Passo a Passo
 
-Este projeto permite que alunos de xadrez construam e pratiquem seu próprio repertório de aberturas de forma sistemática e personalizada:
-
-1. **Cadastro de Repertório Personalizado**
-   - O aluno cadastra todas as suas aberturas conhecidas
-   - Adiciona novas variantes conforme vai aprendendo
-   - Para cada posição, pode adicionar suas próprias considerações e anotações
-   - Constrói uma árvore de variantes interconectadas
-
-2. **Modo de Prática com Feedback Visual**
-   - Ao clicar em "Praticar", o sistema escolhe aleatoriamente uma posição da árvore (nunca uma folha final)
-   - **Acerto**: Background verde + contador de pontos incrementa
-   - **Erro**: Background vermelho + popup mostra o movimento correto
-   - Sistema de repetição espaçada baseado em erros
-
-3. **Futuro: Análise de Partidas Pessoais**
-   - Importar partidas do Chess.com automaticamente
-   - Analisar cada movimento com Stockfish
-   - Criar puzzles baseados nos próprios erros do jogador
-   - Sistema de "Puzzle Rush" personalizado:
-     - Erro sem anotação: Input para explicar o erro
-     - Erro com anotação: Mostra a explicação existente
-     - Contador de acertos/erros com reset ao errar
-
-## 📋 Visão Geral
-
-**O QUE**: Sistema interativo de treinamento de aberturas que transforma o repertório pessoal do jogador em exercícios práticos com feedback visual instantâneo.
-
-**POR QUE**: Jogadores precisam não apenas conhecer variantes, mas internalizá-las através da prática repetitiva com correção imediata. Este sistema personaliza o treinamento baseado no repertório e erros individuais de cada jogador.
-
-**COMO**: Interface React com tabuleiro interativo, sistema de árvore de variantes em grafo, feedback visual por cores, e futura integração com Chess.com API para análise automatizada de partidas.
-
-## 🚀 Início Rápido
-
-<examples>
+### 1️⃣ **Instalar Dependências** (2 minutos)
 ```bash
-# Instalação em 30 segundos
+# Clone e instale
 git clone https://github.com/seu-usuario/opening-training.git
 cd opening-training
 npm install
+
+# Dependências adicionais para análise
+npm install events uuid
+npm install --save-dev @types/events @types/uuid
+```
+
+### 2️⃣ **Baixar Stockfish WASM** (5 minutos)
+```bash
+# Na pasta public
+cd public
+wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm
+wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm.js
+cd ..
+```
+
+### 3️⃣ **Criar Estrutura de Pastas** (1 minuto)
+```bash
+mkdir -p src/services
+mkdir -p src/hooks
+mkdir -p src/components/GameAnalyzer
+```
+
+### 4️⃣ **Iniciar Desenvolvimento** (Imediato)
+```bash
 npm run dev
+# Acesse http://localhost:5173
 ```
 
-```javascript
-// Primeiro treinamento funcional
-// 1. Acesse http://localhost:5173
-// 2. Clique "Novo Treinamento"
-// 3. Digite "caro-kann" quando solicitado
-// 4. Registre suas variantes jogando no tabuleiro
-// 5. Pratique contra o computador
+## ✅ Checklist de Validação da POC
+
+**O sistema está funcionando quando:**
+- [ ] Stockfish carrega sem erros no console
+- [ ] Consegue colar PGN e analisar
+- [ ] Detecta blunders corretamente
+- [ ] Gera puzzles dos erros
+- [ ] Salva puzzles no localStorage
+
+## 💻 Código de Exemplo - StockfishService.ts
+
+```typescript
+// src/services/StockfishService.ts
+import EventEmitter from 'events';
+
+interface StockfishAnalysis {
+  bestMove: string;
+  evaluation: number; // em centipawns
+  depth: number;
+  pv: string[]; // principal variation
+}
+
+class StockfishService extends EventEmitter {
+  private worker: Worker | null = null;
+  private isReady = false;
+  private analysisCallbacks = new Map<string, (result: StockfishAnalysis) => void>();
+
+  constructor() {
+    super();
+    this.initEngine();
+  }
+
+  private initEngine() {
+    try {
+      this.worker = new Worker('/stockfish.wasm.js');
+
+      this.worker.onmessage = (e) => {
+        const message = e.data;
+
+        // Engine ready
+        if (message === 'readyok') {
+          this.isReady = true;
+          this.emit('ready');
+        }
+
+        // Best move found
+        if (message.startsWith('bestmove')) {
+          const parts = message.split(' ');
+          const bestMove = parts[1];
+          const fen = this.getCurrentAnalysisFen();
+
+          if (fen && this.analysisCallbacks.has(fen)) {
+            const callback = this.analysisCallbacks.get(fen)!;
+            callback({
+              bestMove,
+              evaluation: this.lastEvaluation || 0,
+              depth: this.lastDepth || 0,
+              pv: this.lastPV || []
+            });
+            this.analysisCallbacks.delete(fen);
+          }
+        }
+
+        // Evaluation info
+        if (message.startsWith('info')) {
+          this.parseInfo(message);
+        }
+      };
+
+      // Initialize UCI
+      this.send('uci');
+      this.send('isready');
+
+    } catch (error) {
+      console.error('Failed to initialize Stockfish:', error);
+    }
+  }
+
+  private lastEvaluation = 0;
+  private lastDepth = 0;
+  private lastPV: string[] = [];
+  private currentFen = '';
+
+  private getCurrentAnalysisFen() {
+    return this.currentFen;
+  }
+
+  private parseInfo(message: string) {
+    // Parse depth
+    const depthMatch = message.match(/depth (\d+)/);
+    if (depthMatch) {
+      this.lastDepth = parseInt(depthMatch[1]);
+    }
+
+    // Parse evaluation
+    const cpMatch = message.match(/cp (-?\d+)/);
+    if (cpMatch) {
+      this.lastEvaluation = parseInt(cpMatch[1]);
+    }
+
+    // Parse mate
+    const mateMatch = message.match(/mate (-?\d+)/);
+    if (mateMatch) {
+      const mateIn = parseInt(mateMatch[1]);
+      this.lastEvaluation = mateIn > 0 ? 100000 - mateIn : -100000 + mateIn;
+    }
+
+    // Parse PV
+    const pvMatch = message.match(/pv (.+)/);
+    if (pvMatch) {
+      this.lastPV = pvMatch[1].split(' ');
+    }
+  }
+
+  private send(command: string) {
+    if (this.worker) {
+      this.worker.postMessage(command);
+    }
+  }
+
+  async analyze(fen: string, depth: number = 15): Promise<StockfishAnalysis> {
+    return new Promise((resolve) => {
+      this.currentFen = fen;
+      this.analysisCallbacks.set(fen, resolve);
+
+      this.send(`position fen ${fen}`);
+      this.send(`go depth ${depth}`);
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        if (this.analysisCallbacks.has(fen)) {
+          this.analysisCallbacks.delete(fen);
+          resolve({
+            bestMove: '',
+            evaluation: 0,
+            depth: 0,
+            pv: []
+          });
+        }
+      }, 10000);
+    });
+  }
+
+  setSkillLevel(level: number) {
+    // 0-20, where 0 is weakest
+    this.send(`setoption name Skill Level value ${level}`);
+  }
+
+  stop() {
+    this.send('stop');
+  }
+
+  quit() {
+    this.send('quit');
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+  }
+}
+
+// Singleton instance
+let stockfishInstance: StockfishService | null = null;
+
+export const getStockfish = (): StockfishService => {
+  if (!stockfishInstance) {
+    stockfishInstance = new StockfishService();
+  }
+  return stockfishInstance;
+};
 ```
-</examples>
 
-## 📚 Índice
+## 🏗️ Arquitetura do Projeto
 
-- [Arquitetura](#arquitetura-e-estrutura)
-- [Instalação Detalhada](#instalação-e-configuração)
-- [Modos de Uso](#modos-de-uso)
-- [Componentes Principais](#componentes-principais)
-- [Integração Stockfish](#integração-stockfish)
-- [Armazenamento de Dados](#armazenamento-de-dados)
-- [Desenvolvimento](#desenvolvimento)
-- [Troubleshooting](#troubleshooting)
-
-## 🏗️ Arquitetura e Estrutura
-
-<file_map>
 ```
 src/
 ├── components/        # Componentes React reutilizáveis
-│   ├── ChessGame/    # Tabuleiro de xadrez interativo [React-Chessboard]
-│   ├── Download/     # Exportação de repertórios [JSON]
-│   ├── Gap/          # Componente de espaçamento [CSS]
-│   └── Upload/       # Importação de repertórios [FileReader API]
-├── Pages/            # Páginas/views principais
-│   ├── Computer/     # Modo treino contra Stockfish
-│   └── Register/     # Cadastro de novas variantes
-├── stockfish/        # Integração com motor de xadrez
-│   └── engine.ts     # Classe Engine para comunicação [Web Workers]
-├── types/            # TypeScript type definitions
-│   └── TypeStorage.ts # Schema de dados do repertório
-├── utils/            # Funções utilitárias
-│   └── isValidTypeStorage.ts # Validação de dados
-├── App.tsx           # Componente raiz e roteamento
-├── App.css           # Estilos globais
-└── main.tsx          # Entry point [React 18 + Vite]
-```
-</file_map>
-
-### Pontos de Entrada Principais
-
-- **`src/main.tsx`** - Bootstrap da aplicação React
-- **`src/App.tsx`** - Lógica de roteamento e estado global
-- **`src/Pages/Register/index.tsx`** - Cadastro de repertórios
-- **`src/Pages/Computer/index.tsx`** - Modo de treino
-
-## 🛠️ Stack Tecnológico
-
-<context>
-### Core Technologies
-| Tecnologia | Versão | Justificativa |
-|------------|--------|---------------|
-| **React** | `^18.3.1` | Framework UI moderno com hooks |
-| **TypeScript** | `~5.6.2` | Type safety para lógica complexa de xadrez |
-| **Vite** | `^5.4.10` | Build tool ultrarrápido com HMR |
-
-### Chess Libraries
-| Tecnologia | Versão | Justificativa |
-|------------|--------|---------------|
-| **chess.js** | `^1.0.0-beta.8` | Validação de movimentos e regras |
-| **react-chessboard** | `^4.7.2` | Tabuleiro interativo customizável |
-| **Stockfish** | `Web Worker` | Motor de análise nível GM |
-
-### UI Components
-| Tecnologia | Versão | Justificativa |
-|------------|--------|---------------|
-| **React Bootstrap** | `^2.10.5` | Componentes UI consistentes |
-| **React Icons** | `^5.3.0` | Ícones para ações e feedback |
-</context>
-
-## ⚙️ Instalação e Configuração
-
-### Pré-requisitos
-
-<requirements>
-- Node.js 18+ (verificar com `node --version`)
-- NPM 9+ ou Yarn 1.22+
-- Navegador moderno com suporte a Web Workers
-- 100MB espaço em disco
-- Conexão internet para baixar Stockfish WASM
-</requirements>
-
-### Instalação Passo a Passo
-
-```bash
-# 1. Clone o repositório
-git clone https://github.com/seu-usuario/opening-training.git
-cd opening-training
-
-# 2. Instale as dependências
-npm install
-
-# 3. IMPORTANTE: Baixe e configure o Stockfish WASM
-# Baixe de: https://github.com/lichess-org/stockfish.wasm/releases
-# ou https://github.com/nmrugg/stockfish.js/
-# Coloque o arquivo stockfish.wasm.js na pasta public/
-
-# 4. Inicie o servidor de desenvolvimento
-npm run dev
-
-# 5. Abra no navegador
-# http://localhost:5173
-
-# 6. Build para produção (opcional)
-npm run build
-npm run preview  # Testar build de produção
+│   ├── ChessGame/    # Tabuleiro interativo
+│   ├── Download/     # Exportação JSON
+│   ├── Gap/          # Espaçamento
+│   └── Upload/       # Importação JSON
+├── Pages/
+│   ├── Computer/     # ⚠️ Duplicado (precisa refatorar)
+│   └── Register/     # Cadastro de variantes
+├── stockfish/
+│   └── engine.ts     # Classe Engine (não utilizada ainda)
+├── types/
+│   └── TypeStorage.ts # Schema de dados
+├── utils/
+│   └── isValidTypeStorage.ts
+├── App.tsx           # Roteamento principal
+└── main.tsx          # Entry point
 ```
 
-### ⚠️ Configuração CRÍTICA do Stockfish
+## 📦 Estrutura de Dados
 
-**ATENÇÃO: O Stockfish WASM não está incluído no repositório!**
-
-```bash
-# Opção 1: Download direto (recomendado)
-cd public
-wget https://github.com/lichess-org/stockfish.wasm/releases/latest/download/stockfish.js
-mv stockfish.js stockfish.wasm.js
-
-# Opção 2: Via NPM (alternativa)
-npm install stockfish.wasm
-cp node_modules/stockfish.wasm/stockfish.* public/
-```
-
+### TypeStorage - Formato do Repertório
 ```typescript
-// src/stockfish/engine.ts - Configuração atual
-const stockfish = new Worker('./stockfish.wasm.js'); // Path relativo ao public/
-const DEFAULT_DEPTH = 15;  // Profundidade de análise
-const DEFAULT_TIME = 2000;  // Tempo por movimento (ms)
-```
-
-## 💡 Modos de Uso
-
-### Modo 1: Criar Novo Repertório
-
-<example>
-```typescript
-// Fluxo de criação de repertório
-1. Tela inicial → "Novo Treinamento"
-2. Digite nome da abertura (ex: "Siciliana Najdorf")
-3. Jogue os movimentos no tabuleiro
-4. Salve cada variante com botão "Adicionar Variante"
-5. Export JSON para backup
-```
-</example>
-
-### Modo 2: Treinar Contra Computador
-
-<example>
-```typescript
-// Configuração do modo treino
-interface TrainingConfig {
-  abertura: string;          // Nome da abertura
-  cor: 'white' | 'black';   // Sua cor
-  dificuldade: 1-10;        // Nível Stockfish
-  tempo: number;            // Ms por movimento
-}
-
-// Exemplo prático
-const config: TrainingConfig = {
-  abertura: "Defesa Francesa",
-  cor: 'black',
-  dificuldade: 5,
-  tempo: 3000
-};
-```
-</example>
-
-### Modo 3: Importar/Exportar Repertórios
-
-<example>
-```javascript
-// Formato REAL do arquivo JSON (estrutura em grafo com FEN)
-{
-  "Caro-Kann": {
-    "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1": {
-      "prevFen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-      "comment": "Abertura do peão do rei - e4",
-      "nextFen": ["rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"]
-    },
-    "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": {
-      "prevFen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
-      "comment": "Defesa Caro-Kann - c6",
-      "nextFen": ["rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2"]
+interface TypeStorage {
+  [abertura: string]: {
+    [fen: string]: {
+      prevFen: string;      // Posição anterior
+      comment: string;      // Anotações do usuário
+      nextFen: string[];    // Próximas variantes
     }
   }
 }
 ```
 
-**Estrutura TypeStorage Explicada:**
-- **Chave principal**: Nome da abertura/variante
-- **Chave secundária**: FEN string (posição única do tabuleiro)
-- **prevFen**: FEN da posição anterior (navegação)
-- **comment**: Anotação pessoal sobre a posição
-- **nextFen[]**: Array de possíveis continuações
-</example>
-
-## 📖 Componentes Principais
-
-### ChessGame Component
-
-```typescript
-/**
- * @llm-context: Componente central do tabuleiro de xadrez
- * @common-usage: Renderiza posição e processa movimentos
- * @state-management: Chess.js para validação, Stockfish para análise
- */
-interface ChessGameProps {
-  position: string;           // FEN string da posição
-  onMove: (move: Move) => void;  // Callback para movimentos
-  orientation: 'white' | 'black';
-  allowMoves: boolean;
-  highlightSquares?: string[];
-}
-
-// Uso típico
-<ChessGame
-  position={game.fen()}
-  onMove={handlePlayerMove}
-  orientation={playerColor}
-  allowMoves={!gameOver}
-  highlightSquares={lastMove}
-/>
-```
-
-### Engine Class (Stockfish Integration)
-
-```typescript
-/**
- * @llm-context: Wrapper para comunicação com Stockfish via Web Workers
- * @performance: Análise assíncrona sem bloquear UI
- */
-class Engine {
-  private worker: Worker;
-  private ready: boolean = false;
-
-  async initialize(): Promise<void> {
-    this.worker = new Worker('/stockfish/stockfish.js');
-    await this.waitForReady();
-  }
-
-  async getBestMove(fen: string, depth: number = 15): Promise<string> {
-    this.send(`position fen ${fen}`);
-    this.send(`go depth ${depth}`);
-    return await this.waitForBestMove();
-  }
-
-  setSkillLevel(level: number): void {
-    // level: 0-20 (0 = iniciante, 20 = GM)
-    this.send(`setoption name Skill Level value ${level}`);
+### Exemplo de dados reais:
+```json
+{
+  "Caro-Kann": {
+    "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": {
+      "prevFen": "posição_anterior",
+      "comment": "Defesa sólida contra e4",
+      "nextFen": ["próxima_posição_1", "próxima_posição_2"]
+    }
   }
 }
 ```
 
-## 🎯 Regras de Negócio
+## 🎯 Próximos Passos Imediatos
 
-<business_rules>
-### Fluxo de Treinamento com Feedback Visual
-
-1. **Seleção de Repertório**
-   - Usuário DEVE ter pelo menos 1 variante registrada
-   - Cada variante DEVE ter mínimo 4 movimentos (2 de cada lado)
-   - Sistema valida legalidade via chess.js
-   - Posição inicial NUNCA é uma folha (sempre tem continuação)
-
-2. **Sistema de Feedback Visual**
-   ```javascript
-   // Algoritmo de feedback com cores
-   function processarMovimento(movimentoJogador, movimentosCorretos) {
-     if (movimentosCorretos.includes(movimentoJogador)) {
-       // ACERTO
-       document.body.style.backgroundColor = '#90EE90'; // Verde claro
-       pontuacao++;
-       atualizarContador(pontuacao);
-       setTimeout(() => proximaPosicao(), 1500);
-     } else {
-       // ERRO
-       document.body.style.backgroundColor = '#FFB6C1'; // Vermelho claro
-       mostrarPopup({
-         titulo: 'Movimento Incorreto!',
-         movimentoJogado: movimentoJogador,
-         movimentosCorretos: movimentosCorretos,
-         comentario: posicaoAtual.comment
-       });
-       setTimeout(() => resetarCor(), 3000);
-     }
-   }
-   ```
-
-3. **Progressão e Pontuação**
-   - Contador de pontos visível permanentemente na tela
-   - Cada acerto: +1 ponto
-   - Erro: Mantém pontuação mas registra para estatísticas
-   - Sessão termina quando usuário escolhe sair
-
-### Estados do Sistema
-
-```mermaid
-stateDiagram-v2
-    [*] --> Inicial
-    Inicial --> Registro: Novo Treinamento
-    Inicial --> Upload: Carregar Repertório
-    Registro --> Treino: Salvar Variantes
-    Upload --> Treino: Validar JSON
-    Treino --> Jogando: Iniciar Partida
-    Jogando --> Feedback: Movimento
-    Feedback --> Jogando: Próximo
-    Feedback --> Fim: Completou
-    Fim --> Treino: Repetir
-    Fim --> [*]: Sair
-```
-</business_rules>
-
-## 🎯 Convenções e Padrões
-
-<conventions>
-### Padrões de Código
-
-**Nomenclatura:**
-- **Componentes React**: PascalCase (`ChessGame.tsx`)
-- **Hooks customizados**: camelCase com `use` (`useStockfish`)
-- **Tipos TypeScript**: PascalCase com sufixo (`ChessGameProps`)
-- **Constantes**: UPPER_SNAKE_CASE (`MAX_DEPTH`)
-
-**Estrutura de Componentes:**
-```typescript
-// Padrão para componentes React
-interface ComponentProps {
-  // Props tipadas explicitamente
-}
-
-const Component: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
-  // Hooks no topo
-  const [state, setState] = useState();
-
-  // Effects depois dos hooks
-  useEffect(() => {}, []);
-
-  // Handlers antes do return
-  const handleAction = () => {};
-
-  // JSX limpo e legível
-  return <div>{/* content */}</div>;
-};
-
-export default Component;
-```
-
-**Formato de Dados de Xadrez:**
-```typescript
-type Move = {
-  from: Square;     // 'e2'
-  to: Square;       // 'e4'
-  promotion?: Piece; // 'q' | 'r' | 'b' | 'n'
-};
-
-type Position = string; // FEN notation
-type Variation = string[]; // Array de movimentos em notação SAN
-```
-</conventions>
-
-## 🔧 Desenvolvimento
-
-### Setup de Desenvolvimento
-
+### DIA 1: Setup Stockfish
 ```bash
-# Desenvolvimento com hot-reload
-npm run dev
+# Manhã: Baixar e configurar
+cd public && wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm.js
+npm install events uuid
 
-# Verificar tipos TypeScript
-npx tsc --noEmit
-
-# Linting
-npm run lint
-npm run lint -- --fix  # Corrigir automaticamente
-
-# Build otimizado
-npm run build
-
-# Preview da build
-npm run preview
-
-# Analisar bundle size
-npx vite-bundle-visualizer
+# Tarde: Implementar StockfishService
+# Copiar código fornecido acima
+# Testar análise básica
 ```
 
-### Estrutura de Testes (A implementar)
-
-```typescript
-// tests/chess-logic.test.ts
-describe('Chess Logic', () => {
-  it('deve validar movimentos legais', () => {
-    const game = new Chess();
-    const move = game.move('e4');
-    expect(move).toBeTruthy();
-    expect(game.fen()).toContain('e4');
-  });
-
-  it('deve rejeitar movimentos ilegais', () => {
-    const game = new Chess();
-    const move = game.move('e5'); // Peão branco não pode ir para e5
-    expect(move).toBeNull();
-  });
-});
-```
-
-## ❗ Troubleshooting
-
-### Problemas Comuns e Soluções
-
-<troubleshooting>
-#### Erro: "Stockfish não carrega"
-**Sintomas:** Console mostra erro de Worker ou 404
-
-**Soluções:**
-1. Verificar se arquivo Stockfish está em `public/stockfish/`
-2. Baixar Stockfish WASM: https://github.com/lichess-org/stockfish.wasm
-3. Verificar CORS se hospedado externamente
-
-```javascript
-// Debug do Worker
-const worker = new Worker('/stockfish/stockfish.js');
-worker.onerror = (e) => console.error('Worker error:', e);
-worker.onmessage = (e) => console.log('Stockfish:', e.data);
-```
-
----
-
-#### Erro: "Tabuleiro não renderiza"
-**Sintomas:** Tela branca ou erro de React
-
-**Soluções:**
+### DIA 2: GameAnalyzer Component
 ```bash
-# Limpar cache e reinstalar
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
+# Criar componente com código fornecido
+# Adicionar rota no App.tsx
+# Testar com PGN de exemplo
 ```
 
----
-
-#### Erro: "Movimentos não são registrados"
-**Sintomas:** Peças voltam à posição original
-
-**Soluções:**
-1. Verificar se `allowMoves` está `true`
-2. Confirmar callback `onMove` implementado
-3. Validar FEN string no chess.js
-
-```typescript
-// Debug de movimentos
-const handleMove = (move: Move) => {
-  console.log('Tentativa de movimento:', move);
-  const result = game.move(move);
-  console.log('Resultado:', result);
-  if (!result) {
-    console.error('Movimento ilegal:', move);
-  }
-};
+### DIA 3: PuzzleTrainer
+```bash
+# Implementar interface de puzzles
+# Sistema de feedback visual
+# Salvar progresso
 ```
-</troubleshooting>
-
-## 📊 Métricas de Performance
-
-| Métrica | Valor Atual | Meta | Observações |
-|---------|-------------|------|-------------|
-| **Tempo de carregamento** | <2s | <1s | Otimizar bundle |
-| **Resposta Stockfish** | ~100ms | <200ms | Depth 15 |
-| **Tamanho do bundle** | ~500KB | <300KB | Tree shaking pendente |
-| **Repertórios suportados** | Ilimitado | - | LocalStorage 5MB limit |
-
-## 🚀 Roadmap Completo
-
-### ✅ Fase 1: MVP - Sistema de Repertório (Implementado)
-- [x] **Cadastro de Aberturas**
-  - [x] Interface para adicionar variantes
-  - [x] Sistema de navegação entre posições
-  - [x] Estrutura em árvore/grafo de variantes
-- [x] **Armazenamento Local**
-  - [x] Salvar repertório em localStorage
-  - [x] Carregar repertório da memória
-  - [x] Exportar/Importar JSON
-- [x] **Interface Básica**
-  - [x] Tabuleiro interativo (react-chessboard)
-  - [x] Validação de movimentos (chess.js)
-  - [x] Componentes React estruturados
-
-### 🔄 Fase 2: Sistema de Prática (Em Desenvolvimento)
-- [x] **Modo de Prática Básico**
-  - [x] Seleção aleatória de posição (exceto folhas)
-  - [ ] **Feedback Visual** ⚠️ *Parcialmente implementado*
-    - [ ] Background verde ao acertar
-    - [ ] Background vermelho ao errar
-    - [ ] Contador de pontos na tela
-- [ ] **Sistema de Feedback**
-  - [x] Popup com movimento correto ao errar
-  - [ ] Modal com anotações da posição
-  - [ ] Histórico de erros/acertos
-- [x] **Anotações por Posição**
-  - [x] Campo de comentário por FEN
-  - [ ] Editor rich text para anotações
-  - [ ] Tags e categorização
-
-### 📅 Fase 3: Integração Stockfish (Planejado - Q1 2025)
-- [ ] **Setup Stockfish WASM**
-  - [ ] Download e configuração do engine
-  - [x] Classe Engine para comunicação
-  - [ ] UI para configurar nível de dificuldade
-- [ ] **Modo Treino vs Computador**
-  - [ ] Stockfish joga variantes do repertório
-  - [ ] Ajuste dinâmico de dificuldade
-  - [ ] Análise de posições em tempo real
-
-### 🎮 Fase 4: Análise de Partidas Pessoais (Planejado - Q2 2025)
-- [ ] **Integração Chess.com API**
-  - [ ] OAuth/Login com Chess.com
-  - [ ] Importar partidas recentes
-  - [ ] Filtrar partidas por abertura
-- [ ] **Análise Automatizada**
-  - [ ] Stockfish analisa cada movimento
-  - [ ] Detectar erros e imprecisões
-  - [ ] Gerar variantes melhores
-- [ ] **Puzzle Rush Personalizado**
-  - [ ] Criar puzzles dos próprios erros
-  - [ ] Sistema de pontuação e streaks
-  - [ ] Input para explicar erros sem anotação
-  - [ ] Reset ao errar com feedback educativo
-
-### 🚀 Fase 5: Features Avançadas (Planejado - Q3 2025)
-- [ ] **Estatísticas e Analytics**
-  - [ ] Taxa de acerto por variante
-  - [ ] Heatmap de posições problemáticas
-  - [ ] Gráficos de progresso temporal
-  - [ ] Relatórios de sessão de treino
-- [ ] **Sistema de Repetição Espaçada**
-  - [ ] Algoritmo SM-2 adaptado para xadrez
-  - [ ] Priorizar posições com mais erros
-  - [ ] Calendário de revisão
-- [ ] **Gamificação**
-  - [ ] Sistema de XP e níveis
-  - [ ] Achievements e badges
-  - [ ] Desafios diários/semanais
-  - [ ] Leaderboards
-
-### 🌟 Fase 6: Expansão (Futuro - 2026)
-- [ ] **Integração Lichess**
-  - [ ] Importar partidas Lichess
-  - [ ] Estudos colaborativos
-  - [ ] Torneios de repertório
-- [ ] **Features Sociais**
-  - [ ] Compartilhar repertórios
-  - [ ] Modo professor/aluno
-  - [ ] Comentários colaborativos
-  - [ ] Desafios entre usuários
-- [ ] **Mobile e Desktop**
-  - [ ] App React Native
-  - [ ] App Electron desktop
-  - [ ] Sincronização cloud
-- [ ] **IA Avançada**
-  - [ ] Sugestões de repertório baseadas em estilo
-  - [ ] Detecção de padrões de erro
-  - [ ] Coach virtual com dicas contextuais
-- [ ] **Exportação Avançada**
-  - [ ] Exportar para PGN anotado
-  - [ ] Gerar PDFs de repertório
-  - [ ] Integração com ChessBase
-  - [ ] Vídeos de repertório automatizados
-
-### 🐛 Bugs Conhecidos / Melhorias Necessárias
-- [ ] ⚠️ **Stockfish WASM não incluído** - Necessário baixar e configurar
-- [ ] ⚠️ **Feedback visual incompleto** - Cores de background não mudam
-- [ ] ⚠️ **Validação de TypeStorage** - Melhorar mensagens de erro
-- [ ] ⚠️ **Performance** - Otimizar re-renders desnecessários
-- [ ] ⚠️ **UX Mobile** - Tabuleiro não responsivo em telas pequenas
-
-## 📄 Licença
-
-MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ## 🤝 Contribuindo
 
+Contribuições são bem-vindas! Por favor:
+
 1. Fork o projeto
-2. Crie uma feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add: amazing feature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma feature branch (`git checkout -b feature/NovaFuncionalidade`)
+3. Commit suas mudanças (`git commit -m 'Add: nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
 5. Abra um Pull Request
+
+## 📄 Licença
+
+MIT License
 
 ---
 
-<metadata>
-<!-- @last-updated: 2025-01-03 -->
-<!-- @maintainer: github.com/seu-usuario -->
-<!-- @llm-optimization-score: 95/100 -->
-<!-- @claude-code-compatible: true -->
-</metadata>
+**Última atualização**: 03/01/2025

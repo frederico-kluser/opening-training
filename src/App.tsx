@@ -6,6 +6,7 @@ import TypeStorage from './types/TypeStorage';
 import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
 import Register from './Pages/Register';
+import StockfishTest from './components/StockfishTest';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -72,8 +73,18 @@ function App() {
 				>
 					Treinar minhas partidas
 				</Button>
+				<Button
+					variant="warning"
+					onClick={() => setVariant('stockfish-test')}
+				>
+					Testar Stockfish
+				</Button>
 			</Gap>
 		);
+	}
+
+	if (variant === 'stockfish-test') {
+		return <StockfishTest />;
 	}
 
 	return <Register variant={variant} save={data} setSave={setData} handleExist={handleExist} />;
