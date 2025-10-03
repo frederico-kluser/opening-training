@@ -60,6 +60,18 @@ function App() {
 				>
 					Novo Treinamento
 				</Button>
+				<Button
+					variant="danger"
+					onClick={() => {
+						const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
+
+						if (user) {
+							window.open(`https://www.chess.com/member/${user}/games`);
+						}
+					}}
+				>
+					Treinar minhas partidas
+				</Button>
 			</Gap>
 		);
 	}
