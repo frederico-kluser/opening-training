@@ -1,13 +1,13 @@
 import { Button, Form } from 'react-bootstrap';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Chess, Move } from 'chess.js';
-import Gap from '../Gap';
 import { FaRedo, FaUndo } from 'react-icons/fa';
 import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
 import { ImExit } from 'react-icons/im';
-import ChessGame from '../ChessGame';
-import Download from '../Download';
 import TypeStorage from '../../types/TypeStorage';
+import Gap from '../../components/Gap';
+import Download from '../../components/Download';
+import ChessGame from '../../components/ChessGame';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -59,7 +59,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 
 		setComment(comment);
-	}, [actualFen]);
+	}, [actualFen, save, variant]);
 
 	const updateActualFen = (newFen: string) => {
 		setSave((prevSave) => {
