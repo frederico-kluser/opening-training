@@ -274,12 +274,12 @@ const PuzzleTrainer: React.FC = () => {
   }
 
   return (
-    <div style={{ ...backgroundStyle, minHeight: '100vh', padding: '16px' }}>
+    <div className="container-fluid" style={{ ...backgroundStyle, minHeight: '100vh', padding: '16px' }}>
       <Gap size={16}>
         <Card>
           <Card.Body>
             <Row>
-              <Col md={8}>
+              <Col xs={12} md={8}>
                 <h4>
                   Puzzle {session.puzzleIndex + 1} de {session.totalPuzzles}
                   {session.currentPuzzle && (
@@ -289,7 +289,7 @@ const PuzzleTrainer: React.FC = () => {
                   )}
                 </h4>
               </Col>
-              <Col md={4} className="text-end">
+              <Col xs={12} md={4} className="text-end">
                 <Badge bg="success" className="me-2">✓ {session.correctCount}</Badge>
                 <Badge bg="danger" className="me-2">✗ {session.incorrectCount}</Badge>
                 <Badge bg="info">🔥 {session.streak}</Badge>
@@ -302,7 +302,7 @@ const PuzzleTrainer: React.FC = () => {
             />
 
             <Row>
-              <Col md={6}>
+              <Col xs={12} md={6}>
                 <p>
                   <strong>Tempo:</strong> {formatTime(timeElapsed)}<br/>
                   <strong>Streak Máximo:</strong> {session.maxStreak}<br/>
@@ -313,7 +313,7 @@ const PuzzleTrainer: React.FC = () => {
                   }%
                 </p>
               </Col>
-              <Col md={6} className="text-end">
+              <Col xs={12} md={6} className="text-md-end text-start mt-3 mt-md-0">
                 {session.currentPuzzle && (
                   <div>
                     <Badge bg={session.currentPuzzle.color === 'white' ? 'light' : 'dark'}>
@@ -333,13 +333,15 @@ const PuzzleTrainer: React.FC = () => {
 
         <Card>
           <Card.Body>
-            <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-              <Chessboard
-                position={game.fen()}
-                onPieceDrop={onDrop}
-                boardOrientation={boardOrientation}
-                arePiecesDraggable={!showFeedback}
-              />
+            <div className="d-flex justify-content-center">
+              <div style={{ width: '100%', maxWidth: '500px' }}>
+                <Chessboard
+                  position={game.fen()}
+                  onPieceDrop={onDrop}
+                  boardOrientation={boardOrientation}
+                  arePiecesDraggable={!showFeedback}
+                />
+              </div>
             </div>
 
             {showFeedback === 'correct' && (
@@ -392,16 +394,16 @@ const PuzzleTrainer: React.FC = () => {
           <Card.Body>
             <h5>Estatísticas Globais</h5>
             <Row>
-              <Col md={3}>
+              <Col xs={6} md={3}>
                 <p><strong>Total de Puzzles:</strong> {stats.totalPuzzles}</p>
               </Col>
-              <Col md={3}>
+              <Col xs={6} md={3}>
                 <p><strong>Resolvidos:</strong> {stats.solvedPuzzles}</p>
               </Col>
-              <Col md={3}>
+              <Col xs={6} md={3}>
                 <p><strong>Taxa de Sucesso:</strong> {stats.successRate.toFixed(1)}%</p>
               </Col>
-              <Col md={3}>
+              <Col xs={6} md={3}>
                 <p><strong>Média de Tentativas:</strong> {stats.averageAttempts.toFixed(1)}</p>
               </Col>
             </Row>

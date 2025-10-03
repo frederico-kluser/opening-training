@@ -35,6 +35,8 @@ const GameAnalyzer: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [savedPuzzlesCount, setSavedPuzzlesCount] = useState(0);
+  const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(null);
+  const [showColorModal, setShowColorModal] = useState(false);
 
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
@@ -58,13 +60,20 @@ const GameAnalyzer: React.FC = () => {
     }
   };
 
-  // Analisar partida completa
-  const analyzeGame = useCallback(async () => {
+  // Iniciar análise - primeiro pergunta a cor
+  const startAnalysis = useCallback(() => {
     if (!pgn.trim()) {
       setError('Por favor, insira uma partida em formato PGN');
       return;
     }
+    setShowColorModal(true);
+  }, [pgn]);
 
+  // Analisar partida completa
+  const analyzeGame = useCallback(async () => {
+    if (!playerColor) return;
+
+    setShowColorModal(false);
     setIsAnalyzing(true);
     setError('');
     setAnalysis([]);
@@ -142,8 +151,9 @@ const GameAnalyzer: React.FC = () => {
 
         moveAnalyses.push(moveAnalysis);
 
-        // Se for blunder, criar puzzle
-        if (classification === 'blunder' && cpLoss > 300) {
+        // Se for blunder do jogador selecionado, criar puzzle
+        const moveColor = isWhiteTurn ? 'white' : 'black';
+        if (classification === 'blunder' && cpLoss > 300 && moveColor === playerColor) {
           foundBlunders.push({
             id: `blunder-${i}`,
             fenBefore: positions[i],
@@ -181,7 +191,7 @@ const GameAnalyzer: React.FC = () => {
       setIsAnalyzing(false);
       setProgress({ current: 0, total: 0 });
     }
-  }, [pgn]);
+  }, [pgn, playerColor]);
 
   // Estatísticas da análise
   const getStats = () => {
@@ -243,6 +253,42 @@ const GameAnalyzer: React.FC = () => {
 
   return (
     <Gap size={16}>
+      {/* Modal de seleção de cor */}
+      <Modal show={showColorModal} onHide={() => setShowColorModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Selecione sua cor nesta partida</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="d-flex justify-content-around p-3">
+            <Button
+              variant="light"
+              size="lg"
+              onClick={() => {
+                setPlayerColor('white');
+                analyzeGame();
+              }}
+              className="d-flex flex-column align-items-center p-4 border"
+            >
+              <div style={{ fontSize: '48px' }}>♔</div>
+              <span className="mt-2">Brancas</span>
+            </Button>
+            <Button
+              variant="dark"
+              size="lg"
+              onClick={() => {
+                setPlayerColor('black');
+                analyzeGame();
+              }}
+              className="d-flex flex-column align-items-center p-4"
+            >
+              <div style={{ fontSize: '48px' }}>♚</div>
+              <span className="mt-2">Pretas</span>
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal de sucesso */}
       <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Puzzles Salvos com Sucesso!</Modal.Title>
@@ -285,7 +331,7 @@ const GameAnalyzer: React.FC = () => {
             <Gap size={8} horizontal>
               <Button
                 variant="primary"
-                onClick={analyzeGame}
+                onClick={startAnalysis}
                 disabled={isAnalyzing || !pgn.trim()}
               >
                 {isAnalyzing ? 'Analisando...' : 'Analisar Partida'}

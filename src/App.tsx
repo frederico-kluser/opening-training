@@ -39,61 +39,74 @@ function App() {
 
 	if (!variant) {
 		return (
-			<Gap size={16} padding={32} centralize>
-				<Upload onFileUpload={handleLoadData} />
-				<Button
-					variant="success"
-					onClick={() => {
-						const data = localStorage.getItem('data');
-						handleLoadData(data ? JSON.parse(data) : {});
-					}}
-					disabled={(() => {
-						const data = localStorage.getItem('data');
-						return !data;
-					})()}
-				>
-					Carregar da Memória
-				</Button>
-				<Button
-					variant="secondary"
-					onClick={() => {
-						const trainingName = prompt('Digite o nome do que quer treinar', 'caro-kann');
-						setVariant(trainingName || '');
-					}}
-				>
-					Novo Treinamento
-				</Button>
-				<Button
-					variant="danger"
-					onClick={() => {
-						const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
+			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3">
+				<div className="row w-100">
+					<div className="col-12 col-md-8 col-lg-6 col-xl-4 mx-auto">
+						<Gap size={16} centralize>
+							<h2 className="text-center mb-4">Opening Training</h2>
+							<Upload onFileUpload={handleLoadData} />
+							<Button
+								variant="success"
+								className="w-100"
+								onClick={() => {
+									const data = localStorage.getItem('data');
+									handleLoadData(data ? JSON.parse(data) : {});
+								}}
+								disabled={(() => {
+									const data = localStorage.getItem('data');
+									return !data;
+								})()}
+							>
+								Carregar da Memória
+							</Button>
+							<Button
+								variant="secondary"
+								className="w-100"
+								onClick={() => {
+									const trainingName = prompt('Digite o nome do que quer treinar', 'caro-kann');
+									setVariant(trainingName || '');
+								}}
+							>
+								Novo Treinamento
+							</Button>
+							<Button
+								variant="danger"
+								className="w-100"
+								onClick={() => {
+									const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
 
-						if (user) {
-							window.open(`https://www.chess.com/member/${user}/games`);
-						}
-					}}
-				>
-					Treinar minhas partidas
-				</Button>
-				<Button
-					variant="warning"
-					onClick={() => setVariant('stockfish-test')}
-				>
-					Testar Stockfish
-				</Button>
-				<Button
-					variant="info"
-					onClick={() => setVariant('game-analyzer')}
-				>
-					Analisar Partidas
-				</Button>
-				<Button
-					variant="primary"
-					onClick={() => setVariant('puzzle-trainer')}
-				>
-					Treinar Puzzles
-				</Button>
-			</Gap>
+									if (user) {
+										window.open(`https://www.chess.com/member/${user}/games`);
+									}
+								}}
+							>
+								Treinar minhas partidas
+							</Button>
+							<Button
+								variant="warning"
+								className="w-100"
+								onClick={() => setVariant('stockfish-test')}
+							>
+								Testar Stockfish
+							</Button>
+							<Button
+								variant="info"
+								className="w-100"
+								onClick={() => setVariant('game-analyzer')}
+							>
+								Analisar Partidas
+							</Button>
+							<Button
+								variant="primary"
+								className="w-100"
+								onClick={() => setVariant('puzzle-trainer')}
+							>
+								Treinar Puzzles
+							</Button>
+						</Gap>
+					</div>
+				</div>
+			</div>
 		);
 	}
 
