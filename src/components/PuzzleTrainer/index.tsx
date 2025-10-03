@@ -16,6 +16,7 @@ interface PuzzleSession {
   maxStreak: number;
   startTime: Date;
   isRushMode: boolean;
+  attemptCount: number; // Contador de tentativas para o puzzle atual
 }
 
 const PuzzleTrainer: React.FC = () => {
@@ -28,7 +29,8 @@ const PuzzleTrainer: React.FC = () => {
     streak: 0,
     maxStreak: 0,
     startTime: new Date(),
-    isRushMode: false
+    isRushMode: false,
+    attemptCount: 0
   });
 
   const [game, setGame] = useState(new Chess());
@@ -68,7 +70,7 @@ const PuzzleTrainer: React.FC = () => {
       const puzzle = puzzles[session.puzzleIndex];
       const newGame = new Chess(puzzle.fenBefore);
       setGame(newGame);
-      setSession(prev => ({ ...prev, currentPuzzle: puzzle }));
+      setSession(prev => ({ ...prev, currentPuzzle: puzzle, attemptCount: 0 }));
       setBoardOrientation(puzzle.color);
       setShowFeedback(null);
       setShowSolution(false);
@@ -148,15 +150,19 @@ const PuzzleTrainer: React.FC = () => {
 
   // Movimento incorreto
   const handleIncorrectMove = () => {
+    // Incrementar contador de tentativas
+    const newAttemptCount = session.attemptCount + 1;
+
     setShowFeedback('incorrect');
     setBackgroundStyle({
       backgroundColor: '#FFB6C1',
       transition: 'background-color 0.5s'
     });
 
-    // Atualizar estatísticas
+    // Atualizar estatísticas e contador de tentativas
     setSession(prev => ({
       ...prev,
+      attemptCount: newAttemptCount,
       incorrectCount: prev.incorrectCount + 1,
       streak: 0 // Reset streak
     }));
@@ -166,11 +172,19 @@ const PuzzleTrainer: React.FC = () => {
       puzzleService.recordAttempt(session.currentPuzzle.id, false);
     }
 
-    // Mostrar solução após 2 segundos
-    setTimeout(() => {
-      setShowSolution(true);
-      setBackgroundStyle({});
-    }, 2000);
+    // Se já errou 3 vezes, vai para o próximo puzzle automaticamente
+    if (newAttemptCount >= 3) {
+      setTimeout(() => {
+        setBackgroundStyle({});
+        nextPuzzle();
+      }, 1500);
+    } else {
+      // Limpar feedback após 2 segundos para tentar novamente
+      setTimeout(() => {
+        setShowFeedback(null);
+        setBackgroundStyle({});
+      }, 2000);
+    }
   };
 
   // Próximo puzzle
@@ -206,7 +220,8 @@ const PuzzleTrainer: React.FC = () => {
       correctCount: 0,
       incorrectCount: 0,
       streak: 0,
-      maxStreak: 0
+      maxStreak: 0,
+      attemptCount: 0
     }));
     loadPuzzles();
   };
@@ -304,9 +319,11 @@ const PuzzleTrainer: React.FC = () => {
                     <Badge bg={session.currentPuzzle.color === 'white' ? 'light' : 'dark'}>
                       {session.currentPuzzle.color === 'white' ? 'Brancas' : 'Pretas'}
                     </Badge>
-                    <p className="mt-2">
-                      <small>Erro original: <strong>{session.currentPuzzle.blunderMove}</strong></small>
-                    </p>
+                    {session.attemptCount > 0 && (
+                      <p className="mt-2">
+                        <small>Tentativas: <strong>{session.attemptCount}/3</strong></small>
+                      </p>
+                    )}
                   </div>
                 )}
               </Col>
@@ -333,7 +350,7 @@ const PuzzleTrainer: React.FC = () => {
 
             {showFeedback === 'incorrect' && (
               <Alert variant="danger" className="mt-3">
-                ❌ Incorreto! Tente novamente ou veja a solução.
+                ❌ Incorreto! {session.attemptCount < 3 ? `Você tem ${3 - session.attemptCount} tentativa(s) restante(s).` : 'Limite de tentativas atingido. Avançando para o próximo puzzle...'}
               </Alert>
             )}
 
