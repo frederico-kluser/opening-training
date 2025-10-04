@@ -4,6 +4,7 @@ import { Button, Form, ProgressBar, Alert, Card, Badge, Modal } from 'react-boot
 import { getStockfish } from '../../services/StockfishService';
 import puzzleService from '../../services/PuzzleService';
 import Gap from '../Gap';
+import ChessComImporter from '../ChessComImporter';
 
 interface MoveAnalysis {
   moveNumber: number;
@@ -37,6 +38,7 @@ const GameAnalyzer: React.FC = () => {
   const [savedPuzzlesCount, setSavedPuzzlesCount] = useState(0);
   const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(null);
   const [showColorModal, setShowColorModal] = useState(false);
+  const [showImporter, setShowImporter] = useState(false);
 
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
@@ -248,8 +250,29 @@ const GameAnalyzer: React.FC = () => {
     window.location.reload();
   };
 
+  // Lidar com partidas importadas do Chess.com
+  const handleImportedGames = (importedPGN: string) => {
+    setPgn(importedPGN);
+    setShowImporter(false);
+    setError('');
+    // Feedback visual
+    setTimeout(() => {
+      alert('Partidas importadas com sucesso! Clique em "Analisar Partida" para começar.');
+    }, 100);
+  };
+
   // Obter estatísticas de puzzles
   const puzzleStats = puzzleService.getStats();
+
+  // Se estiver mostrando o importador
+  if (showImporter) {
+    return (
+      <ChessComImporter
+        onImportGames={handleImportedGames}
+        onBack={() => setShowImporter(false)}
+      />
+    );
+  }
 
   return (
     <Gap size={16}>
@@ -335,6 +358,14 @@ const GameAnalyzer: React.FC = () => {
                 disabled={isAnalyzing || !pgn.trim()}
               >
                 {isAnalyzing ? 'Analisando...' : 'Analisar Partida'}
+              </Button>
+
+              <Button
+                variant="success"
+                onClick={() => setShowImporter(true)}
+                disabled={isAnalyzing}
+              >
+                🌐 Importar do Chess.com
               </Button>
 
               <Button

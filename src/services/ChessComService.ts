@@ -275,14 +275,6 @@ class ChessComService {
 
       console.log('\n=== Busca concluída com sucesso! ===\n');
 
-      // Retornar dados para análise
-      return {
-        profile,
-        archives,
-        latestGames,
-        stats
-      };
-
     } catch (error) {
       console.error('Erro durante a busca:', error);
       throw error;
