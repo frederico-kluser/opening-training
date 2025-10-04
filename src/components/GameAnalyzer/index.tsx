@@ -3,7 +3,7 @@ import { Chess } from 'chess.js';
 import { Button, Form, ProgressBar, Alert, Card, Badge, Modal, Table } from 'react-bootstrap';
 import { getStockfish } from '../../services/StockfishService';
 import puzzleService from '../../services/PuzzleService';
-import { parseMultiplePGN, extractGamesInfo, hasMultipleGames, GameInfo, ParsedGame, validatePGN } from '../../utils/pgnParser';
+import { parseMultiplePGN, extractGamesInfo, hasMultipleGames, GameInfo, ParsedGame, validatePGN, detectMostFrequentPlayer } from '../../utils/pgnParser';
 import Gap from '../Gap';
 import ChessComImporter from '../ChessComImporter';
 
@@ -58,6 +58,13 @@ const GameAnalyzer: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string>('');
 
+  // Estado para jogador detectado
+  const [detectedPlayer, setDetectedPlayer] = useState<{
+    name: string | null;
+    positions: Map<number, 'white' | 'black'>;
+    frequency: number;
+  }>({ name: null, positions: new Map(), frequency: 0 });
+
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
     if (cpLoss < 0) return 'brilliant'; // Ganhou material inesperado
@@ -89,6 +96,10 @@ const GameAnalyzer: React.FC = () => {
       // Sempre extrair info das partidas (mesmo que seja uma só)
       const info = extractGamesInfo(games);
       setGamesInfo(info);
+
+      // Detectar jogador mais frequente
+      const detected = detectMostFrequentPlayer(games);
+      setDetectedPlayer(detected);
     }
   }, [pgn]);
 
@@ -299,11 +310,23 @@ const GameAnalyzer: React.FC = () => {
       return;
     }
 
+    // Pré-selecionar as partidas do jogador detectado
+    const preSelected: GameSelection[] = [];
+    if (detectedPlayer.name && detectedPlayer.positions.size > 0) {
+      detectedPlayer.positions.forEach((color, gameIndex) => {
+        preSelected.push({
+          gameIndex,
+          color,
+          playerName: detectedPlayer.name!
+        });
+      });
+    }
+
     // Sempre mostrar modal de seleção (mesmo para uma partida)
     setShowMultiGameModal(true);
-    setSelectedGames([]); // Limpar seleções anteriores
+    setSelectedGames(preSelected); // Usar pré-seleção se houver
     setError(''); // Limpar erros anteriores
-  }, [pgn]);
+  }, [pgn, detectedPlayer]);
 
   // Analisar partida completa
   const analyzeGame = useCallback(async () => {
@@ -604,6 +627,25 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
             )}
           </Alert>
 
+          {/* Mostrar jogador detectado */}
+          {detectedPlayer.name && detectedPlayer.frequency > 0 && (
+            <Alert variant="success">
+              <strong>🎯 Jogador detectado automaticamente:</strong>{' '}
+              <Badge bg="primary" className="ms-1">
+                {detectedPlayer.name}
+              </Badge>
+              <br />
+              <small>
+                Aparece em {detectedPlayer.frequency} de {parsedGames.length} partida(s) -{' '}
+                {Math.round((detectedPlayer.frequency / parsedGames.length) * 100)}%
+              </small>
+              <br />
+              <small className="text-muted">
+                As cores foram pré-selecionadas automaticamente baseado neste jogador.
+              </small>
+            </Alert>
+          )}
+
           <Table striped bordered hover size="sm">
             <thead>
               <tr>
@@ -625,17 +667,26 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
                   g => g.gameIndex === idx && g.color === 'black'
                 );
 
+                const isDetectedPlayerWhite = game.white === detectedPlayer.name;
+                const isDetectedPlayerBlack = game.black === detectedPlayer.name;
+
                 return (
                   <tr key={idx}>
                     <td>{idx + 1}</td>
                     <td><small>{game.event}</small></td>
                     <td><small>{game.date}</small></td>
                     <td>
-                      <strong>{game.white}</strong>
+                      <strong className={isDetectedPlayerWhite ? 'text-primary' : ''}>
+                        {game.white}
+                      </strong>
+                      {isDetectedPlayerWhite && ' 🎯'}
                       {game.result === '1-0' && ' ✓'}
                     </td>
                     <td>
-                      <strong>{game.black}</strong>
+                      <strong className={isDetectedPlayerBlack ? 'text-primary' : ''}>
+                        {game.black}
+                      </strong>
+                      {isDetectedPlayerBlack && ' 🎯'}
                       {game.result === '0-1' && ' ✓'}
                     </td>
                     <td className="text-center">

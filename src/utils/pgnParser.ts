@@ -120,6 +120,73 @@ export function getPlayerColors(games: ParsedGame[], playerName: string): Map<nu
 }
 
 /**
+ * Detect the most frequent player in the games
+ * @param games Array of parsed games
+ * @returns Object with the most frequent player name and their positions in each game
+ */
+export function detectMostFrequentPlayer(games: ParsedGame[]): {
+  playerName: string | null;
+  positions: Map<number, 'white' | 'black'>;
+  frequency: number;
+} {
+  if (games.length === 0) {
+    return { playerName: null, positions: new Map(), frequency: 0 };
+  }
+
+  // Count frequency of each player name
+  const playerCount = new Map<string, number>();
+  const playerPositions = new Map<string, Map<number, 'white' | 'black'>>();
+
+  games.forEach((game, index) => {
+    const white = game.headers['White'];
+    const black = game.headers['Black'];
+
+    if (white) {
+      const count = playerCount.get(white) || 0;
+      playerCount.set(white, count + 1);
+
+      if (!playerPositions.has(white)) {
+        playerPositions.set(white, new Map());
+      }
+      playerPositions.get(white)!.set(index, 'white');
+    }
+
+    if (black) {
+      const count = playerCount.get(black) || 0;
+      playerCount.set(black, count + 1);
+
+      if (!playerPositions.has(black)) {
+        playerPositions.set(black, new Map());
+      }
+      playerPositions.get(black)!.set(index, 'black');
+    }
+  });
+
+  // Find the most frequent player
+  let mostFrequent: string | null = null;
+  let maxCount = 0;
+
+  for (const [player, count] of playerCount.entries()) {
+    // Only consider players that appear in at least 50% of games
+    if (count > maxCount && count >= Math.ceil(games.length * 0.5)) {
+      mostFrequent = player;
+      maxCount = count;
+    }
+  }
+
+  // If we found a frequent player, return their positions
+  if (mostFrequent) {
+    return {
+      playerName: mostFrequent,
+      positions: playerPositions.get(mostFrequent) || new Map(),
+      frequency: maxCount
+    };
+  }
+
+  return { playerName: null, positions: new Map(), frequency: 0 };
+}
+
+/**
  * Detect if PGN contains multiple games
  * @param pgnText PGN text to check
  * @returns true if contains multiple games
