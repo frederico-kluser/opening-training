@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import TypeStorage from './types/TypeStorage';
 import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
@@ -44,53 +44,70 @@ function App() {
 	if (Object.keys(data).length > 0 && !variant && !mode) {
 		const variants = Object.keys(data);
 		return (
-			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3">
+			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
 				<div className="row w-100">
-					<div className="col-12 col-md-8 col-lg-6 col-xl-4 mx-auto">
-						<Gap size={16} centralize>
-							<h2 className="text-center mb-4">Repertório Carregado</h2>
-							<h5 className="text-center mb-3">Variantes disponíveis: {variants.join(', ')}</h5>
+					<div className="col-12 col-md-8 col-lg-6 col-xl-5 mx-auto">
+						<Card className="shadow-lg border-0">
+							<Card.Body className="p-4">
+								<h2 className="text-center mb-3">📚 Repertório Carregado</h2>
+								<div className="alert alert-success text-center">
+									<strong>Variantes disponíveis:</strong>
+									<div className="mt-2">
+										{variants.map((v, i) => (
+											<span key={i} className="badge bg-primary me-2 mb-1">{v}</span>
+										))}
+									</div>
+								</div>
 
-							<Button
-								variant="primary"
-								className="w-100"
-								onClick={() => {
-									const selectedVariant = variants.length === 1
-										? variants[0]
-										: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
-									if (selectedVariant && data[selectedVariant]) {
-										setVariant(selectedVariant);
-										setMode('train');
-									}
-								}}
-							>
-								🎯 Treinar Abertura
-							</Button>
+								<Gap size={16}>
+									<Button
+										variant="primary"
+										size="lg"
+										className="w-100"
+										onClick={() => {
+											const selectedVariant = variants.length === 1
+												? variants[0]
+												: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
+											if (selectedVariant && data[selectedVariant]) {
+												setVariant(selectedVariant);
+												setMode('train');
+											}
+										}}
+									>
+										🎯 Treinar Abertura
+										<small className="d-block mt-1">Pratique com posições aleatórias</small>
+									</Button>
 
-							<Button
-								variant="info"
-								className="w-100"
-								onClick={() => {
-									const selectedVariant = variants.length === 1
-										? variants[0]
-										: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
-									if (selectedVariant && data[selectedVariant]) {
-										setVariant(selectedVariant);
-										setMode('edit');
-									}
-								}}
-							>
-								✏️ Editar Repertório
-							</Button>
+									<Button
+										variant="info"
+										size="lg"
+										className="w-100"
+										onClick={() => {
+											const selectedVariant = variants.length === 1
+												? variants[0]
+												: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
+											if (selectedVariant && data[selectedVariant]) {
+												setVariant(selectedVariant);
+												setMode('edit');
+											}
+										}}
+									>
+										✏️ Editar Repertório
+										<small className="d-block mt-1">Adicione ou modifique variantes</small>
+									</Button>
 
-							<Button
-								variant="secondary"
-								className="w-100"
-								onClick={handleExist}
-							>
-								← Voltar
-							</Button>
-						</Gap>
+									<hr className="w-100" />
+
+									<Button
+										variant="outline-secondary"
+										className="w-100"
+										onClick={handleExist}
+									>
+										← Voltar ao Menu
+									</Button>
+								</Gap>
+							</Card.Body>
+						</Card>
 					</div>
 				</div>
 			</div>
@@ -99,74 +116,103 @@ function App() {
 
 	if (!variant) {
 		return (
-			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3">
+			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
 				<div className="row w-100">
-					<div className="col-12 col-md-8 col-lg-6 col-xl-4 mx-auto">
-						<Gap size={16} centralize>
-							<h2 className="text-center mb-4">Opening Training</h2>
-							<Upload onFileUpload={handleLoadData} />
-							<Button
-								variant="success"
-								className="w-100"
-								onClick={() => {
-									const data = localStorage.getItem('data');
-									handleLoadData(data ? JSON.parse(data) : {});
-								}}
-								disabled={(() => {
-									const data = localStorage.getItem('data');
-									return !data;
-								})()}
-							>
-								Carregar da Memória
-							</Button>
-							<Button
-								variant="secondary"
-								className="w-100"
-								onClick={() => {
-									const trainingName = prompt('Digite o nome do que quer treinar', 'caro-kann');
-									if (trainingName) {
-										setVariant(trainingName);
-										setMode('edit');
-									}
-								}}
-							>
-								Novo Repertório
-							</Button>
-							<Button
-								variant="danger"
-								className="w-100"
-								onClick={() => {
-									const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
+					<div className="col-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
+						<Card className="shadow-lg border-0">
+							<Card.Body className="p-4">
+								<h1 className="text-center mb-2">♟️ Chess Training System</h1>
+								<p className="text-center text-muted mb-4">Sistema completo de treinamento de xadrez</p>
 
-									if (user) {
-										window.open(`https://www.chess.com/member/${user}/games`);
-									}
-								}}
-							>
-								Treinar minhas partidas
-							</Button>
-							<Button
-								variant="warning"
-								className="w-100"
-								onClick={() => setVariant('stockfish-test')}
-							>
-								Testar Stockfish
-							</Button>
-							<Button
-								variant="info"
-								className="w-100"
-								onClick={() => setVariant('game-analyzer')}
-							>
-								Analisar Partidas
-							</Button>
-							<Button
-								variant="primary"
-								className="w-100"
-								onClick={() => setVariant('puzzle-trainer')}
-							>
-								Treinar Puzzles
-							</Button>
-						</Gap>
+								<Gap size={16} centralize>
+									{/* Seção de Repertórios */}
+									<div className="w-100">
+										<h5 className="mb-3">📚 Repertórios de Abertura</h5>
+										<div className="d-grid gap-2">
+											<Upload onFileUpload={handleLoadData} />
+
+											<Button
+												variant="success"
+												size="lg"
+												onClick={() => {
+													const data = localStorage.getItem('data');
+													handleLoadData(data ? JSON.parse(data) : {});
+												}}
+												disabled={!localStorage.getItem('data')}
+											>
+												💾 Carregar Repertório Salvo
+												<small className="d-block mt-1">Continuar de onde parou</small>
+											</Button>
+
+											<Button
+												variant="outline-primary"
+												onClick={() => {
+													const trainingName = prompt('Digite o nome do repertório', 'caro-kann');
+													if (trainingName) {
+														setVariant(trainingName);
+														setMode('edit');
+													}
+												}}
+											>
+												➕ Criar Novo Repertório
+												<small className="d-block mt-1">Cadastre suas variantes</small>
+											</Button>
+										</div>
+									</div>
+
+									<hr className="w-100" />
+
+									{/* Seção de Análise */}
+									<div className="w-100">
+										<h5 className="mb-3">🔍 Análise e Treinamento</h5>
+										<div className="d-grid gap-2">
+											<Button
+												variant="primary"
+												size="lg"
+												onClick={() => setVariant('puzzle-trainer')}
+											>
+												🧩 Treinar Puzzles
+												<small className="d-block mt-1">Resolva puzzles dos seus erros</small>
+											</Button>
+
+											<Button
+												variant="info"
+												onClick={() => setVariant('game-analyzer')}
+											>
+												📊 Analisar Partidas
+												<small className="d-block mt-1">Detecte erros e gere puzzles</small>
+											</Button>
+
+											<Button
+												variant="outline-danger"
+												onClick={() => {
+													const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
+													if (user) {
+														window.open(`https://www.chess.com/member/${user}/games`);
+													}
+												}}
+											>
+												🌐 Minhas Partidas Chess.com
+												<small className="d-block mt-1">Acesse suas partidas online</small>
+											</Button>
+										</div>
+									</div>
+
+									<hr className="w-100" />
+
+									{/* Ferramentas */}
+									<div className="w-100">
+										<Button
+											variant="outline-secondary"
+											className="w-100"
+											onClick={() => setVariant('stockfish-test')}
+										>
+											⚙️ Testar Engine Stockfish
+										</Button>
+									</div>
+								</Gap>
+							</Card.Body>
+						</Card>
 					</div>
 				</div>
 			</div>

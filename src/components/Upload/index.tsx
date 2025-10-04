@@ -43,8 +43,14 @@ const Upload = ({ onFileUpload }: UploadProps) => {
 				id="upload-json"
 				onChange={handleFileChange}
 			/>
-			<Button variant="primary" as="span" onClick={() => document.getElementById('upload-json')?.click()}>
-				Carregar Treinamento
+			<Button
+				variant="outline-success"
+				className="w-100"
+				as="span"
+				onClick={() => document.getElementById('upload-json')?.click()}
+			>
+				📁 Carregar Arquivo JSON
+				<small className="d-block mt-1">Importe repertório existente</small>
 			</Button>
 		</>
 	);

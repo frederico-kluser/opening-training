@@ -57,6 +57,9 @@ const StockfishTest: React.FC = () => {
 
   return (
     <Gap size={16} padding={16}>
+      <Button variant="secondary" onClick={() => window.location.reload()}>
+        ← Voltar ao Menu
+      </Button>
       <h2>Teste do Stockfish</h2>
 
       {!isReady ? (
