@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Form, ProgressBar, Alert, Card, Badge, Modal } from 'react-bootstrap';
+import { Button, Form, ProgressBar, Alert, Card, Badge, Modal, Table } from 'react-bootstrap';
 import { getStockfish } from '../../services/StockfishService';
 import puzzleService from '../../services/PuzzleService';
+import { parseMultiplePGN, extractGamesInfo, hasMultipleGames, GameInfo, ParsedGame, validatePGN } from '../../utils/pgnParser';
 import Gap from '../Gap';
 import ChessComImporter from '../ChessComImporter';
 
@@ -27,10 +28,16 @@ interface BlunderPuzzle {
   color: 'white' | 'black';
 }
 
+interface GameSelection {
+  gameIndex: number;
+  color: 'white' | 'black';
+  playerName: string;
+}
+
 const GameAnalyzer: React.FC = () => {
   const [pgn, setPgn] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [progress, setProgress] = useState({ current: 0, total: 0, currentGame: 0, totalGames: 0 });
   const [analysis, setAnalysis] = useState<MoveAnalysis[]>([]);
   const [blunders, setBlunders] = useState<BlunderPuzzle[]>([]);
   const [error, setError] = useState<string>('');
@@ -39,6 +46,17 @@ const GameAnalyzer: React.FC = () => {
   const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(null);
   const [showColorModal, setShowColorModal] = useState(false);
   const [showImporter, setShowImporter] = useState(false);
+
+  // Estados para múltiplas partidas
+  const [parsedGames, setParsedGames] = useState<ParsedGame[]>([]);
+  const [gamesInfo, setGamesInfo] = useState<GameInfo[]>([]);
+  const [selectedGames, setSelectedGames] = useState<GameSelection[]>([]);
+  const [showMultiGameModal, setShowMultiGameModal] = useState(false);
+  const [currentAnalyzingGame, setCurrentAnalyzingGame] = useState<string>('');
+
+  // Referência para o input de arquivo
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string>('');
 
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
@@ -62,13 +80,229 @@ const GameAnalyzer: React.FC = () => {
     }
   };
 
-  // Iniciar análise - primeiro pergunta a cor
-  const startAnalysis = useCallback(() => {
-    if (!pgn.trim()) {
-      setError('Por favor, insira uma partida em formato PGN');
+  // Effect para detectar múltiplas partidas quando PGN muda
+  useEffect(() => {
+    if (pgn.trim()) {
+      const games = parseMultiplePGN(pgn);
+      setParsedGames(games);
+
+      // Sempre extrair info das partidas (mesmo que seja uma só)
+      const info = extractGamesInfo(games);
+      setGamesInfo(info);
+    }
+  }, [pgn]);
+
+  // Lidar com carregamento de arquivo
+  const handleFileLoad = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setFileName(file.name);
+    setError('');
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+
+      // Validar PGN
+      const validation = validatePGN(content);
+      if (!validation.valid) {
+        setError(validation.error || 'Arquivo PGN inválido');
+        return;
+      }
+
+      setPgn(content);
+
+      // Feedback visual
+      setTimeout(() => {
+        const games = parseMultiplePGN(content);
+        const message = games.length === 1
+          ? 'Arquivo carregado: 1 partida detectada'
+          : `Arquivo carregado: ${games.length} partidas detectadas`;
+
+        // Usar alert temporariamente como feedback
+        alert(message);
+      }, 100);
+    };
+
+    reader.onerror = () => {
+      setError('Erro ao ler o arquivo');
+    };
+
+    reader.readAsText(file);
+  };
+
+  // Lidar com seleção de partidas múltiplas
+  const handleGameSelection = (gameIndex: number, color: 'white' | 'black', checked: boolean) => {
+    setSelectedGames(prev => {
+      if (checked) {
+        const game = parsedGames[gameIndex];
+        const playerName = color === 'white'
+          ? game.headers['White'] || 'Unknown'
+          : game.headers['Black'] || 'Unknown';
+
+        return [...prev, { gameIndex, color, playerName }];
+      } else {
+        return prev.filter(g => !(g.gameIndex === gameIndex && g.color === color));
+      }
+    });
+  };
+
+  // Iniciar análise de múltiplas partidas
+  const startMultiGameAnalysis = useCallback(async () => {
+    if (selectedGames.length === 0) {
+      setError('Por favor, selecione ao menos uma partida para analisar');
       return;
     }
-    setShowColorModal(true);
+
+    setShowMultiGameModal(false);
+    setIsAnalyzing(true);
+    setError('');
+    setAnalysis([]);
+    setBlunders([]);
+
+    const allBlunders: BlunderPuzzle[] = [];
+
+    try {
+      setProgress({
+        current: 0,
+        total: 0,
+        currentGame: 0,
+        totalGames: selectedGames.length
+      });
+
+      for (let g = 0; g < selectedGames.length; g++) {
+        const selection = selectedGames[g];
+        const gamePGN = parsedGames[selection.gameIndex].fullPGN;
+
+        setCurrentAnalyzingGame(
+          `Partida ${g + 1}/${selectedGames.length}: ${selection.playerName} (${selection.color === 'white' ? 'Brancas' : 'Pretas'})`
+        );
+
+        setProgress(prev => ({
+          ...prev,
+          currentGame: g + 1,
+          totalGames: selectedGames.length
+        }));
+
+        // Analisar cada partida individualmente
+        const gameBlunders = await analyzeGamePGN(gamePGN, selection.color);
+        allBlunders.push(...gameBlunders);
+      }
+
+      setBlunders(allBlunders);
+
+      // Salvar puzzles usando PuzzleService
+      if (allBlunders.length > 0) {
+        const puzzlesToSave = allBlunders.map(blunder => ({
+          fenBefore: blunder.fenBefore,
+          blunderMove: blunder.blunderMove,
+          solution: blunder.solution,
+          evaluation: blunder.evaluation,
+          moveNumber: blunder.moveNumber,
+          color: blunder.color as 'white' | 'black'
+        }));
+
+        puzzleService.addMultiplePuzzles(puzzlesToSave);
+        setSavedPuzzlesCount(allBlunders.length);
+        setShowSuccessModal(true);
+      }
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao analisar partidas');
+    } finally {
+      setIsAnalyzing(false);
+      setProgress({ current: 0, total: 0, currentGame: 0, totalGames: 0 });
+      setCurrentAnalyzingGame('');
+    }
+  }, [selectedGames, parsedGames]);
+
+  // Função auxiliar para analisar uma única partida PGN
+  const analyzeGamePGN = async (gamePGN: string, playerColor: 'white' | 'black'): Promise<BlunderPuzzle[]> => {
+    const foundBlunders: BlunderPuzzle[] = [];
+
+    try {
+      const game = new Chess();
+      game.loadPgn(gamePGN);
+
+      const moves = game.history({ verbose: true });
+      const positions: string[] = [];
+
+      game.reset();
+      positions.push(game.fen());
+
+      moves.forEach(move => {
+        game.move(move);
+        positions.push(game.fen());
+      });
+
+      setProgress(prev => ({
+        ...prev,
+        current: 0,
+        total: moves.length
+      }));
+
+      const stockfish = getStockfish();
+
+      for (let i = 0; i < moves.length; i++) {
+        setProgress(prev => ({
+          ...prev,
+          current: i + 1,
+          total: moves.length
+        }));
+
+        // Pular primeiros 10 lances (teoria de abertura)
+        if (i < 10) continue;
+
+        const evalBefore = await stockfish.analyze(positions[i], 18);
+        const evalAfter = await stockfish.analyze(positions[i + 1], 18);
+
+        const isWhiteTurn = i % 2 === 0;
+        const cpLoss = Math.abs(
+          (isWhiteTurn ? evalBefore.evaluation : -evalBefore.evaluation) -
+          (isWhiteTurn ? evalAfter.evaluation : -evalAfter.evaluation)
+        );
+
+        const classification = classifyMove(cpLoss);
+        const moveColor = isWhiteTurn ? 'white' : 'black';
+
+        if (classification === 'blunder' && cpLoss > 300 && moveColor === playerColor) {
+          foundBlunders.push({
+            id: `blunder-${Date.now()}-${i}`,
+            fenBefore: positions[i],
+            blunderMove: moves[i].san,
+            solution: evalBefore.bestMove,
+            evaluation: cpLoss,
+            moveNumber: Math.floor(i / 2) + 1,
+            color: isWhiteTurn ? 'white' : 'black'
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Erro ao analisar partida:', err);
+    }
+
+    return foundBlunders;
+  };
+
+  // Iniciar análise - sempre mostrar modal de seleção
+  const startAnalysis = useCallback(() => {
+    if (!pgn.trim()) {
+      setError('Por favor, insira uma partida em formato PGN ou carregue um arquivo');
+      return;
+    }
+
+    // Validar PGN antes de prosseguir
+    const validation = validatePGN(pgn);
+    if (!validation.valid) {
+      setError(validation.error || 'PGN inválido');
+      return;
+    }
+
+    // Sempre mostrar modal de seleção (mesmo para uma partida)
+    setShowMultiGameModal(true);
+    setSelectedGames([]); // Limpar seleções anteriores
+    setError(''); // Limpar erros anteriores
   }, [pgn]);
 
   // Analisar partida completa
@@ -228,21 +462,51 @@ const GameAnalyzer: React.FC = () => {
 
   // PGN de exemplo
   const loadExamplePGN = () => {
-    setPgn(`[Event "Example Game"]
+    // Usar exemplo com múltiplas partidas para demonstrar o novo recurso
+    const multiGameExample = `[Event "Live Chess"]
 [Site "Chess.com"]
-[Date "2024.01.01"]
+[Date "2025.09.24"]
+[Round "-"]
 [White "Player1"]
-[Black "Player2"]
+[Black "YourUsername"]
 [Result "1-0"]
+[WhiteElo "693"]
+[BlackElo "664"]
 
-1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O
-8. c3 d6 9. h3 Nb8 10. d4 Nbd7 11. Nbd2 Bb7 12. Bc2 Re8 13. Nf1 Bf8
-14. Ng3 g6 15. a4 c5 16. d5 c4 17. Bg5 h6 18. Be3 Nc5 19. Qd2 h5
-20. Bg5 Bg7 21. Nh2 Qb6 22. Rf1 bxa4 23. f4 exf4 24. Bxf4 Nfd7
-25. Ngf1 f6 26. g4 h4 27. Qf2 Qxf2+ 28. Rxf2 a3 29. bxa3 Bf8
-30. Nd2 Bxa3 31. Nxc4 Bf8 32. Nf3 a5 33. Rfa2 Ra6 34. Nfd2 Rea8
-35. Nb1 Bc8 36. Nbd2 Bd7 37. Kf2 Bb5 38. Nb2 Nb6 39. c4 Bd7
-40. Ke3 a4 41. Kd4 a3 42. Nc3 1-0`);
+1. d4 c6 2. Nf3 d5 3. Bf4 Bg4 4. e3 Bxf3 5. Qxf3 Nd7 6. Qd1 e6 7. Bd3 Ngf6 8. c3
+c5 9. dxc5 Nxc5 10. O-O h5 11. Bb5+ Ncd7 12. Bxd7+ Qxd7 13. Nd2 Bd6 14. Bxd6
+Qxd6 15. h3 g5 16. Re1 Ng4 17. hxg4 hxg4 18. Kf1 Qa6+ 19. c4 Rh1+ 20. Ke2 Rxe1+
+21. Kxe1 1-0
+
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2025.09.24"]
+[Round "-"]
+[White "YourUsername"]
+[Black "Player2"]
+[Result "0-1"]
+[WhiteElo "655"]
+[BlackElo "660"]
+
+1. d4 d5 2. c4 dxc4 3. e4 g6 4. Bxc4 Bg7 5. Nf3 Nc6 6. Bb5 a6 7. Bxc6+ bxc6 8.
+Nc3 c5 9. Qa4+ Bd7 10. Qc4 cxd4 11. Nxd4 Nh6 12. Nc6 Qc8 13. Bxh6 Bxh6 14. Rd1
+O-O 15. Ne5 Be6 16. Qd4 Rd8 17. Qc5 Rxd1+ 18. Nxd1 Qd8 19. Nc6 Qd2+ 0-1
+
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2025.09.24"]
+[Round "-"]
+[White "YourUsername"]
+[Black "Player3"]
+[Result "0-1"]
+[WhiteElo "646"]
+[BlackElo "641"]
+
+1. e4 e5 2. Bc4 h6 3. d3 a6 4. Be3 Nc6 5. Nc3 Bb4 6. Bd2 Nf6 7. a3 Bxc3 8. Bxc3
+O-O 9. Nf3 d6 10. h3 b6 11. Bd5 Nxd5 12. exd5 Na5 13. Qe2 Bb7 14. d4 Bxd5 15.
+dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`;
+
+    setPgn(multiGameExample);
   };
 
   // Botão voltar
@@ -311,6 +575,126 @@ const GameAnalyzer: React.FC = () => {
         </Modal.Body>
       </Modal>
 
+      {/* Modal de seleção de partidas */}
+      <Modal
+        show={showMultiGameModal}
+        onHide={() => setShowMultiGameModal(false)}
+        size="lg"
+        scrollable
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {parsedGames.length === 1
+              ? 'Partida Detectada - Selecione sua cor'
+              : `${parsedGames.length} partidas detectadas`}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+          <Alert variant="info">
+            <strong>
+              {parsedGames.length === 1
+                ? 'Selecione qual cor você jogou nesta partida:'
+                : 'Selecione as partidas que deseja analisar:'}
+            </strong>
+            {parsedGames.length > 1 && (
+              <>
+                <br />
+                Marque o checkbox ao lado de cada partida indicando qual cor você jogou.
+              </>
+            )}
+          </Alert>
+
+          <Table striped bordered hover size="sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Brancas</th>
+                <th>Pretas</th>
+                <th>Resultado</th>
+                <th className="text-center">Sua Cor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {gamesInfo.map((game, idx) => {
+                const isWhiteSelected = selectedGames.some(
+                  g => g.gameIndex === idx && g.color === 'white'
+                );
+                const isBlackSelected = selectedGames.some(
+                  g => g.gameIndex === idx && g.color === 'black'
+                );
+
+                return (
+                  <tr key={idx}>
+                    <td>{idx + 1}</td>
+                    <td><small>{game.event}</small></td>
+                    <td><small>{game.date}</small></td>
+                    <td>
+                      <strong>{game.white}</strong>
+                      {game.result === '1-0' && ' ✓'}
+                    </td>
+                    <td>
+                      <strong>{game.black}</strong>
+                      {game.result === '0-1' && ' ✓'}
+                    </td>
+                    <td className="text-center">
+                      <Badge bg={
+                        game.result === '1-0' ? 'light' :
+                        game.result === '0-1' ? 'dark' :
+                        'secondary'
+                      } text={
+                        game.result === '1-0' ? 'dark' :
+                        game.result === '0-1' ? 'light' :
+                        'light'
+                      }>
+                        {game.result}
+                      </Badge>
+                    </td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <Form.Check
+                          type="checkbox"
+                          label={<span style={{ fontSize: '20px' }}>♔</span>}
+                          checked={isWhiteSelected}
+                          onChange={(e) => handleGameSelection(idx, 'white', e.target.checked)}
+                          disabled={isBlackSelected}
+                        />
+                        <Form.Check
+                          type="checkbox"
+                          label={<span style={{ fontSize: '20px' }}>♚</span>}
+                          checked={isBlackSelected}
+                          onChange={(e) => handleGameSelection(idx, 'black', e.target.checked)}
+                          disabled={isWhiteSelected}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+
+          {selectedGames.length > 0 && (
+            <Alert variant="success">
+              {selectedGames.length} {selectedGames.length === 1 ? 'partida selecionada' : 'partidas selecionadas'}
+            </Alert>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowMultiGameModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={startMultiGameAnalysis}
+            disabled={selectedGames.length === 0}
+          >
+            Analisar {selectedGames.length > 0 && `(${selectedGames.length})`}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Modal de sucesso */}
       <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
         <Modal.Header closeButton>
@@ -340,16 +724,35 @@ const GameAnalyzer: React.FC = () => {
 
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Cole sua partida em formato PGN:</Form.Label>
+              <Form.Label>
+                Cole sua partida em formato PGN ou carregue um arquivo:
+                {fileName && (
+                  <Badge bg="success" className="ms-2">
+                    📁 {fileName}
+                  </Badge>
+                )}
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={10}
                 value={pgn}
-                onChange={(e) => setPgn(e.target.value)}
-                placeholder="[Event ...]"
+                onChange={(e) => {
+                  setPgn(e.target.value);
+                  setFileName(''); // Limpar nome do arquivo se digitar manualmente
+                }}
+                placeholder="[Event ...]&#10;&#10;Ou use o botão 'Carregar Arquivo PGN' abaixo"
                 disabled={isAnalyzing}
               />
             </Form.Group>
+
+            {/* Input de arquivo oculto */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pgn"
+              style={{ display: 'none' }}
+              onChange={handleFileLoad}
+            />
 
             <Gap size={8} horizontal>
               <Button
@@ -357,7 +760,15 @@ const GameAnalyzer: React.FC = () => {
                 onClick={startAnalysis}
                 disabled={isAnalyzing || !pgn.trim()}
               >
-                {isAnalyzing ? 'Analisando...' : 'Analisar Partida'}
+                {isAnalyzing ? 'Analisando...' : 'Analisar Partida(s)'}
+              </Button>
+
+              <Button
+                variant="info"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isAnalyzing}
+              >
+                📂 Carregar Arquivo PGN
               </Button>
 
               <Button
@@ -378,8 +789,35 @@ const GameAnalyzer: React.FC = () => {
             </Gap>
           </Form>
 
+          {/* Mostrar informação sobre partidas carregadas */}
+          {!isAnalyzing && parsedGames.length > 0 && (
+            <Alert variant="info" className="mt-3">
+              <strong>
+                {parsedGames.length === 1
+                  ? '✅ 1 partida pronta para análise'
+                  : `✅ ${parsedGames.length} partidas prontas para análise`}
+              </strong>
+              <br />
+              <small>Clique em "Analisar Partida(s)" para continuar</small>
+            </Alert>
+          )}
+
           {isAnalyzing && progress.total > 0 && (
             <div className="mt-3">
+              {progress.totalGames > 1 && (
+                <>
+                  <div className="mb-2">
+                    <small className="text-muted">{currentAnalyzingGame}</small>
+                  </div>
+                  <ProgressBar className="mb-2">
+                    <ProgressBar
+                      variant="success"
+                      now={(progress.currentGame / progress.totalGames) * 100}
+                      label={`Partida ${progress.currentGame}/${progress.totalGames}`}
+                    />
+                  </ProgressBar>
+                </>
+              )}
               <ProgressBar
                 now={(progress.current / progress.total) * 100}
                 label={`${progress.current}/${progress.total} movimentos`}
