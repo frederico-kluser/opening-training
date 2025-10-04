@@ -10,6 +10,7 @@ import StockfishTest from './components/StockfishTest';
 import GameAnalyzer from './components/GameAnalyzer';
 import PuzzleTrainer from './components/PuzzleTrainer';
 import OpeningTrainer from './components/OpeningTrainer';
+import puzzleService from './services/PuzzleService';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -115,104 +116,197 @@ function App() {
 	}
 
 	if (!variant) {
+		const hasLocalData = !!localStorage.getItem('data');
+
 		return (
-			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-				<div className="row w-100">
-					<div className="col-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
-						<Card className="shadow-lg border-0">
-							<Card.Body className="p-4">
-								<h1 className="text-center mb-2">♟️ Chess Training System</h1>
-								<p className="text-center text-muted mb-4">Sistema completo de treinamento de xadrez</p>
+			<div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8f9fa' }}>
+				{/* Clean Header */}
+				<div className="bg-white shadow-sm">
+					<div className="container py-4">
+						<div className="text-center">
+							<h1 className="h2 fw-bold text-dark mb-2">♟ Sistema de Treino de Xadrez</h1>
+							<p className="text-muted mb-0">Escolha uma opção para começar</p>
+						</div>
+					</div>
+				</div>
 
-								<Gap size={16} centralize>
-									{/* Seção de Repertórios */}
-									<div className="w-100">
-										<h5 className="mb-3">📚 Repertórios de Abertura</h5>
+				{/* Main Menu */}
+				<div className="container-fluid flex-grow-1 d-flex align-items-center py-5">
+					<div className="container">
+						<div className="row g-4 justify-content-center">
+
+							{/* Análise de Partidas */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm hover-shadow"
+									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+									onClick={() => setVariant('game-analyzer')}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>📊</div>
+										<h5 className="fw-bold mb-2">Analisar Partidas</h5>
+										<p className="text-muted small mb-0">
+											Importe partidas do Chess.com ou PGN para análise detalhada
+										</p>
+									</Card.Body>
+								</Card>
+							</div>
+
+							{/* Treinar Puzzles */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm hover-shadow"
+									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+									onClick={() => setVariant('puzzle-trainer')}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>🧩</div>
+										<h5 className="fw-bold mb-2">Treinar Puzzles</h5>
+										<p className="text-muted small mb-0">
+											Resolva puzzles táticos nos modos Normal ou Rush
+										</p>
+									</Card.Body>
+								</Card>
+							</div>
+
+							{/* Repertório de Aberturas */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm"
+									style={{ transition: 'transform 0.2s' }}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>📚</div>
+										<h5 className="fw-bold mb-3">Repertório</h5>
+
 										<div className="d-grid gap-2">
-											<Upload onFileUpload={handleLoadData} />
-
-											<Button
-												variant="success"
-												size="lg"
-												onClick={() => {
-													const data = localStorage.getItem('data');
-													handleLoadData(data ? JSON.parse(data) : {});
-												}}
-												disabled={!localStorage.getItem('data')}
-											>
-												💾 Carregar Repertório Salvo
-												<small className="d-block mt-1">Continuar de onde parou</small>
-											</Button>
+											{hasLocalData && (
+												<Button
+													variant="primary"
+													size="sm"
+													onClick={() => {
+														const data = localStorage.getItem('data');
+														handleLoadData(data ? JSON.parse(data) : {});
+													}}
+												>
+													💾 Continuar
+												</Button>
+											)}
 
 											<Button
 												variant="outline-primary"
+												size="sm"
 												onClick={() => {
-													const trainingName = prompt('Digite o nome do repertório', 'caro-kann');
+													const trainingName = prompt('Nome do repertório:', 'caro-kann');
 													if (trainingName) {
 														setVariant(trainingName);
 														setMode('edit');
 													}
 												}}
 											>
-												➕ Criar Novo Repertório
-												<small className="d-block mt-1">Cadastre suas variantes</small>
+												➕ Novo
 											</Button>
+
+											<Upload onFileUpload={handleLoadData} />
 										</div>
-									</div>
+									</Card.Body>
+								</Card>
+							</div>
 
-									<hr className="w-100" />
+							{/* Segunda linha - Ferramentas auxiliares */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm hover-shadow"
+									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+									onClick={() => setVariant('stockfish-test')}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>🤖</div>
+										<h5 className="fw-bold mb-2">Stockfish</h5>
+										<p className="text-muted small mb-0">
+											Teste o engine de análise
+										</p>
+									</Card.Body>
+								</Card>
+							</div>
 
-									{/* Seção de Análise */}
-									<div className="w-100">
-										<h5 className="mb-3">🔍 Análise e Treinamento</h5>
-										<div className="d-grid gap-2">
-											<Button
-												variant="primary"
-												size="lg"
-												onClick={() => setVariant('puzzle-trainer')}
-											>
-												🧩 Treinar Puzzles
-												<small className="d-block mt-1">Resolva puzzles dos seus erros</small>
-											</Button>
+							{/* Chess.com */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm hover-shadow"
+									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+									onClick={() => {
+										const user = prompt('Usuário do Chess.com:', 'hikaru');
+										if (user) {
+											window.open(`https://www.chess.com/member/${user}/games`);
+										}
+									}}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>🌐</div>
+										<h5 className="fw-bold mb-2">Chess.com</h5>
+										<p className="text-muted small mb-0">
+											Ver perfil no site
+										</p>
+									</Card.Body>
+								</Card>
+							</div>
 
-											<Button
-												variant="info"
-												onClick={() => setVariant('game-analyzer')}
-											>
-												📊 Analisar Partidas
-												<small className="d-block mt-1">Detecte erros e gere puzzles</small>
-											</Button>
+							{/* GitHub */}
+							<div className="col-12 col-sm-6 col-md-4">
+								<Card
+									className="h-100 border-0 shadow-sm hover-shadow"
+									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+									onClick={() => window.open('https://github.com/frederico-kluser/opening-training')}
+								>
+									<Card.Body className="text-center p-4">
+										<div className="mb-3" style={{ fontSize: '3rem' }}>💻</div>
+										<h5 className="fw-bold mb-2">GitHub</h5>
+										<p className="text-muted small mb-0">
+											Código fonte e docs
+										</p>
+									</Card.Body>
+								</Card>
+							</div>
+						</div>
 
-											<Button
-												variant="outline-danger"
-												onClick={() => {
-													const user = prompt('Digite o seu usuário do chess.com', 'FredericoOliveira');
-													if (user) {
-														window.open(`https://www.chess.com/member/${user}/games`);
-													}
-												}}
-											>
-												🌐 Minhas Partidas Chess.com
-												<small className="d-block mt-1">Acesse suas partidas online</small>
-											</Button>
+						{/* Statistics Footer */}
+						<div className="row mt-5">
+							<div className="col-12">
+								<Card className="border-0 shadow-sm bg-primary text-white">
+									<Card.Body>
+										<div className="row text-center">
+											<div className="col-6 col-md-3">
+												<h4 className="mb-0">{puzzleService.getPuzzles().length}</h4>
+												<small>Puzzles Salvos</small>
+											</div>
+											<div className="col-6 col-md-3">
+												<h4 className="mb-0">{puzzleService.getStats().solvedPuzzles}</h4>
+												<small>Resolvidos</small>
+											</div>
+											<div className="col-6 col-md-3">
+												<h4 className="mb-0">{Math.round(puzzleService.getStats().successRate)}%</h4>
+												<small>Taxa de Acerto</small>
+											</div>
+											<div className="col-6 col-md-3">
+												<h4 className="mb-0">{hasLocalData ? '✅' : '❌'}</h4>
+												<small>Dados Salvos</small>
+											</div>
 										</div>
-									</div>
-
-									<hr className="w-100" />
-
-									{/* Ferramentas */}
-									<div className="w-100">
-										<Button
-											variant="outline-secondary"
-											className="w-100"
-											onClick={() => setVariant('stockfish-test')}
-										>
-											⚙️ Testar Engine Stockfish
-										</Button>
-									</div>
-								</Gap>
-							</Card.Body>
-						</Card>
+									</Card.Body>
+								</Card>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
