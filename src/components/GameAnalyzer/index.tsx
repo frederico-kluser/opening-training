@@ -3,9 +3,8 @@ import { Chess } from 'chess.js';
 import { Button, Form, ProgressBar, Alert, Card, Badge, Modal, Table } from 'react-bootstrap';
 import { getStockfish } from '../../services/StockfishService';
 import puzzleService from '../../services/PuzzleService';
-import { parseMultiplePGN, extractGamesInfo, hasMultipleGames, GameInfo, ParsedGame, validatePGN, detectMostFrequentPlayer } from '../../utils/pgnParser';
+import { parseMultiplePGN, extractGamesInfo, GameInfo, ParsedGame, validatePGN, detectMostFrequentPlayer } from '../../utils/pgnParser';
 import Gap from '../Gap';
-import ChessComImporter from '../ChessComImporter';
 
 interface MoveAnalysis {
   moveNumber: number;
@@ -45,7 +44,6 @@ const GameAnalyzer: React.FC = () => {
   const [savedPuzzlesCount, setSavedPuzzlesCount] = useState(0);
   const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(null);
   const [showColorModal, setShowColorModal] = useState(false);
-  const [showImporter, setShowImporter] = useState(false);
 
   // Estados para múltiplas partidas
   const [parsedGames, setParsedGames] = useState<ParsedGame[]>([]);
@@ -56,6 +54,7 @@ const GameAnalyzer: React.FC = () => {
 
   // Referência para o input de arquivo
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const analysisFileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string>('');
 
   // Estado para jogador detectado
@@ -483,53 +482,70 @@ const GameAnalyzer: React.FC = () => {
 
   const stats = getStats();
 
-  // PGN de exemplo
-  const loadExamplePGN = () => {
-    // Usar exemplo com múltiplas partidas para demonstrar o novo recurso
-    const multiGameExample = `[Event "Live Chess"]
-[Site "Chess.com"]
-[Date "2025.09.24"]
-[Round "-"]
-[White "Player1"]
-[Black "YourUsername"]
-[Result "1-0"]
-[WhiteElo "693"]
-[BlackElo "664"]
+  // Exportar análise para JSON
+  const exportAnalysis = () => {
+    const analysisData = {
+      date: new Date().toISOString(),
+      pgn: pgn,
+      analysis: analysis,
+      blunders: blunders,
+      stats: stats,
+      selectedGames: selectedGames,
+      parsedGames: parsedGames
+    };
 
-1. d4 c6 2. Nf3 d5 3. Bf4 Bg4 4. e3 Bxf3 5. Qxf3 Nd7 6. Qd1 e6 7. Bd3 Ngf6 8. c3
-c5 9. dxc5 Nxc5 10. O-O h5 11. Bb5+ Ncd7 12. Bxd7+ Qxd7 13. Nd2 Bd6 14. Bxd6
-Qxd6 15. h3 g5 16. Re1 Ng4 17. hxg4 hxg4 18. Kf1 Qa6+ 19. c4 Rh1+ 20. Ke2 Rxe1+
-21. Kxe1 1-0
+    const dataStr = JSON.stringify(analysisData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
 
-[Event "Live Chess"]
-[Site "Chess.com"]
-[Date "2025.09.24"]
-[Round "-"]
-[White "YourUsername"]
-[Black "Player2"]
-[Result "0-1"]
-[WhiteElo "655"]
-[BlackElo "660"]
+    const exportFileDefaultName = `chess-analysis-${new Date().toISOString().slice(0,10)}.json`;
 
-1. d4 d5 2. c4 dxc4 3. e4 g6 4. Bxc4 Bg7 5. Nf3 Nc6 6. Bb5 a6 7. Bxc6+ bxc6 8.
-Nc3 c5 9. Qa4+ Bd7 10. Qc4 cxd4 11. Nxd4 Nh6 12. Nc6 Qc8 13. Bxh6 Bxh6 14. Rd1
-O-O 15. Ne5 Be6 16. Qd4 Rd8 17. Qc5 Rxd1+ 18. Nxd1 Qd8 19. Nc6 Qd2+ 0-1
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
 
-[Event "Live Chess"]
-[Site "Chess.com"]
-[Date "2025.09.24"]
-[Round "-"]
-[White "YourUsername"]
-[Black "Player3"]
-[Result "0-1"]
-[WhiteElo "646"]
-[BlackElo "641"]
+  // Importar análise de JSON
+  const handleAnalysisImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-1. e4 e5 2. Bc4 h6 3. d3 a6 4. Be3 Nc6 5. Nc3 Bb4 6. Bd2 Nf6 7. a3 Bxc3 8. Bxc3
-O-O 9. Nf3 d6 10. h3 b6 11. Bd5 Nxd5 12. exd5 Na5 13. Qe2 Bb7 14. d4 Bxd5 15.
-dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const analysisData = JSON.parse(content);
 
-    setPgn(multiGameExample);
+        // Restaurar dados da análise
+        if (analysisData.pgn) setPgn(analysisData.pgn);
+        if (analysisData.analysis) setAnalysis(analysisData.analysis);
+        if (analysisData.blunders) setBlunders(analysisData.blunders);
+        if (analysisData.selectedGames) setSelectedGames(analysisData.selectedGames);
+        if (analysisData.parsedGames) setParsedGames(analysisData.parsedGames);
+
+        // Extrair informações dos jogos
+        if (analysisData.parsedGames) {
+          const info = extractGamesInfo(analysisData.parsedGames);
+          setGamesInfo(info);
+        }
+
+        setError('');
+        alert('Análise importada com sucesso!');
+      } catch (err) {
+        setError('Erro ao importar análise. Verifique se o arquivo está no formato correto.');
+      }
+    };
+
+    reader.onerror = () => {
+      setError('Erro ao ler o arquivo de análise');
+    };
+
+    reader.readAsText(file);
+
+    // Limpar o input para permitir reimportar o mesmo arquivo
+    if (analysisFileInputRef.current) {
+      analysisFileInputRef.current.value = '';
+    }
   };
 
   // Botão voltar
@@ -537,29 +553,8 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
     window.location.reload();
   };
 
-  // Lidar com partidas importadas do Chess.com
-  const handleImportedGames = (importedPGN: string) => {
-    setPgn(importedPGN);
-    setShowImporter(false);
-    setError('');
-    // Feedback visual
-    setTimeout(() => {
-      alert('Partidas importadas com sucesso! Clique em "Analisar Partida" para começar.');
-    }, 100);
-  };
-
   // Obter estatísticas de puzzles
   const puzzleStats = puzzleService.getStats();
-
-  // Se estiver mostrando o importador
-  if (showImporter) {
-    return (
-      <ChessComImporter
-        onImportGames={handleImportedGames}
-        onBack={() => setShowImporter(false)}
-      />
-    );
-  }
 
   return (
     <Gap size={16}>
@@ -796,13 +791,20 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
               />
             </Form.Group>
 
-            {/* Input de arquivo oculto */}
+            {/* Inputs de arquivo ocultos */}
             <input
               ref={fileInputRef}
               type="file"
               accept=".pgn"
               style={{ display: 'none' }}
               onChange={handleFileLoad}
+            />
+            <input
+              ref={analysisFileInputRef}
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              onChange={handleAnalysisImport}
             />
 
             <Gap size={8} horizontal>
@@ -823,19 +825,11 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
               </Button>
 
               <Button
-                variant="success"
-                onClick={() => setShowImporter(true)}
+                variant="warning"
+                onClick={() => analysisFileInputRef.current?.click()}
                 disabled={isAnalyzing}
               >
-                🌐 Importar do Chess.com
-              </Button>
-
-              <Button
-                variant="secondary"
-                onClick={loadExamplePGN}
-                disabled={isAnalyzing}
-              >
-                Carregar Exemplo
+                📥 Importar Análise
               </Button>
             </Gap>
           </Form>
@@ -889,7 +883,16 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
       {stats && (
         <Card>
           <Card.Body>
-            <Card.Title>Estatísticas</Card.Title>
+            <Card.Title className="d-flex justify-content-between align-items-center">
+              Estatísticas
+              <Button
+                variant="success"
+                size="sm"
+                onClick={exportAnalysis}
+              >
+                💾 Exportar Análise
+              </Button>
+            </Card.Title>
             <div className="row">
               <div className="col-md-6">
                 <h5>Brancas</h5>
