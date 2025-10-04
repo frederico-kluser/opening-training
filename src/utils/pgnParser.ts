@@ -125,12 +125,12 @@ export function getPlayerColors(games: ParsedGame[], playerName: string): Map<nu
  * @returns Object with the most frequent player name and their positions in each game
  */
 export function detectMostFrequentPlayer(games: ParsedGame[]): {
-  playerName: string | null;
+  name: string | null;
   positions: Map<number, 'white' | 'black'>;
   frequency: number;
 } {
   if (games.length === 0) {
-    return { playerName: null, positions: new Map(), frequency: 0 };
+    return { name: null, positions: new Map(), frequency: 0 };
   }
 
   // Count frequency of each player name
@@ -162,13 +162,13 @@ export function detectMostFrequentPlayer(games: ParsedGame[]): {
     }
   });
 
-  // Find the most frequent player
+  // Find the most frequent player (sem threshold mínimo)
   let mostFrequent: string | null = null;
   let maxCount = 0;
 
   for (const [player, count] of playerCount.entries()) {
-    // Only consider players that appear in at least 50% of games
-    if (count > maxCount && count >= Math.ceil(games.length * 0.5)) {
+    // Considerar o jogador mais frequente, independente da porcentagem
+    if (count > maxCount) {
       mostFrequent = player;
       maxCount = count;
     }
@@ -177,13 +177,13 @@ export function detectMostFrequentPlayer(games: ParsedGame[]): {
   // If we found a frequent player, return their positions
   if (mostFrequent) {
     return {
-      playerName: mostFrequent,
+      name: mostFrequent,
       positions: playerPositions.get(mostFrequent) || new Map(),
       frequency: maxCount
     };
   }
 
-  return { playerName: null, positions: new Map(), frequency: 0 };
+  return { name: null, positions: new Map(), frequency: 0 };
 }
 
 /**
