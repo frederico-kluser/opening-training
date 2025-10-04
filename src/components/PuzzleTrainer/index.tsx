@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Card, Alert, Badge, ProgressBar, Row, Col } from 'react-bootstrap';
-import { Chessboard } from 'react-chessboard';
+import { Button, Card, Alert } from 'react-bootstrap';
 import puzzleService from '../../services/PuzzleService';
 import { Puzzle } from '../../types/Puzzle';
 import Gap from '../Gap';
+import SessionStats from '../PuzzleSession/SessionStats';
+import PuzzleFeedback from '../PuzzleSession/PuzzleFeedback';
+import PuzzleControls from '../PuzzleSession/PuzzleControls';
+import GlobalStats from '../PuzzleSession/GlobalStats';
+import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
+import { formatTime, getElapsedTime } from '../../utils/timeUtils';
+import { convertUCItoSAN, moveToUCI } from '../../utils/chessUtils';
 
 interface PuzzleSession {
   currentPuzzle: Puzzle | null;
@@ -45,7 +51,7 @@ const PuzzleTrainer: React.FC = () => {
   useEffect(() => {
     loadPuzzles();
     const timer = setInterval(() => {
-      setTimeElapsed(Date.now() - session.startTime.getTime());
+      setTimeElapsed(getElapsedTime(session.startTime));
     }, 1000);
 
     return () => clearInterval(timer);
@@ -78,13 +84,6 @@ const PuzzleTrainer: React.FC = () => {
     }
   }, [puzzles, session.puzzleIndex]);
 
-  // Formatar tempo
-  const formatTime = (ms: number) => {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
 
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
@@ -100,7 +99,7 @@ const PuzzleTrainer: React.FC = () => {
       if (!move) return false;
 
       // Converter movimento para notação UCI
-      const uciMove = sourceSquare + targetSquare + (move.promotion ? move.promotion : '');
+      const uciMove = moveToUCI(sourceSquare, targetSquare, move.promotion);
 
       // Verificar se é a solução correta
       const isCorrect = uciMove === session.currentPuzzle.solution ||
@@ -234,22 +233,7 @@ const PuzzleTrainer: React.FC = () => {
   // Converter solução UCI para SAN
   const getSolutionSAN = () => {
     if (!session.currentPuzzle) return '';
-
-    const tempGame = new Chess(session.currentPuzzle.fenBefore);
-    const from = session.currentPuzzle.solution.substring(0, 2);
-    const to = session.currentPuzzle.solution.substring(2, 4);
-    const promotion = session.currentPuzzle.solution.substring(4, 5);
-
-    try {
-      const move = tempGame.move({
-        from,
-        to,
-        promotion: promotion || undefined
-      });
-      return move ? move.san : session.currentPuzzle.solution;
-    } catch {
-      return session.currentPuzzle.solution;
-    }
+    return convertUCItoSAN(session.currentPuzzle.solution, session.currentPuzzle.fenBefore);
   };
 
   // Obter estatísticas
@@ -278,137 +262,50 @@ const PuzzleTrainer: React.FC = () => {
       <Gap size={16}>
         <Card>
           <Card.Body>
-            <Row>
-              <Col xs={12} md={8}>
-                <h4>
-                  Puzzle {session.puzzleIndex + 1} de {session.totalPuzzles}
-                  {session.currentPuzzle && (
-                    <Badge bg="secondary" className="ms-2">
-                      Lance {session.currentPuzzle.moveNumber}
-                    </Badge>
-                  )}
-                </h4>
-              </Col>
-              <Col xs={12} md={4} className="text-end">
-                <Badge bg="success" className="me-2">✓ {session.correctCount}</Badge>
-                <Badge bg="danger" className="me-2">✗ {session.incorrectCount}</Badge>
-                <Badge bg="info">🔥 {session.streak}</Badge>
-              </Col>
-            </Row>
+            <SessionStats
+              puzzleIndex={session.puzzleIndex}
+              totalPuzzles={session.totalPuzzles}
+              correctCount={session.correctCount}
+              incorrectCount={session.incorrectCount}
+              streak={session.streak}
+              maxStreak={session.maxStreak}
+              timeElapsed={timeElapsed}
+              moveNumber={session.currentPuzzle?.moveNumber}
+              color={session.currentPuzzle?.color}
+              attemptCount={session.attemptCount}
+            />
+          </Card.Body>
+        </Card>
 
-            <ProgressBar
-              now={(session.puzzleIndex + 1) / session.totalPuzzles * 100}
-              className="mb-3"
+        <Card>
+          <Card.Body>
+            <ChessBoardWrapper
+              position={game.fen()}
+              onPieceDrop={onDrop}
+              orientation={boardOrientation}
+              isDraggable={!showFeedback}
             />
 
-            <Row>
-              <Col xs={12} md={6}>
-                <p>
-                  <strong>Tempo:</strong> {formatTime(timeElapsed)}<br/>
-                  <strong>Streak Máximo:</strong> {session.maxStreak}<br/>
-                  <strong>Taxa de Acerto:</strong> {
-                    session.correctCount + session.incorrectCount > 0
-                      ? Math.round(session.correctCount / (session.correctCount + session.incorrectCount) * 100)
-                      : 0
-                  }%
-                </p>
-              </Col>
-              <Col xs={12} md={6} className="text-md-end text-start mt-3 mt-md-0">
-                {session.currentPuzzle && (
-                  <div>
-                    <Badge bg={session.currentPuzzle.color === 'white' ? 'light' : 'dark'}>
-                      {session.currentPuzzle.color === 'white' ? 'Brancas' : 'Pretas'}
-                    </Badge>
-                    {session.attemptCount > 0 && (
-                      <p className="mt-2">
-                        <small>Tentativas: <strong>{session.attemptCount}/3</strong></small>
-                      </p>
-                    )}
-                  </div>
-                )}
-              </Col>
-            </Row>
+            <PuzzleFeedback
+              showFeedback={showFeedback}
+              attemptCount={session.attemptCount}
+              showSolution={showSolution}
+              solutionSAN={getSolutionSAN()}
+              evaluationLoss={session.currentPuzzle?.evaluation}
+            />
+
+            <PuzzleControls
+              onSkip={skipPuzzle}
+              onNext={showSolution ? nextPuzzle : undefined}
+              onReset={resetSession}
+              onExit={() => window.location.reload()}
+              showNext={showSolution}
+              disableSkip={showFeedback === 'correct'}
+            />
           </Card.Body>
         </Card>
 
-        <Card>
-          <Card.Body>
-            <div className="d-flex justify-content-center">
-              <div style={{ width: '100%', maxWidth: '500px' }}>
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={onDrop}
-                  boardOrientation={boardOrientation}
-                  arePiecesDraggable={!showFeedback}
-                />
-              </div>
-            </div>
-
-            {showFeedback === 'correct' && (
-              <Alert variant="success" className="mt-3">
-                ✅ Correto! Muito bem!
-              </Alert>
-            )}
-
-            {showFeedback === 'incorrect' && (
-              <Alert variant="danger" className="mt-3">
-                ❌ Incorreto! {session.attemptCount < 3 ? `Você tem ${3 - session.attemptCount} tentativa(s) restante(s).` : 'Limite de tentativas atingido. Avançando para o próximo puzzle...'}
-              </Alert>
-            )}
-
-            {showSolution && session.currentPuzzle && (
-              <Alert variant="info" className="mt-3">
-                💡 <strong>Solução:</strong> {getSolutionSAN()}
-                <br/>
-                <small>Perdeu {session.currentPuzzle.evaluation} centipawns</small>
-              </Alert>
-            )}
-
-            <Gap size={8} horizontal>
-              <Button
-                variant="secondary"
-                onClick={skipPuzzle}
-                disabled={showFeedback === 'correct'}
-              >
-                Pular Puzzle
-              </Button>
-
-              {showSolution && (
-                <Button variant="primary" onClick={nextPuzzle}>
-                  Próximo Puzzle
-                </Button>
-              )}
-
-              <Button variant="warning" onClick={resetSession}>
-                Reiniciar Sessão
-              </Button>
-
-              <Button variant="danger" onClick={() => window.location.reload()}>
-                Sair
-              </Button>
-            </Gap>
-          </Card.Body>
-        </Card>
-
-        <Card>
-          <Card.Body>
-            <h5>Estatísticas Globais</h5>
-            <Row>
-              <Col xs={6} md={3}>
-                <p><strong>Total de Puzzles:</strong> {stats.totalPuzzles}</p>
-              </Col>
-              <Col xs={6} md={3}>
-                <p><strong>Resolvidos:</strong> {stats.solvedPuzzles}</p>
-              </Col>
-              <Col xs={6} md={3}>
-                <p><strong>Taxa de Sucesso:</strong> {stats.successRate.toFixed(1)}%</p>
-              </Col>
-              <Col xs={6} md={3}>
-                <p><strong>Média de Tentativas:</strong> {stats.averageAttempts.toFixed(1)}</p>
-              </Col>
-            </Row>
-          </Card.Body>
-        </Card>
+        <GlobalStats stats={stats} />
       </Gap>
     </div>
   );

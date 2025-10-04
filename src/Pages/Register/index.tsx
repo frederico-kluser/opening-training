@@ -1,13 +1,10 @@
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Chess, Move } from 'chess.js';
-import { FaRedo, FaUndo } from 'react-icons/fa';
-import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
-import { ImExit } from 'react-icons/im';
 import TypeStorage from '../../types/TypeStorage';
 import Gap from '../../components/Gap';
-import Download from '../../components/Download';
 import ChessGame from '../../components/ChessGame';
+import NavigationBar from '../../components/TrainingControls/NavigationBar';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -96,46 +93,34 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 	};
 
+  const handleUndo = () => {
+    if (save[variant][actualFen]?.prevFen) {
+      setActualFen(save[variant][actualFen]?.prevFen);
+    } else if (actualFen !== initialFen) {
+      setActualFen(initialFen);
+    }
+  };
+
+  const handleRedo = () => {
+    if (save[variant][actualFen]?.nextFen.length > 0) {
+      // TODO: Implementar a seleção de variações
+      setActualFen(save[variant][actualFen]?.nextFen[0]);
+    }
+  };
+
 	return (
 		<Gap size={16} padding={16}>
-			<Gap size={16} horizontal>
-				<Button variant="danger" onClick={handleExist}>
-					<ImExit color="white" />
-				</Button>
-				<Button
-					variant="light"
-					onClick={() => {
-						if (save[variant][actualFen]?.prevFen) {
-							setActualFen(save[variant][actualFen]?.prevFen);
-						} else if (actualFen !== initialFen) {
-							setActualFen(initialFen);
-						} else {
-							throw new Error('Not implemented');
-						}
-					}}
-					disabled={actualFen === initialFen}
-				>
-					<FaUndo />
-				</Button>
-				<Button variant="secondary" onClick={() => setInvertedBoard(!invertedBoard)}>
-					{!invertedBoard ? <RiFlipVerticalLine /> : <RiFlipVerticalFill />}
-				</Button>
-				<Button
-					variant="light"
-					onClick={() => {
-						if (save[variant][actualFen]?.nextFen.length > 0) {
-							// TODO: Implementar a seleção de variações
-							setActualFen(save[variant][actualFen]?.nextFen[0]);
-						} else {
-							throw new Error('Not implemented');
-						}
-					}}
-					disabled={save[variant] && save[variant][actualFen]?.nextFen.length === 0}
-				>
-					<FaRedo />
-				</Button>
-				<Download data={save} disabled={Object.keys(save).length === 0} />
-			</Gap>
+			<NavigationBar
+        onExit={handleExist}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onFlipBoard={() => setInvertedBoard(!invertedBoard)}
+        isBoardFlipped={invertedBoard}
+        canUndo={actualFen !== initialFen}
+        canRedo={!!save[variant] && save[variant][actualFen]?.nextFen.length > 0}
+        downloadData={save}
+        downloadDisabled={Object.keys(save).length === 0}
+      />
 			{/* <Form.Select aria-label="Default select example">
 				<option>Selecionar variante</option>
 				<option value="1">One</option>
