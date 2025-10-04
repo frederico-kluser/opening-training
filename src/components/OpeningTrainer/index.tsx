@@ -52,9 +52,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [comment, setComment] = useState('');
 
-  // Inicializar sessão de treinamento
+  // Inicializar sessão de treinamento com posições aleatórias
   useEffect(() => {
-    const positions = openingTrainerService.generateTrainingSequence(data, variant, 15);
+    const positions = openingTrainerService.generateTrainingSequence(data, variant, 20);
     if (positions.length > 0) {
       setSession(prev => ({
         ...prev,
@@ -230,9 +230,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     }
   };
 
-  // Resetar sessão
+  // Resetar sessão com novas posições aleatórias
   const resetSession = () => {
-    const positions = openingTrainerService.generateTrainingSequence(data, variant, 15);
+    const positions = openingTrainerService.generateTrainingSequence(data, variant, 20);
     setSession({
       currentPosition: positions[0] || '',
       positionIndex: 0,
@@ -246,6 +246,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       trainingPositions: positions,
       showHint: false
     });
+    setTimeElapsed(0);
   };
 
   // Obter estatísticas

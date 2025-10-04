@@ -25,7 +25,10 @@ interface PuzzleSession {
   attemptCount: number; // Contador de tentativas para o puzzle atual
 }
 
+type GameMode = 'normal' | 'rush';
+
 const PuzzleTrainer: React.FC = () => {
+  const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [session, setSession] = useState<PuzzleSession>({
     currentPuzzle: null,
     puzzleIndex: 0,
@@ -47,9 +50,15 @@ const PuzzleTrainer: React.FC = () => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
 
-  // Carregar puzzles não resolvidos
+  // Carregar puzzles quando o modo mudar
   useEffect(() => {
-    loadPuzzles();
+    if (gameMode) {
+      loadPuzzles();
+    }
+  }, [gameMode]);
+
+  // Timer
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeElapsed(getElapsedTime(session.startTime));
     }, 1000);
@@ -58,16 +67,30 @@ const PuzzleTrainer: React.FC = () => {
   }, [session.startTime]);
 
   const loadPuzzles = () => {
-    const unsolvedPuzzles = puzzleService.getUnsolvedPuzzles();
-    if (unsolvedPuzzles.length === 0) {
-      // Se não houver puzzles não resolvidos, carrega todos
-      const allPuzzles = puzzleService.getPuzzles();
-      setPuzzles(allPuzzles);
-      setSession(prev => ({ ...prev, totalPuzzles: allPuzzles.length }));
+    // Se não há modo selecionado, não carrega ainda
+    if (!gameMode) return;
+
+    let loadedPuzzles: Puzzle[] = [];
+
+    if (gameMode === 'rush') {
+      // Modo Rush: puzzles totalmente aleatórios
+      loadedPuzzles = puzzleService.getRandomPuzzles(20, true);
+      setSession(prev => ({ ...prev, isRushMode: true }));
     } else {
-      setPuzzles(unsolvedPuzzles);
-      setSession(prev => ({ ...prev, totalPuzzles: unsolvedPuzzles.length }));
+      // Modo Normal: puzzles embaralhados mas sem repetição
+      loadedPuzzles = puzzleService.getShuffledPuzzles(false);
+      if (loadedPuzzles.length === 0) {
+        // Se não houver puzzles não resolvidos, carrega todos embaralhados
+        loadedPuzzles = puzzleService.getShuffledPuzzles(true);
+      }
     }
+
+    setPuzzles(loadedPuzzles);
+    setSession(prev => ({
+      ...prev,
+      totalPuzzles: loadedPuzzles.length,
+      startTime: new Date()
+    }));
   };
 
   // Carregar puzzle
@@ -227,7 +250,24 @@ const PuzzleTrainer: React.FC = () => {
 
   // Resetar sessão
   const resetSession = () => {
-    window.location.reload();
+    setGameMode(null);
+    setPuzzles([]);
+    setSession({
+      currentPuzzle: null,
+      puzzleIndex: 0,
+      totalPuzzles: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+      streak: 0,
+      maxStreak: 0,
+      startTime: new Date(),
+      isRushMode: false,
+      attemptCount: 0
+    });
+    setTimeElapsed(0);
+    setShowFeedback(null);
+    setShowSolution(false);
+    setBackgroundStyle({});
   };
 
   // Converter solução UCI para SAN
@@ -239,7 +279,64 @@ const PuzzleTrainer: React.FC = () => {
   // Obter estatísticas
   const stats = puzzleService.getStats();
 
-  if (puzzles.length === 0) {
+  // Tela de seleção de modo
+  if (!gameMode) {
+    const hasPuzzles = puzzleService.getPuzzles().length > 0;
+
+    return (
+      <Gap size={16} padding={16}>
+        <Button variant="secondary" onClick={() => window.location.reload()}>
+          ← Voltar
+        </Button>
+
+        <Card>
+          <Card.Body>
+            <h3 className="text-center mb-4">Escolha o Modo de Treinamento</h3>
+
+            {hasPuzzles ? (
+              <Gap size={12}>
+                <Button
+                  variant="primary"
+                  className="w-100 py-3"
+                  onClick={() => setGameMode('normal')}
+                >
+                  <h5>🎯 Modo Normal</h5>
+                  <small>Puzzles embaralhados sem repetição</small>
+                </Button>
+
+                <Button
+                  variant="danger"
+                  className="w-100 py-3"
+                  onClick={() => setGameMode('rush')}
+                >
+                  <h5>⚡ Modo Rush</h5>
+                  <small>Puzzles totalmente aleatórios com repetição</small>
+                </Button>
+
+                <hr />
+
+                <div className="text-center">
+                  <small className="text-muted">
+                    {stats.totalPuzzles} puzzles disponíveis • {stats.solvedPuzzles} resolvidos
+                  </small>
+                </div>
+              </Gap>
+            ) : (
+              <Alert variant="warning">
+                <h4>Nenhum puzzle encontrado!</h4>
+                <p>Analise algumas partidas primeiro para gerar puzzles dos seus erros.</p>
+                <Button variant="primary" onClick={() => window.location.reload()}>
+                  Voltar ao Menu
+                </Button>
+              </Alert>
+            )}
+          </Card.Body>
+        </Card>
+      </Gap>
+    );
+  }
+
+  if (puzzles.length === 0 && gameMode) {
     return (
       <Gap size={16} padding={16}>
         <Button variant="secondary" onClick={() => window.location.reload()}>
@@ -262,6 +359,15 @@ const PuzzleTrainer: React.FC = () => {
       <Gap size={16}>
         <Card>
           <Card.Body>
+            <div className="d-flex justify-content-between align-items-start mb-3">
+              <h5>
+                {gameMode === 'rush' ? '⚡ Modo Rush' : '🎯 Modo Normal'}
+              </h5>
+              {gameMode === 'rush' && (
+                <small className="text-muted">Puzzles aleatórios com repetição</small>
+              )}
+            </div>
+
             <SessionStats
               puzzleIndex={session.puzzleIndex}
               totalPuzzles={session.totalPuzzles}

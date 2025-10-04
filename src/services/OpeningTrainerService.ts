@@ -95,8 +95,9 @@ class OpeningTrainerService {
 
   /**
    * Gera uma sequência aleatória de posições para treinar
+   * Usa Fisher-Yates shuffle para garantir aleatorização verdadeira
    */
-  generateTrainingSequence(data: TypeStorage, variant: string, length: number = 10): string[] {
+  generateTrainingSequence(data: TypeStorage, variant: string, length: number = 20): string[] {
     if (!data[variant]) return [];
 
     const fens = Object.keys(data[variant]);
@@ -107,8 +108,28 @@ class OpeningTrainerService {
       return position.nextFen && position.nextFen.length > 0;
     });
 
-    // Embaralha e pega as primeiras N posições
-    const shuffled = [...trainablePositions].sort(() => Math.random() - 0.5);
+    // Fisher-Yates shuffle para aleatorização verdadeira
+    const shuffled = [...trainablePositions];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Se temos menos posições que o solicitado, repete o array embaralhado
+    if (shuffled.length < length && shuffled.length > 0) {
+      const result = [];
+      while (result.length < length) {
+        // Re-embaralha para cada ciclo
+        const reShuffled = [...shuffled];
+        for (let i = reShuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [reShuffled[i], reShuffled[j]] = [reShuffled[j], reShuffled[i]];
+        }
+        result.push(...reShuffled);
+      }
+      return result.slice(0, length);
+    }
+
     return shuffled.slice(0, Math.min(length, shuffled.length));
   }
 

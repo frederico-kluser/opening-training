@@ -95,6 +95,48 @@ class PuzzleService {
     return this.getPuzzles().filter(p => !p.solved);
   }
 
+  // Obter puzzles aleatórios (modo Rush)
+  getRandomPuzzles(count: number = 20, includesSolved: boolean = false): Puzzle[] {
+    const puzzles = includesSolved ? this.getPuzzles() : this.getUnsolvedPuzzles();
+
+    // Fisher-Yates shuffle
+    const shuffled = [...puzzles];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Se não há puzzles suficientes, repete com re-embaralhamento
+    if (shuffled.length < count && shuffled.length > 0) {
+      const result = [];
+      while (result.length < count) {
+        const reShuffled = [...shuffled];
+        for (let i = reShuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [reShuffled[i], reShuffled[j]] = [reShuffled[j], reShuffled[i]];
+        }
+        result.push(...reShuffled);
+      }
+      return result.slice(0, count);
+    }
+
+    return shuffled.slice(0, Math.min(count, shuffled.length));
+  }
+
+  // Obter puzzles embaralhados (sem repetição)
+  getShuffledPuzzles(includesSolved: boolean = false): Puzzle[] {
+    const puzzles = includesSolved ? this.getPuzzles() : this.getUnsolvedPuzzles();
+
+    // Fisher-Yates shuffle
+    const shuffled = [...puzzles];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+  }
+
   // Obter estatísticas
   getStats(): PuzzleStats {
     const puzzles = this.getPuzzles();
