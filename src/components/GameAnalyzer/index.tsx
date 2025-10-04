@@ -641,7 +641,7 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
               </small>
               <br />
               <small className="text-muted">
-                ✅ As cores foram pré-selecionadas automaticamente, mas você pode alterá-las se desejar.
+                As cores foram pré-selecionadas automaticamente baseado neste jogador.
               </small>
             </Alert>
           )}
@@ -733,27 +733,16 @@ dxe5 Bxf3 16. Qxf3 dxe5 17. Bxe5 Re8 18. Rd1 Qf6 19. Qxf6 gxf6 20. Rd5 fxe5 0-1`
           )}
         </Modal.Body>
         <Modal.Footer>
-          <div className="d-flex justify-content-between w-100">
-            <Button
-              variant="outline-danger"
-              onClick={() => setSelectedGames([])}
-              disabled={selectedGames.length === 0}
-            >
-              Limpar Seleção
-            </Button>
-            <div className="d-flex gap-2">
-              <Button variant="secondary" onClick={() => setShowMultiGameModal(false)}>
-                Cancelar
-              </Button>
-              <Button
-                variant="primary"
-                onClick={startMultiGameAnalysis}
-                disabled={selectedGames.length === 0}
-              >
-                Analisar {selectedGames.length > 0 && `(${selectedGames.length})`}
-              </Button>
-            </div>
-          </div>
+          <Button variant="secondary" onClick={() => setShowMultiGameModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={startMultiGameAnalysis}
+            disabled={selectedGames.length === 0}
+          >
+            Analisar {selectedGames.length > 0 && `(${selectedGames.length})`}
+          </Button>
         </Modal.Footer>
       </Modal>
 
