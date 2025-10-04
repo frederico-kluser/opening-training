@@ -1,6 +1,7 @@
 export interface Puzzle {
   id: string;
   fenBefore: string; // Posição antes do erro
+  fenContext?: string; // Posição um movimento antes (para contexto)
   blunderMove: string; // O movimento ruim jogado
   solution: string; // O melhor movimento (solução)
   evaluation: number; // Centipawns perdidos

@@ -20,6 +20,7 @@ interface MoveAnalysis {
 interface BlunderPuzzle {
   id: string;
   fenBefore: string; // Posição antes do blunder
+  fenContext?: string; // Posição um movimento antes (para contexto)
   blunderMove: string; // O movimento ruim
   solution: string; // O melhor movimento
   evaluation: number; // Vantagem perdida
@@ -206,6 +207,7 @@ const GameAnalyzer: React.FC = () => {
       if (allBlunders.length > 0) {
         const puzzlesToSave = allBlunders.map(blunder => ({
           fenBefore: blunder.fenBefore,
+          fenContext: blunder.fenContext, // Adiciona contexto ao salvar
           blunderMove: blunder.blunderMove,
           solution: blunder.solution,
           evaluation: blunder.evaluation,
@@ -280,6 +282,7 @@ const GameAnalyzer: React.FC = () => {
           foundBlunders.push({
             id: `blunder-${Date.now()}-${i}`,
             fenBefore: positions[i],
+            fenContext: i > 0 ? positions[i - 1] : undefined, // Adiciona contexto se disponível
             blunderMove: moves[i].san,
             solution: evalBefore.bestMove,
             evaluation: cpLoss,
@@ -356,7 +359,7 @@ const GameAnalyzer: React.FC = () => {
       });
 
       // Configurar progresso
-      setProgress({ current: 0, total: positions.length - 1 });
+      setProgress({ current: 0, total: positions.length - 1, currentGame: 0, totalGames: 0 });
 
       // Analisar cada movimento
       const stockfish = getStockfish();
@@ -364,7 +367,7 @@ const GameAnalyzer: React.FC = () => {
       const foundBlunders: BlunderPuzzle[] = [];
 
       for (let i = 0; i < moves.length; i++) {
-        setProgress({ current: i + 1, total: moves.length });
+        setProgress({ current: i + 1, total: moves.length, currentGame: 0, totalGames: 0 });
 
         // Pular primeiros 10 lances (teoria de abertura)
         if (i < 10) {
@@ -415,6 +418,7 @@ const GameAnalyzer: React.FC = () => {
           foundBlunders.push({
             id: `blunder-${i}`,
             fenBefore: positions[i],
+            fenContext: i > 0 ? positions[i - 1] : undefined, // Adiciona contexto se disponível
             blunderMove: moves[i].san,
             solution: evalBefore.bestMove,
             evaluation: cpLoss,
@@ -431,6 +435,7 @@ const GameAnalyzer: React.FC = () => {
       if (foundBlunders.length > 0) {
         const puzzlesToSave = foundBlunders.map(blunder => ({
           fenBefore: blunder.fenBefore,
+          fenContext: blunder.fenContext, // Adiciona contexto ao salvar
           blunderMove: blunder.blunderMove,
           solution: blunder.solution,
           evaluation: blunder.evaluation,
@@ -447,7 +452,7 @@ const GameAnalyzer: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Erro ao analisar partida');
     } finally {
       setIsAnalyzing(false);
-      setProgress({ current: 0, total: 0 });
+      setProgress({ current: 0, total: 0, currentGame: 0, totalGames: 0 });
     }
   }, [pgn, playerColor]);
 
@@ -529,8 +534,32 @@ const GameAnalyzer: React.FC = () => {
           setGamesInfo(info);
         }
 
+        // Salvar puzzles no localStorage se houver blunders
+        if (analysisData.blunders && analysisData.blunders.length > 0) {
+          const puzzlesToSave = analysisData.blunders.map((blunder: BlunderPuzzle) => ({
+            fenBefore: blunder.fenBefore,
+            fenContext: blunder.fenContext,
+            blunderMove: blunder.blunderMove,
+            solution: blunder.solution,
+            evaluation: blunder.evaluation,
+            moveNumber: blunder.moveNumber,
+            color: blunder.color as 'white' | 'black'
+          }));
+
+          puzzleService.addMultiplePuzzles(puzzlesToSave);
+          setSavedPuzzlesCount(analysisData.blunders.length);
+        }
+
         setError('');
-        alert('Análise importada com sucesso!');
+
+        // Mensagem de sucesso mais informativa
+        const puzzleCount = analysisData.blunders ? analysisData.blunders.length : 0;
+        if (puzzleCount > 0) {
+          alert(`Análise importada com sucesso! ${puzzleCount} puzzle(s) foram salvos no localStorage.`);
+          setShowSuccessModal(true); // Mostrar modal de sucesso também
+        } else {
+          alert('Análise importada com sucesso!');
+        }
       } catch (err) {
         setError('Erro ao importar análise. Verifique se o arquivo está no formato correto.');
       }
@@ -837,13 +866,27 @@ const GameAnalyzer: React.FC = () => {
           {/* Mostrar informação sobre partidas carregadas */}
           {!isAnalyzing && parsedGames.length > 0 && (
             <Alert variant="info" className="mt-3">
-              <strong>
-                {parsedGames.length === 1
-                  ? '✅ 1 partida pronta para análise'
-                  : `✅ ${parsedGames.length} partidas prontas para análise`}
-              </strong>
-              <br />
-              <small>Clique em "Analisar Partida(s)" para continuar</small>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>
+                    {parsedGames.length === 1
+                      ? '✅ 1 partida pronta para análise'
+                      : `✅ ${parsedGames.length} partidas prontas para análise`}
+                  </strong>
+                  <br />
+                  <small>Clique em "Analisar Partida(s)" para continuar</small>
+                </div>
+                {(analysis.length > 0 || blunders.length > 0) && (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={exportAnalysis}
+                    className="ms-3"
+                  >
+                    💾 Exportar Análise
+                  </Button>
+                )}
+              </div>
             </Alert>
           )}
 

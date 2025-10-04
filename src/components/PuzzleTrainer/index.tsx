@@ -49,6 +49,7 @@ const PuzzleTrainer: React.FC = () => {
   const [showSolution, setShowSolution] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
+  const [showingContext, setShowingContext] = useState(false);
 
   // Carregar puzzles quando o modo mudar
   useEffect(() => {
@@ -97,8 +98,26 @@ const PuzzleTrainer: React.FC = () => {
   useEffect(() => {
     if (puzzles.length > 0 && session.puzzleIndex < puzzles.length) {
       const puzzle = puzzles[session.puzzleIndex];
-      const newGame = new Chess(puzzle.fenBefore);
-      setGame(newGame);
+
+      // Se tem contexto (movimento anterior), mostra primeiro ele
+      if (puzzle.fenContext) {
+        setShowingContext(true);
+        const contextGame = new Chess(puzzle.fenContext);
+        setGame(contextGame);
+
+        // Após 1 segundo, avança para a posição do puzzle
+        setTimeout(() => {
+          const newGame = new Chess(puzzle.fenBefore);
+          setGame(newGame);
+          setShowingContext(false);
+        }, 1000);
+      } else {
+        // Se não tem contexto, carrega direto
+        const newGame = new Chess(puzzle.fenBefore);
+        setGame(newGame);
+        setShowingContext(false);
+      }
+
       setSession(prev => ({ ...prev, currentPuzzle: puzzle, attemptCount: 0 }));
       setBoardOrientation(puzzle.color);
       setShowFeedback(null);
@@ -110,7 +129,7 @@ const PuzzleTrainer: React.FC = () => {
 
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
-    if (!session.currentPuzzle || showFeedback) return false;
+    if (!session.currentPuzzle || showFeedback || showingContext) return false;
 
     try {
       const move = game.move({
@@ -140,7 +159,7 @@ const PuzzleTrainer: React.FC = () => {
     } catch (error) {
       return false;
     }
-  }, [game, session.currentPuzzle, showFeedback]);
+  }, [game, session.currentPuzzle, showFeedback, showingContext]);
 
   // Movimento correto
   const handleCorrectMove = () => {
@@ -385,11 +404,17 @@ const PuzzleTrainer: React.FC = () => {
 
         <Card>
           <Card.Body>
+            {showingContext && (
+              <Alert variant="info" className="mb-3 text-center">
+                <strong>Mostrando posição anterior...</strong>
+              </Alert>
+            )}
+
             <ChessBoardWrapper
               position={game.fen()}
               onPieceDrop={onDrop}
               orientation={boardOrientation}
-              isDraggable={!showFeedback}
+              isDraggable={!showFeedback && !showingContext}
             />
 
             <PuzzleFeedback
