@@ -2,408 +2,518 @@
 
 ## 🎯 Visão Geral do Projeto
 
-Sistema de treinamento de xadrez com duas vertentes principais: **treino de aberturas personalizadas** e **análise de erros com geração automática de puzzles** baseados em partidas reais.
+Sistema avançado de treinamento de xadrez com três módulos principais: **análise de partidas com IA**, **treinamento tático com puzzles personalizados** e **repertório de aberturas**.
 
 ### Funcionalidades Principais:
 
-**1. Sistema de Repertório de Aberturas** ✅
-- Cadastro completo de aberturas e variantes
-- Anotações personalizadas por posição
-- Sistema de navegação em árvore/grafo
-- Import/Export de repertórios em JSON
+**1. Análise de Partidas com Stockfish 17** ✅
+- Análise profunda de partidas (depth 18) com Stockfish WASM
+- Importação de múltiplas partidas via PGN ou Chess.com
+- Detecção automática do jogador mais frequente com badge 🎯
+- Pré-seleção inteligente de partidas para análise
+- Cálculo de ACPL (Average Centipawn Loss) separado por cor
+- Classificação de movimentos em 6 categorias (brilliant, best, good, inaccuracy, mistake, blunder)
+- **Exportação de análises completas** em formato JSON com todos os dados
+- **Importação de análises salvas** com auto-salvamento de puzzles no localStorage
+- Estatísticas detalhadas por cor (blunders, mistakes, inaccuracies)
 
-**2. Análise de Partidas com Stockfish** 🚀 (Nova Feature)
-- Parser de PGN integrado
-- Análise lance a lance com Stockfish 17
-- Detecção automática de blunders/mistakes/inaccuracies
-- Cálculo de ACPL (Average Centipawn Loss)
-- Classificação de movimentos (brilliant/best/good/inaccuracy/mistake/blunder)
+**2. Sistema de Puzzles Táticos** 🎮
+- Geração automática de puzzles a partir de blunders (>300cp)
+- **Dois modos de treinamento:**
+  - **Modo Normal:** Puzzles sem repetição, progresso linear
+  - **Modo Rush:** 20 puzzles aleatórios com repetição permitida (treino intensivo)
+- **Sistema de contexto visual:** Mostra posição anterior por 1 segundo antes do puzzle
+- Feedback visual instantâneo com cores (verde #90EE90 / rosa #FFB6C1)
+- Sistema de streaks e estatísticas globais persistentes
+- **Máximo de 3 tentativas** com feedback progressivo
+- Salvamento automático no localStorage
 
-**3. Geração Automática de Puzzles** 🎮
-- Criar puzzles dos próprios erros detectados
-- Sistema de pontuação e feedback
-- Armazenamento de puzzles para treino futuro
-- Spaced repetition baseado em performance
+**3. Repertório de Aberturas** 📚
+- Cadastro e edição de variantes personalizadas
+- Treinamento interativo com posições aleatórias
+- **Sistema de navegação em árvore** com suporte a múltiplas variantes
+- Comentários personalizados por posição
+- **Dica após 2 tentativas erradas** mostrando comentário da posição
+- Import/Export em JSON
+- Modo de edição e modo de treino com orientação automática do tabuleiro
 
-## 📊 Status Atual do Projeto
+## 📊 Status do Projeto
 
-### ✅ Sistema Completo de Análise e Treinamento:
-- **Stockfish 17 integrado** - Análise profunda de posições (depth 18)
-- **Analisador de Partidas** - Detecta blunders, mistakes e inaccuracies
-- **Gerador de Puzzles** - Cria exercícios dos próprios erros
-- **Puzzle Trainer** - Interface interativa com feedback visual
-- **Sistema de Pontuação** - Streak, estatísticas e progresso
-- **Persistência Completa** - Todos os dados salvos localmente
+### ✅ Funcionalidades Implementadas:
 
-### 🎯 Funcionalidades Principais:
-- **Análise PGN** com classificação de movimentos (6 categorias)
-- **ACPL** (Average Centipawn Loss) por cor
-- **Detecção automática** de blunders (>300 centipawns)
-- **Feedback visual** instantâneo (verde/vermelho)
-- **Timer de sessão** e contador de streak
-- **Estatísticas globais** persistentes
+#### **Análise de Partidas**
+- ✅ Stockfish 17 WASM integrado (depth 18, timeout 10s)
+- ✅ Importação de múltiplas partidas PGN com validação robusta
+- ✅ Integração completa com Chess.com API (múltiplos endpoints)
+- ✅ Detecção automática do jogador principal (sem threshold mínimo)
+- ✅ Análise em lote com barra de progresso por partida
+- ✅ Classificação detalhada: brilliant (<0cp), best (<10cp), good (<50cp), inaccuracy (<100cp), mistake (<300cp), blunder (≥300cp)
+- ✅ Cálculo de ACPL separado por cor com estatísticas individuais
+- ✅ **Exportação de análises** em JSON (formato: `chess-analysis-YYYY-MM-DD.json`)
+- ✅ **Importação de análises** com auto-salvamento de puzzles
 
-### 📈 Próximas Implementações:
-- **Integração Chess.com API** para importar partidas
-- **Sistema de spaced repetition** para otimizar aprendizado
-- **Dashboard avançado** com gráficos e insights
-- **Modo multiplayer** para desafios entre usuários
+#### **Sistema de Puzzles**
+- ✅ Geração automática de puzzles de blunders (>300cp, ignora primeiros 10 lances)
+- ✅ **Modo Normal:** puzzles embaralhados sem repetição
+- ✅ **Modo Rush:** 20 puzzles aleatórios com repetição (Fisher-Yates shuffle)
+- ✅ Sistema de 3 tentativas com feedback progressivo
+- ✅ **Contexto visual:** posição anterior mostrada por 1 segundo
+- ✅ Feedback colorido com transição suave (0.5s)
+- ✅ Estatísticas globais persistentes no localStorage
+- ✅ Timer em tempo real e contador de streak (máximo da sessão)
+- ✅ Orientação automática do tabuleiro baseada na cor
 
-## 🚀 ROADMAP - Sistema de Análise e Treinamento
+#### **Repertório de Aberturas**
+- ✅ Sistema completo de cadastro com navegação em árvore
+- ✅ Modo treino com 20 posições aleatórias (Fisher-Yates)
+- ✅ Navegação: Undo/Redo/Flip com atalhos de teclado
+- ✅ Comentários personalizados por posição FEN
+- ✅ **Dica automática após 2 erros** (mostra comentário)
+- ✅ Import/Export JSON com validação TypeStorage
+- ✅ Persistência completa no localStorage (key: `data`)
+- ✅ Orientação automática baseada no turno
 
-### **FASE 1: Integração do Stockfish** ✅ **[CONCLUÍDA]**
-**Objetivo**: Ter o engine funcionando e analisando posições
+### 🚧 Em Desenvolvimento:
+- [ ] Sistema de spaced repetition com algoritmo SM-2
+- [ ] Dashboard com gráficos de evolução temporal
+- [ ] Filtros avançados para puzzles (por tipo de erro, cor, fase do jogo)
+- [ ] Seleção de variante no Redo (múltiplas ramificações)
+- [ ] Configuração customizável de depth/timeout do Stockfish
+- [ ] Tratamento de rate limiting da API Chess.com
 
-- ✅ Stockfish WASM configurado em `/public`
-- ✅ `StockfishService.ts` com singleton pattern
-- ✅ Comunicação UCI via Web Workers
-- ✅ Hook `useStockfish` para componentes
-- ✅ Análise básica de posições testada
+## 🚀 Como Usar
 
-### **FASE 2: Analisador de Partidas** ✅ **[CONCLUÍDA]**
-**Objetivo**: Analisar PGN e detectar erros automaticamente
+### Instalação
 
-- ✅ `GameAnalyzer` component implementado
-- ✅ Parser de PGN com chess.js
-- ✅ Análise lance a lance com classificação
-- ✅ Cálculo de ACPL (Average Centipawn Loss)
-- ✅ Interface com estatísticas detalhadas
-
-### **FASE 3: Geração de Puzzles** ✅ **[CONCLUÍDA]**
-**Objetivo**: Criar puzzles dos erros detectados
-
-- ✅ Detecção de blunders (>300 centipawns loss)
-- ✅ Estrutura de puzzle com solução
-- ✅ Salvamento no localStorage
-- ✅ PuzzleService para gerenciamento
-- ✅ Sistema de UUID único por puzzle
-
-### **FASE 4: Puzzle Trainer** ✅ **[CONCLUÍDA]**
-**Objetivo**: Interface para resolver puzzles
-
-- ✅ Componente `PuzzleTrainer` completo
-- ✅ Feedback visual (verde/vermelho)
-- ✅ Contador de acertos/erros e streak
-- ✅ Timer com formatação mm:ss
-- ✅ Estatísticas globais em tempo real
-
-### **FASE 5: Integração Chess.com** 🌐 [3-4 dias]
-**Objetivo**: Importar partidas automaticamente
-
-- [ ] Integrar API pública do Chess.com
-- [ ] Buscar partidas por username
-- [ ] Filtrar partidas recentes
-- [ ] Análise em batch de múltiplas partidas
-- [ ] Gerar relatório consolidado
-
-### **FASE 6: Sistema de Repetição Espaçada** 📈 [4-5 dias]
-**Objetivo**: Otimizar aprendizado com algoritmo SM-2
-
-- [ ] Implementar algoritmo de repetição espaçada
-- [ ] Tracking de performance por puzzle
-- [ ] Calendário de revisão
-- [ ] Notificações de puzzles para revisar
-- [ ] Ajuste de dificuldade dinâmico
-
-### **FASE 7: Dashboard e Estatísticas** 📊 [3-4 dias]
-**Objetivo**: Visualizar progresso e insights
-
-- [ ] Gráficos de evolução temporal
-- [ ] Heatmap de tipos de erro
-- [ ] Estatísticas por abertura
-- [ ] Comparação antes/depois
-- [ ] Exportar relatórios PDF
-
-## 🛠️ Stack Tecnológico
-
-[![React](https://img.shields.io/badge/React-18.3.1-61dafb)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-3178c6)](https://www.typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-5.4.10-646cff)](https://vitejs.dev)
-[![Chess.js](https://img.shields.io/badge/Chess.js-1.0.0--beta.8-green)](https://github.com/jhlywa/chess.js)
-
-### Bibliotecas de Xadrez
-- **chess.js**: Validação de movimentos e regras
-- **react-chessboard**: Tabuleiro interativo
-- **Stockfish WASM**: Engine de análise (a ser integrado)
-
-## 🚀 Como Usar o Sistema Completo
-
-### 1️⃣ **Setup Rápido** (Sistema já configurado!)
 ```bash
-# Clone e execute
+# Clone o repositório
 git clone https://github.com/frederico-kluser/opening-training.git
 cd opening-training
+
+# Instale as dependências
 npm install
+
+# Execute o projeto
 npm run dev
 ```
 
-### 2️⃣ **Fluxo de Uso Completo**
+Acesse http://localhost:5173
 
-#### **Passo 1: Analisar uma Partida**
-1. Acesse http://localhost:5173
-2. Clique em **"Analisar Partidas"** (botão azul)
-3. Cole um PGN ou use **"Carregar Exemplo"**
-4. Clique **"Analisar Partida"**
-5. Veja os blunders detectados e estatísticas
+### Fluxo de Uso
 
-#### **Passo 2: Treinar com Puzzles**
-1. Clique em **"Treinar Puzzles"** (botão primário)
-2. Resolva os puzzles gerados dos seus erros
-3. Veja o feedback visual instantâneo:
-   - ✅ Verde = Movimento correto
-   - ❌ Vermelho = Movimento incorreto
-4. Acompanhe seu streak e estatísticas
+#### **1. Análise de Partidas**
+1. Clique em "📊 Analisar Partidas"
+2. Escolha uma opção:
+   - **Importar PGN**: Cole suas partidas ou use o exemplo
+   - **Chess.com**: Digite username e escolha:
+     - Importar Todos (jogos do mês)
+     - Importar Apenas Meus Jogos (filtra por username)
+     - Importar Últimos 10 (importação rápida)
+   - **📥 Importar Análise**: Carregue análises salvas (JSON)
+3. Para múltiplas partidas:
+   - Jogador mais frequente é detectado automaticamente (badge 🎯)
+   - Partidas do jogador detectado são pré-selecionadas
+   - Escolha a cor para análise (brancas ou pretas)
+4. Aguarde a análise (depth 18, timeout 10s por posição)
+5. Veja estatísticas separadas por cor (ACPL, erros)
+6. **💾 Exportar Análise**: Salve para reutilizar depois
+7. Puzzles são gerados automaticamente de blunders (>300cp)
 
-### 3️⃣ **Recursos Disponíveis**
+#### **2. Treinamento de Puzzles**
+1. Clique em "🧩 Treinar Puzzles"
+2. Escolha o modo:
+   - **Normal**: Puzzles embaralhados sem repetição, progresso linear
+   - **Rush**: 20 puzzles aleatórios com repetição permitida
+3. Observe o contexto (posição anterior por 1 segundo)
+4. Resolva o puzzle (máximo 3 tentativas):
+   - Feedback verde = correto
+   - Feedback rosa = incorreto
+   - Após 3 erros, avança automaticamente
+5. Acompanhe suas estatísticas:
+   - Progresso da sessão (X de Y)
+   - Taxa de acerto e streak
+   - Tentativas por puzzle
+   - Timer em tempo real
 
-| Feature | Status | Como Acessar |
-|---------|--------|-------------|
-| Análise de Partidas | ✅ Completo | Botão "Analisar Partidas" |
-| Detecção de Erros | ✅ Completo | Automático na análise |
-| Geração de Puzzles | ✅ Completo | Automático ao detectar blunders |
-| Puzzle Trainer | ✅ Completo | Botão "Treinar Puzzles" |
-| Estatísticas | ✅ Completo | Visível no Puzzle Trainer |
-| Teste Stockfish | ✅ Completo | Botão "Testar Stockfish" |
+#### **3. Repertório de Aberturas**
+1. Clique em "📚 Repertório"
+2. Opções disponíveis:
+   - **Continuar**: Carrega dados salvos do localStorage
+   - **Novo**: Cria novo repertório (limpa dados anteriores)
+   - **Importar**: Carrega arquivo JSON com validação
+3. **Modo Edição:**
+   - Faça movimentos para criar variantes
+   - Adicione comentários por posição
+   - Use Undo/Redo para navegar na árvore
+   - Exporte com botão Download
+4. **Modo Treino:**
+   - 20 posições aleatórias do repertório
+   - Máximo 3 tentativas por posição
+   - Dica automática após 2 erros (mostra comentário)
+   - Orientação do tabuleiro automática
 
-## 💻 Código de Exemplo - StockfishService.ts
+## 🛠️ Stack Tecnológico
 
-```typescript
-// src/services/StockfishService.ts
-import EventEmitter from 'events';
+### Frontend
+- **React 18.3.1** - Interface de usuário
+- **TypeScript 5.6.2** - Type safety
+- **Vite 5.4.10** - Build tool
+- **React Bootstrap 2.10.5** - Componentes UI
+- **React Icons 5.3.0** - Ícones
 
-interface StockfishAnalysis {
-  bestMove: string;
-  evaluation: number; // em centipawns
-  depth: number;
-  pv: string[]; // principal variation
-}
+### Bibliotecas de Xadrez
+- **chess.js 1.0.0-beta.8** - Engine de validação de movimentos
+- **react-chessboard 4.7.2** - Tabuleiro interativo
+- **Stockfish 17 WASM** - Engine de análise (integrado)
 
-class StockfishService extends EventEmitter {
-  private worker: Worker | null = null;
-  private isReady = false;
-  private analysisCallbacks = new Map<string, (result: StockfishAnalysis) => void>();
+### Utilitários
+- **uuid 13.0.0** - Identificadores únicos
+- **events 3.3.0** - Event emitters
 
-  constructor() {
-    super();
-    this.initEngine();
-  }
+## 📋 Features Detalhadas
 
-  private initEngine() {
-    try {
-      this.worker = new Worker('/stockfish.wasm.js');
+### Análise de Partidas
+- **Importação Flexível**: PGN direto, arquivo .pgn, ou Chess.com API
+- **Chess.com API Completa**:
+  - 3 modos de importação (Todos/Meus Jogos/Últimos 10)
+  - Preview visual com badges coloridos por tipo
+  - Estatísticas e ratings em tempo real
+  - Múltiplos endpoints disponíveis
+- **Análise em Lote**: Processa múltiplas partidas com barra de progresso
+- **Detecção Inteligente**: Identifica jogador mais frequente sem threshold mínimo
+- **Pré-seleção Automática**: Badge 🎯 e seleção do jogador detectado
+- **Classificação Precisa**:
+  - Brilliant (< 0 cp loss) - Movimento excepcional
+  - Best (< 10 cp loss) - Melhor movimento
+  - Good (< 50 cp loss) - Movimento bom
+  - Inaccuracy (< 100 cp loss) - Imprecisão
+  - Mistake (< 300 cp loss) - Erro
+  - Blunder (≥ 300 cp loss) - Grande erro
+- **Exportação/Importação**:
+  - Formato JSON completo com análises e puzzles
+  - Auto-salvamento de puzzles ao importar
+  - Nome padrão: `chess-analysis-YYYY-MM-DD.json`
 
-      this.worker.onmessage = (e) => {
-        const message = e.data;
+### Sistema de Puzzles
+- **Geração Inteligente**:
+  - Apenas blunders >300cp viram puzzles
+  - Ignora primeiros 10 lances (teoria)
+  - Inclui contexto da posição anterior
+- **Dois Modos Distintos**:
+  - **Normal**: Sem repetição, todos os puzzles uma vez
+  - **Rush**: 20 puzzles com Fisher-Yates shuffle e repetição
+- **Sistema de Tentativas**:
+  - Máximo 3 tentativas com feedback progressivo
+  - Auto-skip após 3 erros
+- **Contexto Visual**:
+  - Mostra `fenContext` por 1 segundo
+  - Tabuleiro bloqueado durante preview
+- **Feedback Colorido**:
+  - Verde (#90EE90) com transição 0.5s para acerto
+  - Rosa (#FFB6C1) com transição 0.5s para erro
+- **Estatísticas Completas**:
+  - Taxa de acerto, streak máximo
+  - Timer em tempo real
+  - Persistência no localStorage
 
-        // Engine ready
-        if (message === 'readyok') {
-          this.isReady = true;
-          this.emit('ready');
-        }
+### Repertório de Aberturas
+- **Editor Visual**:
+  - Interface drag-and-drop para criar variantes
+  - Suporte a múltiplas ramificações
+  - Navegação com Undo/Redo
+- **Estrutura em Árvore**:
+  - TypeStorage com prevFen/nextFen[]
+  - Comentários únicos por FEN
+  - Validação completa na importação
+- **Modo Treino Avançado**:
+  - 20 posições com Fisher-Yates shuffle
+  - Dica após 2 tentativas (mostra comentário)
+  - Orientação automática por turno
+- **Import/Export**:
+  - JSON validado com TypeStorage
+  - Download direto do navegador
+  - Persistência em localStorage (key: `data`)
 
-        // Best move found
-        if (message.startsWith('bestmove')) {
-          const parts = message.split(' ');
-          const bestMove = parts[1];
-          const fen = this.getCurrentAnalysisFen();
-
-          if (fen && this.analysisCallbacks.has(fen)) {
-            const callback = this.analysisCallbacks.get(fen)!;
-            callback({
-              bestMove,
-              evaluation: this.lastEvaluation || 0,
-              depth: this.lastDepth || 0,
-              pv: this.lastPV || []
-            });
-            this.analysisCallbacks.delete(fen);
-          }
-        }
-
-        // Evaluation info
-        if (message.startsWith('info')) {
-          this.parseInfo(message);
-        }
-      };
-
-      // Initialize UCI
-      this.send('uci');
-      this.send('isready');
-
-    } catch (error) {
-      console.error('Failed to initialize Stockfish:', error);
-    }
-  }
-
-  private lastEvaluation = 0;
-  private lastDepth = 0;
-  private lastPV: string[] = [];
-  private currentFen = '';
-
-  private getCurrentAnalysisFen() {
-    return this.currentFen;
-  }
-
-  private parseInfo(message: string) {
-    // Parse depth
-    const depthMatch = message.match(/depth (\d+)/);
-    if (depthMatch) {
-      this.lastDepth = parseInt(depthMatch[1]);
-    }
-
-    // Parse evaluation
-    const cpMatch = message.match(/cp (-?\d+)/);
-    if (cpMatch) {
-      this.lastEvaluation = parseInt(cpMatch[1]);
-    }
-
-    // Parse mate
-    const mateMatch = message.match(/mate (-?\d+)/);
-    if (mateMatch) {
-      const mateIn = parseInt(mateMatch[1]);
-      this.lastEvaluation = mateIn > 0 ? 100000 - mateIn : -100000 + mateIn;
-    }
-
-    // Parse PV
-    const pvMatch = message.match(/pv (.+)/);
-    if (pvMatch) {
-      this.lastPV = pvMatch[1].split(' ');
-    }
-  }
-
-  private send(command: string) {
-    if (this.worker) {
-      this.worker.postMessage(command);
-    }
-  }
-
-  async analyze(fen: string, depth: number = 15): Promise<StockfishAnalysis> {
-    return new Promise((resolve) => {
-      this.currentFen = fen;
-      this.analysisCallbacks.set(fen, resolve);
-
-      this.send(`position fen ${fen}`);
-      this.send(`go depth ${depth}`);
-
-      // Timeout after 10 seconds
-      setTimeout(() => {
-        if (this.analysisCallbacks.has(fen)) {
-          this.analysisCallbacks.delete(fen);
-          resolve({
-            bestMove: '',
-            evaluation: 0,
-            depth: 0,
-            pv: []
-          });
-        }
-      }, 10000);
-    });
-  }
-
-  setSkillLevel(level: number) {
-    // 0-20, where 0 is weakest
-    this.send(`setoption name Skill Level value ${level}`);
-  }
-
-  stop() {
-    this.send('stop');
-  }
-
-  quit() {
-    this.send('quit');
-    if (this.worker) {
-      this.worker.terminate();
-      this.worker = null;
-    }
-  }
-}
-
-// Singleton instance
-let stockfishInstance: StockfishService | null = null;
-
-export const getStockfish = (): StockfishService => {
-  if (!stockfishInstance) {
-    stockfishInstance = new StockfishService();
-  }
-  return stockfishInstance;
-};
-```
 
 ## 🏗️ Arquitetura do Projeto
 
 ```
 src/
-├── components/        # Componentes React reutilizáveis
-│   ├── ChessGame/    # Tabuleiro interativo
-│   ├── Download/     # Exportação JSON
-│   ├── Gap/          # Espaçamento
-│   └── Upload/       # Importação JSON
+├── components/           # Componentes React
+│   ├── ChessBoard/      # Wrapper do tabuleiro
+│   ├── ChessComImporter/# Importação Chess.com
+│   ├── ChessGame/       # Tabuleiro interativo
+│   ├── GameAnalyzer/    # Análise de partidas
+│   ├── OpeningTrainer/  # Treino de aberturas
+│   ├── PuzzleSession/   # Componentes de sessão
+│   ├── PuzzleTrainer/   # Interface de puzzles
+│   ├── StockfishTest/   # Teste do engine
+│   ├── TrainingControls/# Controles de treino
+│   ├── Download/        # Exportação JSON
+│   ├── Gap/             # Espaçamento
+│   └── Upload/          # Importação JSON
+├── hooks/
+│   └── useStockfish.ts  # Hook para Stockfish
 ├── Pages/
-│   ├── Computer/     # ⚠️ Duplicado (precisa refatorar)
-│   └── Register/     # Cadastro de variantes
+│   └── Register/        # Editor de repertório
+├── services/
+│   ├── ChessComService.ts    # API Chess.com
+│   ├── OpeningTrainerService.ts # Lógica de treino
+│   ├── PuzzleService.ts      # Gestão de puzzles
+│   └── StockfishService.ts   # Engine de análise
 ├── stockfish/
-│   └── engine.ts     # Classe Engine (não utilizada ainda)
+│   ├── engine.ts        # Classe Engine
+│   └── *.js/wasm        # Arquivos Stockfish
 ├── types/
-│   └── TypeStorage.ts # Schema de dados
+│   ├── Puzzle.ts        # Interface Puzzle
+│   └── TypeStorage.ts   # Schema repertório
 ├── utils/
+│   ├── chessUtils.ts    # Utilidades xadrez
+│   ├── pgnParser.ts     # Parser PGN
+│   ├── timeUtils.ts     # Formatação tempo
 │   └── isValidTypeStorage.ts
-├── App.tsx           # Roteamento principal
-└── main.tsx          # Entry point
+├── App.tsx              # Roteamento principal
+└── main.tsx             # Entry point
 ```
 
 ## 📦 Estrutura de Dados
+
+### Puzzle - Estrutura Completa
+```typescript
+interface Puzzle {
+  id: string;              // UUID v4 único
+  fenBefore: string;       // Posição antes do erro
+  fenContext?: string;     // Posição anterior para contexto (NOVO)
+  blunderMove: string;     // Movimento que foi um blunder
+  solution: string;        // Movimento correto (UCI ou SAN)
+  evaluation: number;      // CP loss do blunder
+  moveNumber: number;      // Número do lance
+  color: 'white' | 'black';
+  dateCreated: string;     // ISO 8601
+  attempts?: number;       // Contador de tentativas (max: 3)
+  solved?: boolean;        // Status de resolução
+  lastAttempt?: string;    // Último movimento tentado
+}
+```
 
 ### TypeStorage - Formato do Repertório
 ```typescript
 interface TypeStorage {
   [abertura: string]: {
     [fen: string]: {
-      prevFen: string;      // Posição anterior
-      comment: string;      // Anotações do usuário
-      nextFen: string[];    // Próximas variantes
+      prevFen: string;      // FEN anterior (para Undo)
+      comment: string;      // Comentário da posição
+      nextFen: string[];    // Próximas variantes (múltiplas)
     }
   }
 }
 ```
 
-### Exemplo de dados reais:
-```json
+### Formato de Exportação de Análise
+```typescript
+interface ExportedAnalysis {
+  date: string;            // Data da exportação
+  pgn: string;             // PGN original
+  analysis: MoveAnalysis[]; // Análise detalhada de cada movimento
+  blunders: Puzzle[];      // Puzzles gerados
+  stats: {
+    white: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
+    black: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
+  };
+  selectedGames: GameSelection[]; // Partidas selecionadas
+  parsedGames: ParsedGame[];      // Partidas parseadas
+}
+```
+
+## 🔧 Configuração Avançada
+
+### Stockfish WASM
+O Stockfish 17 está integrado via WASM com as seguintes configurações:
+
+```typescript
+// Em GameAnalyzer/index.tsx
+const ANALYSIS_DEPTH = 18;     // Profundidade de análise (padrão: 18)
+
+// Em StockfishService.ts
+const ANALYSIS_TIMEOUT = 10000; // Timeout em ms (padrão: 10 segundos)
+```
+
+**Funcionalidades disponíveis:**
+- Análise com depth configurável
+- Skill level ajustável (0-20)
+- Execução em Web Worker (não bloqueia UI)
+- Detecção de mate convertida para ±100000 cp
+- Principal Variation (PV) armazenada
+
+### localStorage - Chaves e Estruturas
+Todos os dados são salvos automaticamente no navegador:
+
+| Chave | Descrição | Estrutura |
+|-------|-----------|-----------|
+| `chess-puzzles` | Lista de puzzles gerados | `Puzzle[]` |
+| `opening-training-stats` | Estatísticas do repertório | `TrainingStats` |
+| `opening-training-session` | Sessão atual de treino | `TrainingSession` |
+| `data` | Repertório de aberturas | `TypeStorage` |
+
+**Estatísticas do Repertório (TrainingStats):**
+```typescript
 {
-  "Caro-Kann": {
-    "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": {
-      "prevFen": "posição_anterior",
-      "comment": "Defesa sólida contra e4",
-      "nextFen": ["próxima_posição_1", "próxima_posição_2"]
-    }
-  }
+  totalMoves: number;
+  correctMoves: number;
+  incorrectMoves: number;
+  streak: number;
+  maxStreak: number;
+  sessionsCompleted: number;
+  lastTrainingDate: string;
+  averageAccuracy: number;
 }
 ```
 
-## 🎯 Próximos Passos Imediatos
-
-### DIA 1: Setup Stockfish
-```bash
-# Manhã: Baixar e configurar
-cd public && wget https://github.com/nmrugg/stockfish.js/raw/master/src/stockfish.wasm.js
-npm install events uuid
-
-# Tarde: Implementar StockfishService
-# Copiar código fornecido acima
-# Testar análise básica
+Para limpar todos os dados:
+```javascript
+localStorage.clear(); // Remove tudo
+// Ou específico:
+localStorage.removeItem('chess-puzzles');
 ```
 
-### DIA 2: GameAnalyzer Component
-```bash
-# Criar componente com código fornecido
-# Adicionar rota no App.tsx
-# Testar com PGN de exemplo
+## 🌐 Integração Chess.com API
+
+### Endpoints Disponíveis
+O sistema usa a API pública do Chess.com com os seguintes endpoints:
+
+```javascript
+// Base URL: https://api.chess.com/pub
+
+getPlayerProfile(username)     // Perfil completo do jogador
+getPlayerArchives(username)    // Lista de arquivos mensais
+getMonthlyGames(username, year, month) // Jogos de um mês específico
+getMonthlyPGN(username, year, month)   // PGN direto do mês
+getLatestGames(username, count)        // Últimos N jogos
+getAllGames(username, limit)           // Batch com paginação
+getPlayerStats(username)               // Estatísticas e ratings
 ```
 
-### DIA 3: PuzzleTrainer
-```bash
-# Implementar interface de puzzles
-# Sistema de feedback visual
-# Salvar progresso
+### Funcionalidades da Integração
+- **Rate limiting:** Delay de 1s entre requisições batch
+- **User-Agent customizado:** "ChessTrainingSystem/1.0"
+- **Filtros disponíveis:**
+  - Por controle de tempo (Bullet/Blitz/Rapid/Daily)
+  - Apenas jogos ranqueados
+- **Dados extras capturados:**
+  - Accuracies (precisão de brancas/pretas)
+  - Ratings de ambos jogadores
+  - URLs das partidas
+
+## ⚙️ Algoritmos e Utilitários
+
+### Fisher-Yates Shuffle
+Usado para embaralhamento verdadeiramente aleatório de puzzles e posições:
+
+```typescript
+// OpeningTrainerService.ts e PuzzleService.ts
+for (let i = array.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [array[i], array[j]] = [array[j], array[i]];
+}
 ```
+
+### Conversão UCI ↔ SAN
+Utilitários para compatibilidade entre Stockfish (UCI) e chess.js (SAN):
+
+```typescript
+// chessUtils.ts
+convertUCItoSAN('e2e4', fen) // => 'e4'
+moveToUCI('e2', 'e4', 'q')   // => 'e2e4q'
+executeMove(game, from, to, promotion)
+```
+
+### Parser PGN Robusto
+Validação e parsing de múltiplas partidas:
+
+```typescript
+// pgnParser.ts
+validatePGN(pgn)              // Validação com mensagens específicas
+extractGamesInfo(pgn)         // Extração de metadados
+detectMostFrequentPlayer(games) // Detecção inteligente sem threshold
+getPlayerColors(games, username) // Identificação de cores jogadas
+```
+
+### Cálculo de ACPL
+Average Centipawn Loss por cor:
+
+```typescript
+// GameAnalyzer/index.tsx
+const calculateACPL = (moves) => {
+  const totalCPL = moves.reduce((sum, m) => sum + m.centipawnLoss, 0);
+  return Math.round(totalCPL / moves.length);
+};
+```
+
+## 🎨 Personalização Visual
+
+### Códigos de Cores
+```css
+/* Feedback de Movimentos */
+--correct-bg: #90EE90;  /* Verde claro - movimento correto */
+--incorrect-bg: #FFB6C1; /* Rosa claro - movimento incorreto */
+--transition: 0.5s;      /* Duração da transição */
+
+/* Badges de Tipo de Jogo */
+--bullet-badge: danger;  /* Vermelho - Bullet */
+--blitz-badge: warning;  /* Amarelo - Blitz */
+--rapid-badge: primary;  /* Azul - Rapid */
+```
+
+### Ícones Utilizados
+- 🎯 Jogador detectado automaticamente
+- 💾 Exportar análise
+- 📥 Importar análise
+- 🧩 Puzzles
+- 📊 Análise
+- 📚 Repertório
+- ✅ Acerto
+- ❌ Erro
+- 🔥 Streak
+- 💡 Dica
+
+## 🚀 Roadmap Futuro
+
+### Curto Prazo
+- [ ] Sistema de spaced repetition com algoritmo SM-2
+- [ ] Dashboard com gráficos de evolução temporal
+- [ ] Filtros avançados para puzzles (por tipo de erro)
+- [ ] Exportação de estatísticas em PDF
+
+### Médio Prazo
+- [ ] Integração com Lichess API
+- [ ] Análise de padrões de erro recorrentes
+- [ ] Sugestões personalizadas de estudo
+- [ ] Modo multiplayer para competições
+
+### Longo Prazo
+- [ ] App mobile (React Native)
+- [ ] Integração com engines alternativos (Leela, etc)
+- [ ] Sistema de coaching com IA
+- [ ] Marketplace de repertórios
+
+## 🐛 Problemas Conhecidos e Limitações
+
+### Problemas de Performance
+- Performance pode degradar com >1000 puzzles salvos no localStorage
+- Análise de partidas muito longas (>100 movimentos) pode ser lenta
+- Re-embaralhamento frequente em bibliotecas pequenas de puzzles (<20)
+
+### Limitações Técnicas
+- Chess.com API tem limite de taxa (delay fixo de 1s entre requisições)
+- Timeout do Stockfish fixo em 10 segundos (não configurável via UI)
+- Seleção de cor exclusiva em múltiplas partidas (não permite analisar ambas)
+- Redo sempre seleciona primeira variante (falta UI para escolher)
+- Primeiros 10 lances são ignorados na geração de puzzles (teoria de abertura)
+
+### TODOs Identificados no Código
+- Implementar seleção de variante no Redo (Register/index.tsx:106)
+- Adicionar configuração de depth/timeout do Stockfish via UI
+- Implementar tratamento adequado de rate limiting Chess.com
 
 ## 🤝 Contribuindo
 
@@ -411,14 +521,47 @@ Contribuições são bem-vindas! Por favor:
 
 1. Fork o projeto
 2. Crie uma feature branch (`git checkout -b feature/NovaFuncionalidade`)
-3. Commit suas mudanças (`git commit -m 'Add: nova funcionalidade'`)
+3. Commit suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
 4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
 5. Abra um Pull Request
 
+### Convenção de Commits
+- `feat:` Nova funcionalidade
+- `fix:` Correção de bug
+- `docs:` Documentação
+- `style:` Formatação
+- `refactor:` Refatoração
+- `test:` Testes
+- `chore:` Manutenção
+
 ## 📄 Licença
 
-MIT License
+MIT License - veja [LICENSE](LICENSE) para detalhes
+
+## 👥 Autor
+
+**Frederico Kluser**
+- GitHub: [@frederico-kluser](https://github.com/frederico-kluser)
+- Projeto: [opening-training](https://github.com/frederico-kluser/opening-training)
+
+## 🙏 Agradecimentos
+
+- [Stockfish](https://stockfishchess.org/) - Engine de análise
+- [Chess.js](https://github.com/jhlywa/chess.js) - Biblioteca de xadrez
+- [React Chessboard](https://github.com/Clariity/react-chessboard) - Componente do tabuleiro
+- [Chess.com](https://chess.com) - API de partidas
 
 ---
 
-**Última atualização**: 03/01/2025
+**Última atualização**: 05/01/2025 | **Versão**: 3.0.0
+
+### 📝 Changelog v3.0.0
+- ✅ Adicionado sistema completo de importação/exportação de análises
+- ✅ Auto-salvamento de puzzles ao importar análises
+- ✅ Sistema de contexto visual para puzzles (fenContext)
+- ✅ Modo Rush com 20 puzzles aleatórios
+- ✅ Detecção inteligente de jogador sem threshold mínimo
+- ✅ Integração completa com Chess.com API (3 modos)
+- ✅ Feedback progressivo com 3 tentativas
+- ✅ Dica automática após 2 erros no repertório
+- ✅ Documentação completa e atualizada
