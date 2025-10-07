@@ -425,14 +425,16 @@ const PuzzleTrainer: React.FC = () => {
               evaluationLoss={session.currentPuzzle?.evaluation}
             />
 
-            <PuzzleControls
-              onSkip={skipPuzzle}
-              onNext={showSolution ? nextPuzzle : undefined}
-              onReset={resetSession}
-              onExit={() => window.location.reload()}
-              showNext={showSolution}
-              disableSkip={showFeedback === 'correct'}
-            />
+            <div className="mt-3">
+              <PuzzleControls
+                onSkip={skipPuzzle}
+                onNext={showSolution ? nextPuzzle : undefined}
+                onReset={resetSession}
+                onExit={() => window.location.reload()}
+                showNext={showSolution}
+                disableSkip={showFeedback === 'correct'}
+              />
+            </div>
           </Card.Body>
         </Card>
 

@@ -16,12 +16,25 @@ function App() {
 	const [variant, setVariant] = useState<string>('');
 	const [data, setData] = useState<TypeStorage>({});
 	const [mode, setMode] = useState<'edit' | 'train' | ''>('');
+	const [darkMode, setDarkMode] = useState<boolean>(() => {
+		const saved = localStorage.getItem('darkMode');
+		return saved ? JSON.parse(saved) : false;
+	});
 
 	useEffect(() => {
 		if (Object.keys(data).length > 0) {
 			localStorage.setItem('data', JSON.stringify(data));
 		}
 	}, [data]);
+
+	useEffect(() => {
+		document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+		localStorage.setItem('darkMode', JSON.stringify(darkMode));
+	}, [darkMode]);
+
+	const toggleDarkMode = () => {
+		setDarkMode(!darkMode);
+	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleLoadData = (data: any) => {
@@ -45,8 +58,12 @@ function App() {
 	if (Object.keys(data).length > 0 && !variant && !mode) {
 		const variants = Object.keys(data);
 		return (
-			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-				<div className="row w-100">
+			<>
+				<div className="theme-toggle" onClick={toggleDarkMode}>
+					{darkMode ? '☀️' : '🌙'}
+				</div>
+				<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: `linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)` }}>
+					<div className="row w-100">
 					<div className="col-12 col-md-8 col-lg-6 col-xl-5 mx-auto">
 						<Card className="shadow-lg border-0">
 							<Card.Body className="p-4">
@@ -111,7 +128,8 @@ function App() {
 						</Card>
 					</div>
 				</div>
-			</div>
+				</div>
+			</>
 		);
 	}
 
@@ -119,9 +137,13 @@ function App() {
 		const hasLocalData = !!localStorage.getItem('data');
 
 		return (
-			<div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8f9fa' }}>
-				{/* Clean Header */}
-				<div className="bg-white shadow-sm">
+			<>
+				<div className="theme-toggle" onClick={toggleDarkMode}>
+					{darkMode ? '☀️' : '🌙'}
+				</div>
+				<div className="min-vh-100 d-flex flex-column">
+					{/* Clean Header */}
+					<div className="bg-white shadow-sm">
 					<div className="container py-4">
 						<div className="text-center">
 							<h1 className="h2 fw-bold text-dark mb-2">♟ Sistema de Treino de Xadrez</h1>
@@ -309,7 +331,8 @@ function App() {
 						</div>
 					</div>
 				</div>
-			</div>
+				</div>
+			</>
 		);
 	}
 
