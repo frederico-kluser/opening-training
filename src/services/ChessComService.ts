@@ -258,7 +258,11 @@ class ChessComService {
    * Busca partidas de um usuário e extrai os FENs de todas elas
    * Retorna uma string com todos os FENs concatenados
    */
-  async fetchGamesAndExtractFENs(username: string, page: number = 1): Promise<string> {
+  async fetchGamesAndExtractFENs(
+    username: string,
+    page: number = 1,
+    onProgress?: (current: number, total: number) => void
+  ): Promise<string> {
     try {
       // 1. Buscar lista de partidas
       const archiveData = await this.getExtendedArchiveGames(username, page);
@@ -270,25 +274,41 @@ class ChessComService {
       const games = archiveData.data;
       const fens: string[] = [];
 
+      console.log(`🎮 Encontradas ${games.length} partidas. Buscando FENs...`);
+
       // 2. Para cada partida, buscar detalhes e extrair FEN
-      for (const game of games) {
+      for (let i = 0; i < games.length; i++) {
+        const game = games[i];
+
         try {
+          if (onProgress) {
+            onProgress(i + 1, games.length);
+          }
+
           const gameDetails = await this.getGameDetails(game.id);
 
+          console.log(`Partida ${i + 1}/${games.length} (ID: ${game.id}):`, gameDetails);
+
+          // Tentar extrair FEN da resposta
           if (gameDetails?.game?.fen) {
             fens.push(gameDetails.game.fen);
+            console.log(`✅ FEN extraído: ${gameDetails.game.fen.substring(0, 50)}...`);
+          } else {
+            console.warn(`⚠️ Partida ${game.id} não tem FEN disponível. Estrutura:`, gameDetails);
           }
 
           // Pequeno delay para não sobrecarregar a API
           await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
-          console.error(`Erro ao buscar detalhes da partida ${game.id}:`, error);
+          console.error(`❌ Erro ao buscar detalhes da partida ${game.id}:`, error);
           // Continua mesmo se uma partida falhar
         }
       }
 
+      console.log(`📊 Total de FENs extraídos: ${fens.length} de ${games.length} partidas`);
+
       if (fens.length === 0) {
-        throw new Error('Não foi possível extrair FENs das partidas');
+        throw new Error('Não foi possível extrair FENs das partidas. Verifique o console para mais detalhes.');
       }
 
       // 3. Juntar todos os FENs numa string separada por quebras de linha

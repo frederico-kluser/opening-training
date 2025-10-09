@@ -68,8 +68,9 @@ const GameAnalyzer: React.FC = () => {
 
   // Estados para importação do Chess.com por FEN
   const [showChessComFenModal, setShowChessComFenModal] = useState(false);
-  const [chessComUsername, setChessComUsername] = useState('');
+  const [chessComUsername, setChessComUsername] = useState('fredericokluser');
   const [loadingChessComFens, setLoadingChessComFens] = useState(false);
+  const [chessComImportProgress, setChessComImportProgress] = useState({ current: 0, total: 0 });
 
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
@@ -597,17 +598,24 @@ const GameAnalyzer: React.FC = () => {
 
     setLoadingChessComFens(true);
     setError('');
+    setChessComImportProgress({ current: 0, total: 0 });
 
     try {
-      // Buscar partidas e extrair FENs
-      const fensString = await chessComService.fetchGamesAndExtractFENs(chessComUsername.trim(), 1);
+      // Buscar partidas e extrair FENs com callback de progresso
+      const fensString = await chessComService.fetchGamesAndExtractFENs(
+        chessComUsername.trim(),
+        1,
+        (current, total) => {
+          setChessComImportProgress({ current, total });
+        }
+      );
 
       // Inserir FENs no input de PGN
       setPgn(fensString);
 
       // Fechar modal e limpar username
       setShowChessComFenModal(false);
-      setChessComUsername('');
+      setChessComUsername('fredericokluser'); // Mantém o valor padrão
 
       // Feedback ao usuário
       const fenCount = fensString.split('\n\n').length;
@@ -616,6 +624,7 @@ const GameAnalyzer: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Erro ao importar partidas do Chess.com');
     } finally {
       setLoadingChessComFens(false);
+      setChessComImportProgress({ current: 0, total: 0 });
     }
   };
 
@@ -827,8 +836,8 @@ const GameAnalyzer: React.FC = () => {
       </Modal>
 
       {/* Modal de importação do Chess.com via FEN */}
-      <Modal show={showChessComFenModal} onHide={() => setShowChessComFenModal(false)} centered>
-        <Modal.Header closeButton>
+      <Modal show={showChessComFenModal} onHide={() => !loadingChessComFens && setShowChessComFenModal(false)} centered>
+        <Modal.Header closeButton={!loadingChessComFens}>
           <Modal.Title>♟️ Importar Partidas do Chess.com</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -839,7 +848,7 @@ const GameAnalyzer: React.FC = () => {
               placeholder="Ex: hikaru, magnuscarlsen, gothamchess"
               value={chessComUsername}
               onChange={(e) => setChessComUsername(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleChessComFenImport()}
+              onKeyPress={(e) => e.key === 'Enter' && !loadingChessComFens && handleChessComFenImport()}
               disabled={loadingChessComFens}
               autoFocus
             />
@@ -847,6 +856,33 @@ const GameAnalyzer: React.FC = () => {
               Serão importadas as partidas da página 1 do seu perfil.
             </Form.Text>
           </Form.Group>
+
+          {loadingChessComFens && chessComImportProgress.total > 0 && (
+            <div className="mt-3">
+              <div className="mb-2">
+                <small className="text-muted">
+                  Buscando FEN das partidas... {chessComImportProgress.current}/{chessComImportProgress.total}
+                </small>
+              </div>
+              <ProgressBar
+                now={(chessComImportProgress.current / chessComImportProgress.total) * 100}
+                label={`${Math.round((chessComImportProgress.current / chessComImportProgress.total) * 100)}%`}
+                animated
+                striped
+              />
+            </div>
+          )}
+
+          {loadingChessComFens && chessComImportProgress.total === 0 && (
+            <div className="mt-3 text-center">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Carregando...</span>
+              </div>
+              <div className="mt-2">
+                <small className="text-muted">Buscando lista de partidas...</small>
+              </div>
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowChessComFenModal(false)} disabled={loadingChessComFens}>
