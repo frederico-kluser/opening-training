@@ -51,6 +51,7 @@ const PuzzleTrainer: React.FC = () => {
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
   const [showingContext, setShowingContext] = useState(false);
   const [lastWrongMove, setLastWrongMove] = useState<string>('');
+  const [wrongMovesHistory, setWrongMovesHistory] = useState<string[]>([]);
   const [showNextButton, setShowNextButton] = useState(false);
 
   // Carregar puzzles quando o modo mudar
@@ -126,6 +127,7 @@ const PuzzleTrainer: React.FC = () => {
       setShowSolution(false);
       setBackgroundStyle({});
       setLastWrongMove('');
+      setWrongMovesHistory([]);
       setShowNextButton(false);
     }
   }, [puzzles, session.puzzleIndex]);
@@ -156,6 +158,7 @@ const PuzzleTrainer: React.FC = () => {
       } else {
         // Salvar movimento errado antes de desfazer
         setLastWrongMove(move.san);
+        setWrongMovesHistory(prev => [...prev, move.san]);
         handleIncorrectMove();
         // Desfaz o movimento errado
         game.undo();
@@ -427,6 +430,7 @@ const PuzzleTrainer: React.FC = () => {
               solutionSAN={getSolutionSAN()}
               evaluationLoss={session.currentPuzzle?.evaluation}
               wrongMoveSAN={lastWrongMove}
+              wrongMovesHistory={wrongMovesHistory}
             />
 
             <div className="mt-3">

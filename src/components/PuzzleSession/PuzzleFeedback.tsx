@@ -8,6 +8,7 @@ interface PuzzleFeedbackProps {
   solutionSAN?: string;
   evaluationLoss?: number;
   wrongMoveSAN?: string;
+  wrongMovesHistory?: string[];
 }
 
 const PuzzleFeedback: React.FC<PuzzleFeedbackProps> = ({
@@ -16,16 +17,32 @@ const PuzzleFeedback: React.FC<PuzzleFeedbackProps> = ({
   showSolution = false,
   solutionSAN = '',
   evaluationLoss = 0,
-  wrongMoveSAN = ''
+  wrongMoveSAN = '',
+  wrongMovesHistory = []
 }) => {
   if (!showFeedback && !showSolution) return null;
 
   return (
     <>
       {showFeedback === 'correct' && (
-        <Alert variant="success" className="mt-3">
-          ✅ Correto! Muito bem!
-        </Alert>
+        <>
+          <Alert variant="success" className="mt-3">
+            ✅ Correto! Muito bem!
+          </Alert>
+          {wrongMovesHistory.length > 0 && (
+            <Alert variant="info" className="mt-3">
+              <strong>📊 Análise dos seus erros:</strong>
+              <br/>
+              {wrongMovesHistory.map((move, index) => (
+                <div key={index}>
+                  ❌ Tentativa {index + 1}: {move}
+                </div>
+              ))}
+              <br/>
+              ✅ <strong>Movimento correto:</strong> {solutionSAN}
+            </Alert>
+          )}
+        </>
       )}
 
       {showFeedback === 'incorrect' && (
