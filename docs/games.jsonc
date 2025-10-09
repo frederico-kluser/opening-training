@@ -1,0 +1,888 @@
+{
+  //https://www.chess.com/callback/games/extended-archive?locale=pt_BR&username=fredericokluser&page=1&location=all
+  "data": [
+    {
+      "id": 144089765146,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 708,
+      "user2Rating": 656,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 339760735,
+        "title": null,
+        "username": "Blackkk0",
+        "countryId": 138,
+        "countryName": "Türkiye",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "2a7548c9-a519-11f0-96d5-2653d301000f",
+      "fen": "r2qk2r/ppp2Qpp/3pn3/6bn/2B1P3/3P2P1/PPP4B/RN2KR2 b Qkq - 0 14",
+      "moves": 14,
+      "highlightSquares": "f2f7",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": 76.26,
+      "user2Accuracy": 63.02,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144088674816,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 687,
+      "user2Rating": 682,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 112531098,
+        "title": null,
+        "username": "Baptistemnd",
+        "countryId": 52,
+        "countryName": "France",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "efeada1d-a514-11f0-96d5-2653d301000f",
+      "fen": "1r2kb1r/1p2p1pp/pQpn4/3p4/3P1q2/2P4P/PP3PP1/RN3RK1 w k - 0 17",
+      "moves": 16,
+      "highlightSquares": "e4f4",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144088555722,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 772,
+      "user2Rating": 713,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 202842915,
+        "title": null,
+        "username": "alftt",
+        "countryId": 148,
+        "countryName": "Venezuela",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "789ba354-a514-11f0-9d16-2ccca301000f",
+      "fen": "r3k3/p1Nn2p1/2p3p1/1p1pPn1r/3P4/2P5/PP4PP/R1B1R1K1 b q - 1 19",
+      "moves": 19,
+      "highlightSquares": "e6c7",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144088489278,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 736,
+      "user2Rating": 791,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 239235951,
+        "title": null,
+        "username": "DaniielCardooso",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "356d7476-a514-11f0-bc0b-6deafd01000f",
+      "fen": "r1bqk1nr/ppp2p1p/3p2p1/8/2n1PB2/2P5/PP3PPP/RN1QK2R w KQkq - 0 9",
+      "moves": 8,
+      "highlightSquares": "e5c4",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144088405320,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 779,
+      "user2Rating": 761,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 405157385,
+        "title": null,
+        "username": "shkodran8818",
+        "countryId": 36,
+        "countryName": "Croatia",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "e035825e-a513-11f0-ab68-2b25dc01000f",
+      "fen": "r3kq1r/p6p/1pp1Q1p1/3pP3/8/2N2P2/PPP3PP/2KR1R2 b kq - 0 18",
+      "moves": 18,
+      "highlightSquares": "f6e6",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144088224268,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 792,
+      "user2Rating": 783,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 252426665,
+        "title": null,
+        "username": "Bryanttasi",
+        "countryId": 17,
+        "countryName": "Australia",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "27e78001-a513-11f0-ab68-2b25dc01000f",
+      "fen": "1k4r1/ppp5/3p2Br/3P4/3bP3/3P2K1/P4P2/1R3R2 w - - 3 27",
+      "moves": 26,
+      "highlightSquares": "h4h6",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144083290898,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 829,
+      "user2Rating": 866,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 309414035,
+        "title": null,
+        "username": "Samsit007",
+        "countryId": 217,
+        "countryName": "Timor-Leste",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "38044ebc-a4fe-11f0-bc0b-6deafd01000f",
+      "fen": "r4rk1/p1p2pp1/1p5p/8/8/1N1Pn3/PbP2RPP/4R1K1 w - - 0 19",
+      "moves": 18,
+      "highlightSquares": "d5e3",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144083156794,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 893,
+      "user2Rating": 865,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 45753786,
+        "title": null,
+        "username": "N0_Game",
+        "countryId": 2,
+        "countryName": "United States",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "99b82a4a-a4fd-11f0-96d5-2653d301000f",
+      "fen": "2k3nr/Qp2q1bp/1n6/3rp1p1/8/2P2NB1/PP1N1PPP/R3R1K1 b - - 0 17",
+      "moves": 17,
+      "highlightSquares": "a5a7",
+      "gameEndTime": "9 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144070535094,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 906,
+      "user2Rating": 966,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 304620179,
+        "title": null,
+        "username": "Obaiii1",
+        "countryId": 3,
+        "countryName": "Canada",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "8562292d-a4af-11f0-ab68-2b25dc01000f",
+      "fen": "r4rk1/1p3ppp/p2p4/3P4/1q2Q1P1/1PbP4/P4P1P/2R1K2R w K - 0 20",
+      "moves": 19,
+      "highlightSquares": "f6c3",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": true,
+      "isArena": false
+    },
+    {
+      "id": 144065026494,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 976,
+      "user2Rating": 949,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 28230280,
+        "title": null,
+        "username": "stgu77",
+        "countryId": 132,
+        "countryName": "Sweden",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "c2b0e43a-a48a-11f0-93fb-4635dc01000f",
+      "fen": "8/8/5n2/6p1/1k2N3/4K2P/8/8 b - - 0 52",
+      "moves": 52,
+      "highlightSquares": "d2e4",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": true,
+      "isArena": false
+    },
+    {
+      "id": 144064827982,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 956,
+      "user2Rating": 1005,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 199708785,
+        "title": null,
+        "username": "jjmolino",
+        "countryId": 163,
+        "countryName": "Spain",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "c59ed203-a489-11f0-9703-fe535701000f",
+      "fen": "2kr3r/1p1n2q1/pP2p3/P2p1p2/2pP3N/2P2NP1/8/4K2R w - - 0 30",
+      "moves": 29,
+      "highlightSquares": "f6f5",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": 61.24,
+      "user2Accuracy": 64.68,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144064599658,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 943,
+      "user2Rating": 1038,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 36926888,
+        "title": null,
+        "username": "Rishabhvrm",
+        "countryId": 2,
+        "countryName": "United States",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "aab0dbbb-a488-11f0-93fb-4635dc01000f",
+      "fen": "3r1rk1/7p/4p1p1/pp3p2/4q2P/2P5/PP3Q1K/2R2R2 w - - 0 30",
+      "moves": 29,
+      "highlightSquares": "g4e4",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144062113572,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 927,
+      "user2Rating": 1009,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 487419845,
+        "title": null,
+        "username": "itayis16",
+        "countryId": 75,
+        "countryName": "Israel",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "abd119c5-a47d-11f0-93fb-4635dc01000f",
+      "fen": "r3k2r/pp3ppp/4p3/5b2/3P4/P4N2/1Pn2PPP/R3K2R w KQkq - 1 16",
+      "moves": 15,
+      "highlightSquares": "b4c2",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": 68.13,
+      "user2Accuracy": 81.18,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144061934460,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 917,
+      "user2Rating": 1036,
+      "user1Result": 0,
+      "user2Result": 1,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "user2": {
+        "id": 76516876,
+        "title": null,
+        "username": "HoleInOneHawaii",
+        "countryId": 2,
+        "countryName": "United States",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "ec7c62ee-a47c-11f0-ab68-2b25dc01000f",
+      "fen": "8/p1p1kppp/2p1p3/P3P3/5KP1/3r3P/8/1R6 w - - 0 36",
+      "moves": 35,
+      "highlightSquares": "g3d3",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": null,
+      "user2Accuracy": null,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    },
+    {
+      "id": 144061724022,
+      "baseTime1": 1800,
+      "daysPerTurn": 0,
+      "timeIncrement": 0,
+      "user1Rating": 1232,
+      "user2Rating": 1037,
+      "user1Result": 1,
+      "user2Result": 0,
+      "gameTimeClass": "blitz",
+      "gameType": {
+        "name": "Standard Chess",
+        "code": "chess",
+        "isChess960": false,
+        "isKingOfTheHill": false,
+        "isThreeCheck": false,
+        "isBughouse": false,
+        "isCrazyHouse": false
+      },
+      "user1": {
+        "id": 146459321,
+        "title": null,
+        "username": "Edcros",
+        "countryId": 164,
+        "countryName": "United Kingdom",
+        "membershipLevel": 10,
+        "flair": null
+      },
+      "user2": {
+        "id": 490370683,
+        "title": null,
+        "username": "FredericoKluser",
+        "countryId": 27,
+        "countryName": "Brazil",
+        "membershipLevel": 50,
+        "flair": {
+          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
+          "images": {
+            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
+            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
+            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
+          }
+        }
+      },
+      "isLive": true,
+      "isVsComputer": false,
+      "uuid": "0dd925fa-a47c-11f0-8723-656c4101000f",
+      "fen": "2r4r/5k1b/5n1p/4Q2P/Npp3P1/1P6/PP6/2KR4 w - - 1 37",
+      "moves": 36,
+      "highlightSquares": "e8f7",
+      "gameEndTime": "8 de out. de 2025",
+      "user1Accuracy": 60.44,
+      "user2Accuracy": 57.15,
+      "isTournament": false,
+      "isTeamMatch": false,
+      "isTimeout": false,
+      "isArena": false
+    }
+  ],
+  "meta": {
+    "totalCount": 18,
+    "countPerPage": 50,
+    "totalPages": 1,
+    "currentPage": 1
+  }
+}

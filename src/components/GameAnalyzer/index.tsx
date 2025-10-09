@@ -5,6 +5,7 @@ import { getStockfish } from '../../services/StockfishService';
 import puzzleService from '../../services/PuzzleService';
 import { parseMultiplePGN, extractGamesInfo, GameInfo, ParsedGame, validatePGN, detectMostFrequentPlayer } from '../../utils/pgnParser';
 import Gap from '../Gap';
+import chessComService from '../../services/ChessComService';
 
 interface MoveAnalysis {
   moveNumber: number;
@@ -64,6 +65,11 @@ const GameAnalyzer: React.FC = () => {
     positions: Map<number, 'white' | 'black'>;
     frequency: number;
   }>({ name: null, positions: new Map(), frequency: 0 });
+
+  // Estados para importação do Chess.com por FEN
+  const [showChessComFenModal, setShowChessComFenModal] = useState(false);
+  const [chessComUsername, setChessComUsername] = useState('');
+  const [loadingChessComFens, setLoadingChessComFens] = useState(false);
 
   // Classificar movimento baseado em centipawn loss
   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
@@ -582,6 +588,37 @@ const GameAnalyzer: React.FC = () => {
     window.location.reload();
   };
 
+  // Importar partidas do Chess.com via FEN
+  const handleChessComFenImport = async () => {
+    if (!chessComUsername.trim()) {
+      setError('Por favor, insira um username válido');
+      return;
+    }
+
+    setLoadingChessComFens(true);
+    setError('');
+
+    try {
+      // Buscar partidas e extrair FENs
+      const fensString = await chessComService.fetchGamesAndExtractFENs(chessComUsername.trim(), 1);
+
+      // Inserir FENs no input de PGN
+      setPgn(fensString);
+
+      // Fechar modal e limpar username
+      setShowChessComFenModal(false);
+      setChessComUsername('');
+
+      // Feedback ao usuário
+      const fenCount = fensString.split('\n\n').length;
+      alert(`✅ ${fenCount} posições FEN importadas com sucesso do Chess.com!`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao importar partidas do Chess.com');
+    } finally {
+      setLoadingChessComFens(false);
+    }
+  };
+
   // Obter estatísticas de puzzles
   const puzzleStats = puzzleService.getStats();
 
@@ -789,6 +826,42 @@ const GameAnalyzer: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
+      {/* Modal de importação do Chess.com via FEN */}
+      <Modal show={showChessComFenModal} onHide={() => setShowChessComFenModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>♟️ Importar Partidas do Chess.com</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label>Digite seu nickname do Chess.com:</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Ex: hikaru, magnuscarlsen, gothamchess"
+              value={chessComUsername}
+              onChange={(e) => setChessComUsername(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleChessComFenImport()}
+              disabled={loadingChessComFens}
+              autoFocus
+            />
+            <Form.Text className="text-muted">
+              Serão importadas as partidas da página 1 do seu perfil.
+            </Form.Text>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowChessComFenModal(false)} disabled={loadingChessComFens}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleChessComFenImport}
+            disabled={!chessComUsername.trim() || loadingChessComFens}
+          >
+            {loadingChessComFens ? '⏳ Buscando...' : '✅ Importar'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <Button variant="secondary" onClick={handleBack}>
         ← Voltar
       </Button>
@@ -851,6 +924,14 @@ const GameAnalyzer: React.FC = () => {
                 disabled={isAnalyzing}
               >
                 📂 Carregar Arquivo PGN
+              </Button>
+
+              <Button
+                variant="success"
+                onClick={() => setShowChessComFenModal(true)}
+                disabled={isAnalyzing}
+              >
+                ♟️ Importar do Chess.com
               </Button>
 
               <Button

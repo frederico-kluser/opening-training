@@ -213,6 +213,93 @@ class ChessComService {
   }
 
   /**
+   * Busca partidas via API de callback do Chess.com (extended-archive)
+   * Esta API retorna informações das partidas incluindo IDs
+   */
+  async getExtendedArchiveGames(username: string, page: number = 1): Promise<any> {
+    const url = `https://www.chess.com/callback/games/extended-archive?locale=pt_BR&username=${username}&page=${page}&location=all`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar partidas: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Erro ao buscar extended archive:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Busca detalhes de uma partida específica via API de callback (live/game)
+   * Retorna informações detalhadas incluindo FEN e moveList
+   */
+  async getGameDetails(gameId: number): Promise<any> {
+    const url = `https://www.chess.com/callback/live/game/${gameId}`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar detalhes da partida: ${response.statusText}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Erro ao buscar detalhes da partida:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Busca partidas de um usuário e extrai os FENs de todas elas
+   * Retorna uma string com todos os FENs concatenados
+   */
+  async fetchGamesAndExtractFENs(username: string, page: number = 1): Promise<string> {
+    try {
+      // 1. Buscar lista de partidas
+      const archiveData = await this.getExtendedArchiveGames(username, page);
+
+      if (!archiveData?.data || archiveData.data.length === 0) {
+        throw new Error('Nenhuma partida encontrada para este usuário');
+      }
+
+      const games = archiveData.data;
+      const fens: string[] = [];
+
+      // 2. Para cada partida, buscar detalhes e extrair FEN
+      for (const game of games) {
+        try {
+          const gameDetails = await this.getGameDetails(game.id);
+
+          if (gameDetails?.game?.fen) {
+            fens.push(gameDetails.game.fen);
+          }
+
+          // Pequeno delay para não sobrecarregar a API
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (error) {
+          console.error(`Erro ao buscar detalhes da partida ${game.id}:`, error);
+          // Continua mesmo se uma partida falhar
+        }
+      }
+
+      if (fens.length === 0) {
+        throw new Error('Não foi possível extrair FENs das partidas');
+      }
+
+      // 3. Juntar todos os FENs numa string separada por quebras de linha
+      return fens.join('\n\n');
+    } catch (error) {
+      console.error('Erro ao buscar e extrair FENs:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Busca e exibe informações de exemplo
    */
   async testFetchGames(username: string = 'hikaru'): Promise<void> {
