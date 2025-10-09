@@ -7,6 +7,7 @@ interface PuzzleFeedbackProps {
   showSolution?: boolean;
   solutionSAN?: string;
   evaluationLoss?: number;
+  wrongMoveSAN?: string;
 }
 
 const PuzzleFeedback: React.FC<PuzzleFeedbackProps> = ({
@@ -14,7 +15,8 @@ const PuzzleFeedback: React.FC<PuzzleFeedbackProps> = ({
   attemptCount = 0,
   showSolution = false,
   solutionSAN = '',
-  evaluationLoss = 0
+  evaluationLoss = 0,
+  wrongMoveSAN = ''
 }) => {
   if (!showFeedback && !showSolution) return null;
 
@@ -36,11 +38,17 @@ const PuzzleFeedback: React.FC<PuzzleFeedbackProps> = ({
 
       {showSolution && solutionSAN && (
         <Alert variant="info" className="mt-3">
-          💡 <strong>Solução:</strong> {solutionSAN}
+          {wrongMoveSAN && (
+            <>
+              ❌ <strong>Seu movimento:</strong> {wrongMoveSAN}
+              <br/>
+            </>
+          )}
+          ✅ <strong>Movimento correto:</strong> {solutionSAN}
           {evaluationLoss > 0 && (
             <>
               <br/>
-              <small>Perdeu {evaluationLoss} centipawns</small>
+              <small>Diferença: {evaluationLoss} centipawns</small>
             </>
           )}
         </Alert>

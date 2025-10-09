@@ -50,6 +50,8 @@ const PuzzleTrainer: React.FC = () => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
   const [showingContext, setShowingContext] = useState(false);
+  const [lastWrongMove, setLastWrongMove] = useState<string>('');
+  const [showNextButton, setShowNextButton] = useState(false);
 
   // Carregar puzzles quando o modo mudar
   useEffect(() => {
@@ -123,6 +125,8 @@ const PuzzleTrainer: React.FC = () => {
       setShowFeedback(null);
       setShowSolution(false);
       setBackgroundStyle({});
+      setLastWrongMove('');
+      setShowNextButton(false);
     }
   }, [puzzles, session.puzzleIndex]);
 
@@ -150,6 +154,8 @@ const PuzzleTrainer: React.FC = () => {
       if (isCorrect) {
         handleCorrectMove();
       } else {
+        // Salvar movimento errado antes de desfazer
+        setLastWrongMove(move.san);
         handleIncorrectMove();
         // Desfaz o movimento errado
         game.undo();
@@ -164,6 +170,7 @@ const PuzzleTrainer: React.FC = () => {
   // Movimento correto
   const handleCorrectMove = () => {
     setShowFeedback('correct');
+    setShowNextButton(true);
     setBackgroundStyle({
       backgroundColor: '#90EE90',
       transition: 'background-color 0.5s'
@@ -182,11 +189,6 @@ const PuzzleTrainer: React.FC = () => {
       puzzleService.recordAttempt(session.currentPuzzle.id, true);
       puzzleService.markSolved(session.currentPuzzle.id);
     }
-
-    // Próximo puzzle após 1.5 segundos
-    setTimeout(() => {
-      nextPuzzle();
-    }, 1500);
   };
 
   // Movimento incorreto
@@ -213,12 +215,13 @@ const PuzzleTrainer: React.FC = () => {
       puzzleService.recordAttempt(session.currentPuzzle.id, false);
     }
 
-    // Se já errou 3 vezes, vai para o próximo puzzle automaticamente
+    // Se já errou 3 vezes, mostra a solução após 1 segundo
     if (newAttemptCount >= 3) {
       setTimeout(() => {
+        setShowSolution(true);
+        setShowNextButton(true);
         setBackgroundStyle({});
-        nextPuzzle();
-      }, 1500);
+      }, 1000);
     } else {
       // Limpar feedback após 2 segundos para tentar novamente
       setTimeout(() => {
@@ -423,16 +426,17 @@ const PuzzleTrainer: React.FC = () => {
               showSolution={showSolution}
               solutionSAN={getSolutionSAN()}
               evaluationLoss={session.currentPuzzle?.evaluation}
+              wrongMoveSAN={lastWrongMove}
             />
 
             <div className="mt-3">
               <PuzzleControls
                 onSkip={skipPuzzle}
-                onNext={showSolution ? nextPuzzle : undefined}
+                onNext={showNextButton ? nextPuzzle : undefined}
                 onReset={resetSession}
                 onExit={() => window.location.reload()}
-                showNext={showSolution}
-                disableSkip={showFeedback === 'correct'}
+                showNext={showNextButton}
+                disableSkip={showFeedback === 'correct' || showNextButton}
               />
             </div>
           </Card.Body>
