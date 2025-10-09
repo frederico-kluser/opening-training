@@ -255,66 +255,75 @@ class ChessComService {
   }
 
   /**
-   * Busca partidas de um usuário e extrai os FENs de todas elas
-   * Retorna uma string com todos os FENs concatenados
+   * Busca partidas de um usuário e extrai os PGNs de todas elas
+   * Retorna uma string com todos os PGNs concatenados
    */
-  async fetchGamesAndExtractFENs(
+  async fetchGamesAndExtractPGNs(
     username: string,
-    page: number = 1,
+    monthsToFetch: number = 1,
     onProgress?: (current: number, total: number) => void
   ): Promise<string> {
     try {
-      // 1. Buscar lista de partidas
-      const archiveData = await this.getExtendedArchiveGames(username, page);
+      // 1. Buscar lista de arquivos mensais disponíveis
+      const archives = await this.getPlayerArchives(username);
 
-      if (!archiveData?.data || archiveData.data.length === 0) {
-        throw new Error('Nenhuma partida encontrada para este usuário');
+      if (archives.length === 0) {
+        throw new Error('Nenhum arquivo de partidas encontrado para este usuário');
       }
 
-      const games = archiveData.data;
-      const fens: string[] = [];
+      // 2. Pegar os últimos N meses
+      const archivesToFetch = archives.slice(-monthsToFetch);
+      const allPGNs: string[] = [];
 
-      console.log(`🎮 Encontradas ${games.length} partidas. Buscando FENs...`);
+      console.log(`🎮 Buscando partidas de ${archivesToFetch.length} mês(es)...`);
 
-      // 2. Para cada partida, buscar detalhes e extrair FEN
-      for (let i = 0; i < games.length; i++) {
-        const game = games[i];
+      // 3. Para cada mês, buscar todas as partidas
+      for (let i = 0; i < archivesToFetch.length; i++) {
+        const archiveUrl = archivesToFetch[i];
+        const parts = archiveUrl.split('/');
+        const year = parseInt(parts[parts.length - 2]);
+        const month = parseInt(parts[parts.length - 1]);
 
         try {
           if (onProgress) {
-            onProgress(i + 1, games.length);
+            onProgress(i + 1, archivesToFetch.length);
           }
 
-          const gameDetails = await this.getGameDetails(game.id);
+          console.log(`📥 Buscando partidas de ${month}/${year}...`);
 
-          console.log(`Partida ${i + 1}/${games.length} (ID: ${game.id}):`, gameDetails);
+          // Usar a API pública que retorna objetos com PGN pronto
+          const games = await this.getMonthlyGames(username, year, month);
 
-          // Tentar extrair FEN da resposta
-          if (gameDetails?.game?.fen) {
-            fens.push(gameDetails.game.fen);
-            console.log(`✅ FEN extraído: ${gameDetails.game.fen.substring(0, 50)}...`);
-          } else {
-            console.warn(`⚠️ Partida ${game.id} não tem FEN disponível. Estrutura:`, gameDetails);
+          console.log(`✅ ${games.length} partidas encontradas em ${month}/${year}`);
+
+          // Extrair PGN de cada partida
+          games.forEach((game, idx) => {
+            if (game.pgn) {
+              allPGNs.push(game.pgn);
+              console.log(`  ✓ Partida ${idx + 1}: ${game.white.username} vs ${game.black.username}`);
+            }
+          });
+
+          // Aguardar 1 segundo entre requisições (boa prática com API do Chess.com)
+          if (i < archivesToFetch.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-
-          // Pequeno delay para não sobrecarregar a API
-          await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
-          console.error(`❌ Erro ao buscar detalhes da partida ${game.id}:`, error);
-          // Continua mesmo se uma partida falhar
+          console.error(`❌ Erro ao buscar partidas de ${month}/${year}:`, error);
+          // Continua mesmo se um mês falhar
         }
       }
 
-      console.log(`📊 Total de FENs extraídos: ${fens.length} de ${games.length} partidas`);
+      console.log(`📊 Total de PGNs extraídos: ${allPGNs.length} partidas`);
 
-      if (fens.length === 0) {
-        throw new Error('Não foi possível extrair FENs das partidas. Verifique o console para mais detalhes.');
+      if (allPGNs.length === 0) {
+        throw new Error('Não foi possível extrair PGNs das partidas. Verifique se o usuário existe e tem partidas públicas.');
       }
 
-      // 3. Juntar todos os FENs numa string separada por quebras de linha
-      return fens.join('\n\n');
+      // 4. Juntar todos os PGNs numa string separada por quebras de linha duplas
+      return allPGNs.join('\n\n');
     } catch (error) {
-      console.error('Erro ao buscar e extrair FENs:', error);
+      console.error('Erro ao buscar e extrair PGNs:', error);
       throw error;
     }
   }
