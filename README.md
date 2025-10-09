@@ -9,6 +9,7 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 **1. Análise de Partidas com Stockfish 17** ✅
 - Análise profunda de partidas (depth 18) com Stockfish WASM
 - Importação de múltiplas partidas via PGN ou Chess.com
+- **Importação direta via FEN** do Chess.com com barra de progresso
 - Detecção automática do jogador mais frequente com badge 🎯
 - Pré-seleção inteligente de partidas para análise
 - Cálculo de ACPL (Average Centipawn Loss) separado por cor
@@ -37,6 +38,12 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 - Import/Export em JSON
 - Modo de edição e modo de treino com orientação automática do tabuleiro
 
+**4. Interface e UX** 🎨
+- **Tema escuro/claro** com toggle persistente (🌙/☀️)
+- Design responsivo otimizado para mobile e tablets
+- Transições suaves entre temas
+- Persistência da preferência de tema no localStorage
+
 ## 📊 Status do Projeto
 
 ### ✅ Funcionalidades Implementadas:
@@ -45,6 +52,7 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 - ✅ Stockfish 17 WASM integrado (depth 18, timeout 10s)
 - ✅ Importação de múltiplas partidas PGN com validação robusta
 - ✅ Integração completa com Chess.com API (múltiplos endpoints)
+- ✅ **Importação direta via FEN** do Chess.com com progresso em tempo real
 - ✅ Detecção automática do jogador principal (sem threshold mínimo)
 - ✅ Análise em lote com barra de progresso por partida
 - ✅ Classificação detalhada: brilliant (<0cp), best (<10cp), good (<50cp), inaccuracy (<100cp), mistake (<300cp), blunder (≥300cp)
@@ -72,6 +80,14 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 - ✅ Import/Export JSON com validação TypeStorage
 - ✅ Persistência completa no localStorage (key: `data`)
 - ✅ Orientação automática baseada no turno
+
+#### **Interface e Temas**
+- ✅ **Sistema de tema escuro/claro** com toggle 🌙/☀️
+- ✅ Persistência da preferência de tema (localStorage: `darkMode`)
+- ✅ Variáveis CSS customizáveis por tema
+- ✅ Design responsivo para mobile e tablets
+- ✅ Media queries otimizadas (@media para diferentes tamanhos)
+- ✅ Transições suaves entre temas (0.3s ease)
 
 ### 🚧 Em Desenvolvimento:
 - [ ] Sistema de spaced repetition com algoritmo SM-2
@@ -109,6 +125,7 @@ Acesse http://localhost:5173
      - Importar Todos (jogos do mês)
      - Importar Apenas Meus Jogos (filtra por username)
      - Importar Últimos 10 (importação rápida)
+   - **♟️ Importar do Chess.com**: Importação direta via FEN com progresso
    - **📥 Importar Análise**: Carregue análises salvas (JSON)
 3. Para múltiplas partidas:
    - Jogador mais frequente é detectado automaticamente (badge 🎯)
@@ -176,9 +193,11 @@ Acesse http://localhost:5173
 - **Importação Flexível**: PGN direto, arquivo .pgn, ou Chess.com API
 - **Chess.com API Completa**:
   - 3 modos de importação (Todos/Meus Jogos/Últimos 10)
+  - **Importação direta via FEN**: Extrai FENs de partidas em lote
   - Preview visual com badges coloridos por tipo
+  - Barra de progresso em tempo real (X/Y partidas)
   - Estatísticas e ratings em tempo real
-  - Múltiplos endpoints disponíveis
+  - Múltiplos endpoints disponíveis (extended-archive, live/game)
 - **Análise em Lote**: Processa múltiplas partidas com barra de progresso
 - **Detecção Inteligente**: Identifica jogador mais frequente sem threshold mínimo
 - **Pré-seleção Automática**: Badge 🎯 e seleção do jogador detectado
@@ -345,6 +364,27 @@ const ANALYSIS_TIMEOUT = 10000; // Timeout em ms (padrão: 10 segundos)
 - Detecção de mate convertida para ±100000 cp
 - Principal Variation (PV) armazenada
 
+### Proxy Vite para Chess.com
+O projeto está configurado com proxy reverso para contornar CORS:
+
+```typescript
+// vite.config.ts
+server: {
+  proxy: {
+    '/api/chess-com': {
+      target: 'https://www.chess.com',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/api\/chess-com/, '')
+    }
+  }
+}
+```
+
+**Funcionalidades:**
+- Contorna restrições de CORS da API Chess.com
+- Permite acesso direto aos endpoints de callback
+- Usado por `getExtendedArchiveGames()` e `getGameDetails()`
+
 ### localStorage - Chaves e Estruturas
 Todos os dados são salvos automaticamente no navegador:
 
@@ -354,6 +394,7 @@ Todos os dados são salvos automaticamente no navegador:
 | `opening-training-stats` | Estatísticas do repertório | `TrainingStats` |
 | `opening-training-session` | Sessão atual de treino | `TrainingSession` |
 | `data` | Repertório de aberturas | `TypeStorage` |
+| `darkMode` | Preferência de tema (escuro/claro) | `boolean` |
 
 **Estatísticas do Repertório (TrainingStats):**
 ```typescript
@@ -391,6 +432,11 @@ getMonthlyPGN(username, year, month)   // PGN direto do mês
 getLatestGames(username, count)        // Últimos N jogos
 getAllGames(username, limit)           // Batch com paginação
 getPlayerStats(username)               // Estatísticas e ratings
+
+// Endpoints via Proxy (contornam CORS)
+getExtendedArchiveGames(username, page) // Lista de partidas com IDs e FENs
+getGameDetails(gameId)                  // Detalhes completos de uma partida
+fetchGamesAndExtractFENs(username, page, onProgress) // Extrai FENs em lote
 ```
 
 ### Funcionalidades da Integração
@@ -451,6 +497,44 @@ const calculateACPL = (moves) => {
 
 ## 🎨 Personalização Visual
 
+### Sistema de Temas
+O sistema suporta tema claro e escuro com variáveis CSS customizáveis:
+
+```css
+/* Tema Claro (padrão) */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --gradient-start: #667eea;
+  --gradient-end: #764ba2;
+}
+
+/* Tema Escuro */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-card: #2d2d2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --border-color: #404040;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --gradient-start: #4a5568;
+  --gradient-end: #2d3748;
+}
+```
+
+**Funcionalidades do Tema:**
+- Toggle visual com ícones 🌙 (escuro) / ☀️ (claro)
+- Transições suaves (0.3s ease) entre temas
+- Persistência da preferência no localStorage
+- Aplicação automática via `document.documentElement.setAttribute('data-theme')`
+- Botão fixo no canto superior direito com efeitos hover
+
 ### Códigos de Cores
 ```css
 /* Feedback de Movimentos */
@@ -464,10 +548,34 @@ const calculateACPL = (moves) => {
 --rapid-badge: primary;  /* Azul - Rapid */
 ```
 
+### Responsividade Mobile
+O sistema é totalmente responsivo com breakpoints otimizados:
+
+```css
+/* Tablets e smartphones */
+@media (max-width: 768px) {
+  .h2 { font-size: 1.5rem !important; }
+  .card-body { padding: 1.25rem !important; }
+  .theme-toggle { width: 45px; height: 45px; }
+}
+
+/* Smartphones pequenos */
+@media (max-width: 576px) {
+  .btn { font-size: 0.9rem !important; }
+  .card-body h5 { font-size: 1rem !important; }
+}
+
+/* Tablets landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .container-fluid { padding-top: 2rem !important; }
+}
+```
+
 ### Ícones Utilizados
 - 🎯 Jogador detectado automaticamente
 - 💾 Exportar análise
 - 📥 Importar análise
+- ♟️ Importar do Chess.com
 - 🧩 Puzzles
 - 📊 Análise
 - 📚 Repertório
@@ -475,6 +583,8 @@ const calculateACPL = (moves) => {
 - ❌ Erro
 - 🔥 Streak
 - 💡 Dica
+- 🌙 Tema escuro
+- ☀️ Tema claro
 
 ## 🚀 Roadmap Futuro
 
@@ -553,7 +663,18 @@ MIT License - veja [LICENSE](LICENSE) para detalhes
 
 ---
 
-**Última atualização**: 05/01/2025 | **Versão**: 3.0.0
+**Última atualização**: 09/10/2025 | **Versão**: 3.1.0
+
+### 📝 Changelog v3.1.0
+- ✅ **Sistema de tema escuro/claro** com toggle persistente (🌙/☀️)
+- ✅ **Importação direta via FEN** do Chess.com com barra de progresso
+- ✅ Novos endpoints Chess.com: `getExtendedArchiveGames()` e `getGameDetails()`
+- ✅ Proxy Vite configurado para contornar CORS do Chess.com
+- ✅ Design responsivo melhorado para mobile e tablets
+- ✅ Media queries otimizadas (@media breakpoints)
+- ✅ Variáveis CSS customizáveis por tema
+- ✅ Transições suaves entre temas (0.3s ease)
+- ✅ Documentação de exemplos de API em `docs/` (game.jsonc, games.jsonc)
 
 ### 📝 Changelog v3.0.0
 - ✅ Adicionado sistema completo de importação/exportação de análises
