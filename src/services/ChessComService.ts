@@ -217,7 +217,7 @@ class ChessComService {
    * Esta API retorna informações das partidas incluindo IDs
    */
   async getExtendedArchiveGames(username: string, page: number = 1): Promise<any> {
-    const url = `https://www.chess.com/callback/games/extended-archive?locale=pt_BR&username=${username}&page=${page}&location=all`;
+    const url = `/api/chess-com/callback/games/extended-archive?locale=pt_BR&username=${username}&page=${page}&location=all`;
 
     try {
       const response = await fetch(url);
@@ -238,7 +238,7 @@ class ChessComService {
    * Retorna informações detalhadas incluindo FEN e moveList
    */
   async getGameDetails(gameId: number): Promise<any> {
-    const url = `https://www.chess.com/callback/live/game/${gameId}`;
+    const url = `/api/chess-com/callback/live/game/${gameId}`;
 
     try {
       const response = await fetch(url);
