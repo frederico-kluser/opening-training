@@ -137,6 +137,23 @@ class PuzzleService {
     return shuffled;
   }
 
+  // Obter puzzles de abertura (até o movimento 10)
+  getOpeningPuzzles(includesSolved: boolean = false): Puzzle[] {
+    const puzzles = includesSolved ? this.getPuzzles() : this.getUnsolvedPuzzles();
+
+    // Filtrar puzzles até o movimento 10
+    const openingPuzzles = puzzles.filter(p => p.moveNumber <= 10);
+
+    // Fisher-Yates shuffle
+    const shuffled = [...openingPuzzles];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+  }
+
   // Obter estatísticas
   getStats(): PuzzleStats {
     const puzzles = this.getPuzzles();

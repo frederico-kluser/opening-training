@@ -20,9 +20,10 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 
 **2. Sistema de Puzzles Táticos** 🎮
 - Geração automática de puzzles a partir de blunders (>300cp)
-- **Dois modos de treinamento:**
+- **Três modos de treinamento:**
   - **Modo Normal:** Puzzles sem repetição, progresso linear
   - **Modo Rush:** 20 puzzles aleatórios com repetição permitida (treino intensivo)
+  - **Modo Opening:** Foco em erros de abertura (apenas movimentos 1-10)
 - **Sistema de contexto visual:** Mostra posição anterior por 1 segundo antes do puzzle
 - Feedback visual instantâneo com cores (verde #90EE90 / rosa #FFB6C1)
 - Sistema de streaks e estatísticas globais persistentes
@@ -64,12 +65,20 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 - ✅ Geração automática de puzzles de blunders (>300cp, ignora primeiros 10 lances)
 - ✅ **Modo Normal:** puzzles embaralhados sem repetição
 - ✅ **Modo Rush:** 20 puzzles aleatórios com repetição (Fisher-Yates shuffle)
+- ✅ **Modo Opening:** apenas erros de abertura (movimentos 1-10)
 - ✅ Sistema de 3 tentativas com feedback progressivo
 - ✅ **Contexto visual:** posição anterior mostrada por 1 segundo
 - ✅ Feedback colorido com transição suave (0.5s)
 - ✅ Estatísticas globais persistentes no localStorage
 - ✅ Timer em tempo real e contador de streak (máximo da sessão)
 - ✅ Orientação automática do tabuleiro baseada na cor
+
+**Modo Opening - Detalhes:**
+- Filtragem automática de puzzles até o movimento 10
+- Ideal para corrigir erros na fase de abertura
+- Mantém sistema de 3 tentativas e feedback progressivo
+- Prioriza puzzles não resolvidos, depois inclui todos
+- Fisher-Yates shuffle para variedade no treinamento
 
 #### **Repertório de Aberturas**
 - ✅ Sistema completo de cadastro com navegação em árvore
@@ -141,6 +150,7 @@ Acesse http://localhost:5173
 2. Escolha o modo:
    - **Normal**: Puzzles embaralhados sem repetição, progresso linear
    - **Rush**: 20 puzzles aleatórios com repetição permitida
+   - **Opening**: Apenas erros de abertura (movimentos 1-10) sem repetição
 3. Observe o contexto (posição anterior por 1 segundo)
 4. Resolva o puzzle (máximo 3 tentativas):
    - Feedback verde = correto
@@ -218,9 +228,10 @@ Acesse http://localhost:5173
   - Apenas blunders >300cp viram puzzles
   - Ignora primeiros 10 lances (teoria)
   - Inclui contexto da posição anterior
-- **Dois Modos Distintos**:
+- **Três Modos Distintos**:
   - **Normal**: Sem repetição, todos os puzzles uma vez
   - **Rush**: 20 puzzles com Fisher-Yates shuffle e repetição
+  - **Opening**: Apenas erros de abertura (movimentos 1-10) sem repetição
 - **Sistema de Tentativas**:
   - Máximo 3 tentativas com feedback progressivo
   - Auto-skip após 3 erros
@@ -585,6 +596,7 @@ O sistema é totalmente responsivo com breakpoints otimizados:
 - 💡 Dica
 - 🌙 Tema escuro
 - ☀️ Tema claro
+- ♟️ Modo Opening
 
 ## 🚀 Roadmap Futuro
 
@@ -663,7 +675,15 @@ MIT License - veja [LICENSE](LICENSE) para detalhes
 
 ---
 
-**Última atualização**: 09/10/2025 | **Versão**: 3.1.0
+**Última atualização**: 18/10/2025 | **Versão**: 3.2.0
+
+### 📝 Changelog v3.2.0
+- ✅ **Modo Opening adicionado** - Treino focado em erros de abertura (movimentos 1-10)
+- ✅ Novo método `getOpeningPuzzles()` no PuzzleService
+- ✅ Filtro inteligente por moveNumber <= 10
+- ✅ Interface atualizada com botão verde e ícone ♟️
+- ✅ Fisher-Yates shuffle para variedade no treinamento
+- ✅ Documentação completa do novo modo
 
 ### 📝 Changelog v3.1.0
 - ✅ **Sistema de tema escuro/claro** com toggle persistente (🌙/☀️)

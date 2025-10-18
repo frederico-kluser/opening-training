@@ -25,7 +25,7 @@ interface PuzzleSession {
   attemptCount: number; // Contador de tentativas para o puzzle atual
 }
 
-type GameMode = 'normal' | 'rush';
+type GameMode = 'normal' | 'rush' | 'opening';
 
 const PuzzleTrainer: React.FC = () => {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
@@ -80,6 +80,13 @@ const PuzzleTrainer: React.FC = () => {
       // Modo Rush: puzzles totalmente aleatórios
       loadedPuzzles = puzzleService.getRandomPuzzles(20, true);
       setSession(prev => ({ ...prev, isRushMode: true }));
+    } else if (gameMode === 'opening') {
+      // Modo Opening: apenas puzzles até o movimento 10 (erros de abertura)
+      loadedPuzzles = puzzleService.getOpeningPuzzles(false);
+      if (loadedPuzzles.length === 0) {
+        // Se não houver puzzles não resolvidos, carrega todos de abertura embaralhados
+        loadedPuzzles = puzzleService.getOpeningPuzzles(true);
+      }
     } else {
       // Modo Normal: puzzles embaralhados mas sem repetição
       loadedPuzzles = puzzleService.getShuffledPuzzles(false);
@@ -338,6 +345,15 @@ const PuzzleTrainer: React.FC = () => {
                   <small>Puzzles totalmente aleatórios com repetição</small>
                 </Button>
 
+                <Button
+                  variant="success"
+                  className="w-100 py-3"
+                  onClick={() => setGameMode('opening')}
+                >
+                  <h5>♟️ Modo Opening</h5>
+                  <small>Apenas erros de abertura (até movimento 10)</small>
+                </Button>
+
                 <hr />
 
                 <div className="text-center">
@@ -386,10 +402,15 @@ const PuzzleTrainer: React.FC = () => {
           <Card.Body>
             <div className="d-flex justify-content-between align-items-start mb-3">
               <h5>
-                {gameMode === 'rush' ? '⚡ Modo Rush' : '🎯 Modo Normal'}
+                {gameMode === 'rush' && '⚡ Modo Rush'}
+                {gameMode === 'normal' && '🎯 Modo Normal'}
+                {gameMode === 'opening' && '♟️ Modo Opening'}
               </h5>
               {gameMode === 'rush' && (
                 <small className="text-muted">Puzzles aleatórios com repetição</small>
+              )}
+              {gameMode === 'opening' && (
+                <small className="text-muted">Erros de abertura (movimentos 1-10)</small>
               )}
             </div>
 
