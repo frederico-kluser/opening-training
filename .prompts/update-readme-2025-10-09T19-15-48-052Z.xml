@@ -1,0 +1,2362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task_name thinking_budget="32000">
+ultrathink sobre atualização inteligente e incremental do README.md baseado em mudanças recentes
+
+<role>
+Arquiteto de Documentação Sênior especializado em:
+- Manutenção evolutiva de documentação técnica
+- Análise de diffs e changelog management
+- Semantic versioning e release notes
+- README.md optimization para Claude Code Opus 4.1
+- Git history analysis e pattern recognition
+- Incremental documentation updates
+</role>
+
+<context>
+<!-- Metadados de origem -->
+<context_source>README.md</context_source>
+<update_type>incremental_from_git_diff</update_type>
+<generation_timestamp>2025-10-09T19:15:48.052Z</generation_timestamp>
+<framework_version>RISEN_v2.0_ultrathink_incremental</framework_version>
+
+<!-- README atual que precisa ser atualizado -->
+<current_readme>
+# Chess Training System - Sistema Completo de Treinamento de Xadrez
+
+## 🎯 Visão Geral do Projeto
+
+Sistema avançado de treinamento de xadrez com três módulos principais: **análise de partidas com IA**, **treinamento tático com puzzles personalizados** e **repertório de aberturas**.
+
+### Funcionalidades Principais:
+
+**1. Análise de Partidas com Stockfish 17** ✅
+- Análise profunda de partidas (depth 18) com Stockfish WASM
+- Importação de múltiplas partidas via PGN ou Chess.com
+- Detecção automática do jogador mais frequente com badge 🎯
+- Pré-seleção inteligente de partidas para análise
+- Cálculo de ACPL (Average Centipawn Loss) separado por cor
+- Classificação de movimentos em 6 categorias (brilliant, best, good, inaccuracy, mistake, blunder)
+- **Exportação de análises completas** em formato JSON com todos os dados
+- **Importação de análises salvas** com auto-salvamento de puzzles no localStorage
+- Estatísticas detalhadas por cor (blunders, mistakes, inaccuracies)
+
+**2. Sistema de Puzzles Táticos** 🎮
+- Geração automática de puzzles a partir de blunders (>300cp)
+- **Dois modos de treinamento:**
+  - **Modo Normal:** Puzzles sem repetição, progresso linear
+  - **Modo Rush:** 20 puzzles aleatórios com repetição permitida (treino intensivo)
+- **Sistema de contexto visual:** Mostra posição anterior por 1 segundo antes do puzzle
+- Feedback visual instantâneo com cores (verde #90EE90 / rosa #FFB6C1)
+- Sistema de streaks e estatísticas globais persistentes
+- **Máximo de 3 tentativas** com feedback progressivo
+- Salvamento automático no localStorage
+
+**3. Repertório de Aberturas** 📚
+- Cadastro e edição de variantes personalizadas
+- Treinamento interativo com posições aleatórias
+- **Sistema de navegação em árvore** com suporte a múltiplas variantes
+- Comentários personalizados por posição
+- **Dica após 2 tentativas erradas** mostrando comentário da posição
+- Import/Export em JSON
+- Modo de edição e modo de treino com orientação automática do tabuleiro
+
+## 📊 Status do Projeto
+
+### ✅ Funcionalidades Implementadas:
+
+#### **Análise de Partidas**
+- ✅ Stockfish 17 WASM integrado (depth 18, timeout 10s)
+- ✅ Importação de múltiplas partidas PGN com validação robusta
+- ✅ Integração completa com Chess.com API (múltiplos endpoints)
+- ✅ Detecção automática do jogador principal (sem threshold mínimo)
+- ✅ Análise em lote com barra de progresso por partida
+- ✅ Classificação detalhada: brilliant (<0cp), best (<10cp), good (<50cp), inaccuracy (<100cp), mistake (<300cp), blunder (≥300cp)
+- ✅ Cálculo de ACPL separado por cor com estatísticas individuais
+- ✅ **Exportação de análises** em JSON (formato: `chess-analysis-YYYY-MM-DD.json`)
+- ✅ **Importação de análises** com auto-salvamento de puzzles
+
+#### **Sistema de Puzzles**
+- ✅ Geração automática de puzzles de blunders (>300cp, ignora primeiros 10 lances)
+- ✅ **Modo Normal:** puzzles embaralhados sem repetição
+- ✅ **Modo Rush:** 20 puzzles aleatórios com repetição (Fisher-Yates shuffle)
+- ✅ Sistema de 3 tentativas com feedback progressivo
+- ✅ **Contexto visual:** posição anterior mostrada por 1 segundo
+- ✅ Feedback colorido com transição suave (0.5s)
+- ✅ Estatísticas globais persistentes no localStorage
+- ✅ Timer em tempo real e contador de streak (máximo da sessão)
+- ✅ Orientação automática do tabuleiro baseada na cor
+
+#### **Repertório de Aberturas**
+- ✅ Sistema completo de cadastro com navegação em árvore
+- ✅ Modo treino com 20 posições aleatórias (Fisher-Yates)
+- ✅ Navegação: Undo/Redo/Flip com atalhos de teclado
+- ✅ Comentários personalizados por posição FEN
+- ✅ **Dica automática após 2 erros** (mostra comentário)
+- ✅ Import/Export JSON com validação TypeStorage
+- ✅ Persistência completa no localStorage (key: `data`)
+- ✅ Orientação automática baseada no turno
+
+### 🚧 Em Desenvolvimento:
+- [ ] Sistema de spaced repetition com algoritmo SM-2
+- [ ] Dashboard com gráficos de evolução temporal
+- [ ] Filtros avançados para puzzles (por tipo de erro, cor, fase do jogo)
+- [ ] Seleção de variante no Redo (múltiplas ramificações)
+- [ ] Configuração customizável de depth/timeout do Stockfish
+- [ ] Tratamento de rate limiting da API Chess.com
+
+## 🚀 Como Usar
+
+### Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/frederico-kluser/opening-training.git
+cd opening-training
+
+# Instale as dependências
+npm install
+
+# Execute o projeto
+npm run dev
+```
+
+Acesse http://localhost:5173
+
+### Fluxo de Uso
+
+#### **1. Análise de Partidas**
+1. Clique em "📊 Analisar Partidas"
+2. Escolha uma opção:
+   - **Importar PGN**: Cole suas partidas ou use o exemplo
+   - **Chess.com**: Digite username e escolha:
+     - Importar Todos (jogos do mês)
+     - Importar Apenas Meus Jogos (filtra por username)
+     - Importar Últimos 10 (importação rápida)
+   - **📥 Importar Análise**: Carregue análises salvas (JSON)
+3. Para múltiplas partidas:
+   - Jogador mais frequente é detectado automaticamente (badge 🎯)
+   - Partidas do jogador detectado são pré-selecionadas
+   - Escolha a cor para análise (brancas ou pretas)
+4. Aguarde a análise (depth 18, timeout 10s por posição)
+5. Veja estatísticas separadas por cor (ACPL, erros)
+6. **💾 Exportar Análise**: Salve para reutilizar depois
+7. Puzzles são gerados automaticamente de blunders (>300cp)
+
+#### **2. Treinamento de Puzzles**
+1. Clique em "🧩 Treinar Puzzles"
+2. Escolha o modo:
+   - **Normal**: Puzzles embaralhados sem repetição, progresso linear
+   - **Rush**: 20 puzzles aleatórios com repetição permitida
+3. Observe o contexto (posição anterior por 1 segundo)
+4. Resolva o puzzle (máximo 3 tentativas):
+   - Feedback verde = correto
+   - Feedback rosa = incorreto
+   - Após 3 erros, avança automaticamente
+5. Acompanhe suas estatísticas:
+   - Progresso da sessão (X de Y)
+   - Taxa de acerto e streak
+   - Tentativas por puzzle
+   - Timer em tempo real
+
+#### **3. Repertório de Aberturas**
+1. Clique em "📚 Repertório"
+2. Opções disponíveis:
+   - **Continuar**: Carrega dados salvos do localStorage
+   - **Novo**: Cria novo repertório (limpa dados anteriores)
+   - **Importar**: Carrega arquivo JSON com validação
+3. **Modo Edição:**
+   - Faça movimentos para criar variantes
+   - Adicione comentários por posição
+   - Use Undo/Redo para navegar na árvore
+   - Exporte com botão Download
+4. **Modo Treino:**
+   - 20 posições aleatórias do repertório
+   - Máximo 3 tentativas por posição
+   - Dica automática após 2 erros (mostra comentário)
+   - Orientação do tabuleiro automática
+
+## 🛠️ Stack Tecnológico
+
+### Frontend
+- **React 18.3.1** - Interface de usuário
+- **TypeScript 5.6.2** - Type safety
+- **Vite 5.4.10** - Build tool
+- **React Bootstrap 2.10.5** - Componentes UI
+- **React Icons 5.3.0** - Ícones
+
+### Bibliotecas de Xadrez
+- **chess.js 1.0.0-beta.8** - Engine de validação de movimentos
+- **react-chessboard 4.7.2** - Tabuleiro interativo
+- **Stockfish 17 WASM** - Engine de análise (integrado)
+
+### Utilitários
+- **uuid 13.0.0** - Identificadores únicos
+- **events 3.3.0** - Event emitters
+
+## 📋 Features Detalhadas
+
+### Análise de Partidas
+- **Importação Flexível**: PGN direto, arquivo .pgn, ou Chess.com API
+- **Chess.com API Completa**:
+  - 3 modos de importação (Todos/Meus Jogos/Últimos 10)
+  - Preview visual com badges coloridos por tipo
+  - Estatísticas e ratings em tempo real
+  - Múltiplos endpoints disponíveis
+- **Análise em Lote**: Processa múltiplas partidas com barra de progresso
+- **Detecção Inteligente**: Identifica jogador mais frequente sem threshold mínimo
+- **Pré-seleção Automática**: Badge 🎯 e seleção do jogador detectado
+- **Classificação Precisa**:
+  - Brilliant (< 0 cp loss) - Movimento excepcional
+  - Best (< 10 cp loss) - Melhor movimento
+  - Good (< 50 cp loss) - Movimento bom
+  - Inaccuracy (< 100 cp loss) - Imprecisão
+  - Mistake (< 300 cp loss) - Erro
+  - Blunder (≥ 300 cp loss) - Grande erro
+- **Exportação/Importação**:
+  - Formato JSON completo com análises e puzzles
+  - Auto-salvamento de puzzles ao importar
+  - Nome padrão: `chess-analysis-YYYY-MM-DD.json`
+
+### Sistema de Puzzles
+- **Geração Inteligente**:
+  - Apenas blunders >300cp viram puzzles
+  - Ignora primeiros 10 lances (teoria)
+  - Inclui contexto da posição anterior
+- **Dois Modos Distintos**:
+  - **Normal**: Sem repetição, todos os puzzles uma vez
+  - **Rush**: 20 puzzles com Fisher-Yates shuffle e repetição
+- **Sistema de Tentativas**:
+  - Máximo 3 tentativas com feedback progressivo
+  - Auto-skip após 3 erros
+- **Contexto Visual**:
+  - Mostra `fenContext` por 1 segundo
+  - Tabuleiro bloqueado durante preview
+- **Feedback Colorido**:
+  - Verde (#90EE90) com transição 0.5s para acerto
+  - Rosa (#FFB6C1) com transição 0.5s para erro
+- **Estatísticas Completas**:
+  - Taxa de acerto, streak máximo
+  - Timer em tempo real
+  - Persistência no localStorage
+
+### Repertório de Aberturas
+- **Editor Visual**:
+  - Interface drag-and-drop para criar variantes
+  - Suporte a múltiplas ramificações
+  - Navegação com Undo/Redo
+- **Estrutura em Árvore**:
+  - TypeStorage com prevFen/nextFen[]
+  - Comentários únicos por FEN
+  - Validação completa na importação
+- **Modo Treino Avançado**:
+  - 20 posições com Fisher-Yates shuffle
+  - Dica após 2 tentativas (mostra comentário)
+  - Orientação automática por turno
+- **Import/Export**:
+  - JSON validado com TypeStorage
+  - Download direto do navegador
+  - Persistência em localStorage (key: `data`)
+
+
+## 🏗️ Arquitetura do Projeto
+
+```
+src/
+├── components/           # Componentes React
+│   ├── ChessBoard/      # Wrapper do tabuleiro
+│   ├── ChessComImporter/# Importação Chess.com
+│   ├── ChessGame/       # Tabuleiro interativo
+│   ├── GameAnalyzer/    # Análise de partidas
+│   ├── OpeningTrainer/  # Treino de aberturas
+│   ├── PuzzleSession/   # Componentes de sessão
+│   ├── PuzzleTrainer/   # Interface de puzzles
+│   ├── StockfishTest/   # Teste do engine
+│   ├── TrainingControls/# Controles de treino
+│   ├── Download/        # Exportação JSON
+│   ├── Gap/             # Espaçamento
+│   └── Upload/          # Importação JSON
+├── hooks/
+│   └── useStockfish.ts  # Hook para Stockfish
+├── Pages/
+│   └── Register/        # Editor de repertório
+├── services/
+│   ├── ChessComService.ts    # API Chess.com
+│   ├── OpeningTrainerService.ts # Lógica de treino
+│   ├── PuzzleService.ts      # Gestão de puzzles
+│   └── StockfishService.ts   # Engine de análise
+├── stockfish/
+│   ├── engine.ts        # Classe Engine
+│   └── *.js/wasm        # Arquivos Stockfish
+├── types/
+│   ├── Puzzle.ts        # Interface Puzzle
+│   └── TypeStorage.ts   # Schema repertório
+├── utils/
+│   ├── chessUtils.ts    # Utilidades xadrez
+│   ├── pgnParser.ts     # Parser PGN
+│   ├── timeUtils.ts     # Formatação tempo
+│   └── isValidTypeStorage.ts
+├── App.tsx              # Roteamento principal
+└── main.tsx             # Entry point
+```
+
+## 📦 Estrutura de Dados
+
+### Puzzle - Estrutura Completa
+```typescript
+interface Puzzle {
+  id: string;              // UUID v4 único
+  fenBefore: string;       // Posição antes do erro
+  fenContext?: string;     // Posição anterior para contexto (NOVO)
+  blunderMove: string;     // Movimento que foi um blunder
+  solution: string;        // Movimento correto (UCI ou SAN)
+  evaluation: number;      // CP loss do blunder
+  moveNumber: number;      // Número do lance
+  color: 'white' | 'black';
+  dateCreated: string;     // ISO 8601
+  attempts?: number;       // Contador de tentativas (max: 3)
+  solved?: boolean;        // Status de resolução
+  lastAttempt?: string;    // Último movimento tentado
+}
+```
+
+### TypeStorage - Formato do Repertório
+```typescript
+interface TypeStorage {
+  [abertura: string]: {
+    [fen: string]: {
+      prevFen: string;      // FEN anterior (para Undo)
+      comment: string;      // Comentário da posição
+      nextFen: string[];    // Próximas variantes (múltiplas)
+    }
+  }
+}
+```
+
+### Formato de Exportação de Análise
+```typescript
+interface ExportedAnalysis {
+  date: string;            // Data da exportação
+  pgn: string;             // PGN original
+  analysis: MoveAnalysis[]; // Análise detalhada de cada movimento
+  blunders: Puzzle[];      // Puzzles gerados
+  stats: {
+    white: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
+    black: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
+  };
+  selectedGames: GameSelection[]; // Partidas selecionadas
+  parsedGames: ParsedGame[];      // Partidas parseadas
+}
+```
+
+## 🔧 Configuração Avançada
+
+### Stockfish WASM
+O Stockfish 17 está integrado via WASM com as seguintes configurações:
+
+```typescript
+// Em GameAnalyzer/index.tsx
+const ANALYSIS_DEPTH = 18;     // Profundidade de análise (padrão: 18)
+
+// Em StockfishService.ts
+const ANALYSIS_TIMEOUT = 10000; // Timeout em ms (padrão: 10 segundos)
+```
+
+**Funcionalidades disponíveis:**
+- Análise com depth configurável
+- Skill level ajustável (0-20)
+- Execução em Web Worker (não bloqueia UI)
+- Detecção de mate convertida para ±100000 cp
+- Principal Variation (PV) armazenada
+
+### localStorage - Chaves e Estruturas
+Todos os dados são salvos automaticamente no navegador:
+
+| Chave | Descrição | Estrutura |
+|-------|-----------|-----------|
+| `chess-puzzles` | Lista de puzzles gerados | `Puzzle[]` |
+| `opening-training-stats` | Estatísticas do repertório | `TrainingStats` |
+| `opening-training-session` | Sessão atual de treino | `TrainingSession` |
+| `data` | Repertório de aberturas | `TypeStorage` |
+
+**Estatísticas do Repertório (TrainingStats):**
+```typescript
+{
+  totalMoves: number;
+  correctMoves: number;
+  incorrectMoves: number;
+  streak: number;
+  maxStreak: number;
+  sessionsCompleted: number;
+  lastTrainingDate: string;
+  averageAccuracy: number;
+}
+```
+
+Para limpar todos os dados:
+```javascript
+localStorage.clear(); // Remove tudo
+// Ou específico:
+localStorage.removeItem('chess-puzzles');
+```
+
+## 🌐 Integração Chess.com API
+
+### Endpoints Disponíveis
+O sistema usa a API pública do Chess.com com os seguintes endpoints:
+
+```javascript
+// Base URL: https://api.chess.com/pub
+
+getPlayerProfile(username)     // Perfil completo do jogador
+getPlayerArchives(username)    // Lista de arquivos mensais
+getMonthlyGames(username, year, month) // Jogos de um mês específico
+getMonthlyPGN(username, year, month)   // PGN direto do mês
+getLatestGames(username, count)        // Últimos N jogos
+getAllGames(username, limit)           // Batch com paginação
+getPlayerStats(username)               // Estatísticas e ratings
+```
+
+### Funcionalidades da Integração
+- **Rate limiting:** Delay de 1s entre requisições batch
+- **User-Agent customizado:** "ChessTrainingSystem/1.0"
+- **Filtros disponíveis:**
+  - Por controle de tempo (Bullet/Blitz/Rapid/Daily)
+  - Apenas jogos ranqueados
+- **Dados extras capturados:**
+  - Accuracies (precisão de brancas/pretas)
+  - Ratings de ambos jogadores
+  - URLs das partidas
+
+## ⚙️ Algoritmos e Utilitários
+
+### Fisher-Yates Shuffle
+Usado para embaralhamento verdadeiramente aleatório de puzzles e posições:
+
+```typescript
+// OpeningTrainerService.ts e PuzzleService.ts
+for (let i = array.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [array[i], array[j]] = [array[j], array[i]];
+}
+```
+
+### Conversão UCI ↔ SAN
+Utilitários para compatibilidade entre Stockfish (UCI) e chess.js (SAN):
+
+```typescript
+// chessUtils.ts
+convertUCItoSAN('e2e4', fen) // => 'e4'
+moveToUCI('e2', 'e4', 'q')   // => 'e2e4q'
+executeMove(game, from, to, promotion)
+```
+
+### Parser PGN Robusto
+Validação e parsing de múltiplas partidas:
+
+```typescript
+// pgnParser.ts
+validatePGN(pgn)              // Validação com mensagens específicas
+extractGamesInfo(pgn)         // Extração de metadados
+detectMostFrequentPlayer(games) // Detecção inteligente sem threshold
+getPlayerColors(games, username) // Identificação de cores jogadas
+```
+
+### Cálculo de ACPL
+Average Centipawn Loss por cor:
+
+```typescript
+// GameAnalyzer/index.tsx
+const calculateACPL = (moves) => {
+  const totalCPL = moves.reduce((sum, m) => sum + m.centipawnLoss, 0);
+  return Math.round(totalCPL / moves.length);
+};
+```
+
+## 🎨 Personalização Visual
+
+### Códigos de Cores
+```css
+/* Feedback de Movimentos */
+--correct-bg: #90EE90;  /* Verde claro - movimento correto */
+--incorrect-bg: #FFB6C1; /* Rosa claro - movimento incorreto */
+--transition: 0.5s;      /* Duração da transição */
+
+/* Badges de Tipo de Jogo */
+--bullet-badge: danger;  /* Vermelho - Bullet */
+--blitz-badge: warning;  /* Amarelo - Blitz */
+--rapid-badge: primary;  /* Azul - Rapid */
+```
+
+### Ícones Utilizados
+- 🎯 Jogador detectado automaticamente
+- 💾 Exportar análise
+- 📥 Importar análise
+- 🧩 Puzzles
+- 📊 Análise
+- 📚 Repertório
+- ✅ Acerto
+- ❌ Erro
+- 🔥 Streak
+- 💡 Dica
+
+## 🚀 Roadmap Futuro
+
+### Curto Prazo
+- [ ] Sistema de spaced repetition com algoritmo SM-2
+- [ ] Dashboard com gráficos de evolução temporal
+- [ ] Filtros avançados para puzzles (por tipo de erro)
+- [ ] Exportação de estatísticas em PDF
+
+### Médio Prazo
+- [ ] Integração com Lichess API
+- [ ] Análise de padrões de erro recorrentes
+- [ ] Sugestões personalizadas de estudo
+- [ ] Modo multiplayer para competições
+
+### Longo Prazo
+- [ ] App mobile (React Native)
+- [ ] Integração com engines alternativos (Leela, etc)
+- [ ] Sistema de coaching com IA
+- [ ] Marketplace de repertórios
+
+## 🐛 Problemas Conhecidos e Limitações
+
+### Problemas de Performance
+- Performance pode degradar com >1000 puzzles salvos no localStorage
+- Análise de partidas muito longas (>100 movimentos) pode ser lenta
+- Re-embaralhamento frequente em bibliotecas pequenas de puzzles (<20)
+
+### Limitações Técnicas
+- Chess.com API tem limite de taxa (delay fixo de 1s entre requisições)
+- Timeout do Stockfish fixo em 10 segundos (não configurável via UI)
+- Seleção de cor exclusiva em múltiplas partidas (não permite analisar ambas)
+- Redo sempre seleciona primeira variante (falta UI para escolher)
+- Primeiros 10 lances são ignorados na geração de puzzles (teoria de abertura)
+
+### TODOs Identificados no Código
+- Implementar seleção de variante no Redo (Register/index.tsx:106)
+- Adicionar configuração de depth/timeout do Stockfish via UI
+- Implementar tratamento adequado de rate limiting Chess.com
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o projeto
+2. Crie uma feature branch (`git checkout -b feature/NovaFuncionalidade`)
+3. Commit suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
+5. Abra um Pull Request
+
+### Convenção de Commits
+- `feat:` Nova funcionalidade
+- `fix:` Correção de bug
+- `docs:` Documentação
+- `style:` Formatação
+- `refactor:` Refatoração
+- `test:` Testes
+- `chore:` Manutenção
+
+## 📄 Licença
+
+MIT License - veja [LICENSE](LICENSE) para detalhes
+
+## 👥 Autor
+
+**Frederico Kluser**
+- GitHub: [@frederico-kluser](https://github.com/frederico-kluser)
+- Projeto: [opening-training](https://github.com/frederico-kluser/opening-training)
+
+## 🙏 Agradecimentos
+
+- [Stockfish](https://stockfishchess.org/) - Engine de análise
+- [Chess.js](https://github.com/jhlywa/chess.js) - Biblioteca de xadrez
+- [React Chessboard](https://github.com/Clariity/react-chessboard) - Componente do tabuleiro
+- [Chess.com](https://chess.com) - API de partidas
+
+---
+
+**Última atualização**: 05/01/2025 | **Versão**: 3.0.0
+
+### 📝 Changelog v3.0.0
+- ✅ Adicionado sistema completo de importação/exportação de análises
+- ✅ Auto-salvamento de puzzles ao importar análises
+- ✅ Sistema de contexto visual para puzzles (fenContext)
+- ✅ Modo Rush com 20 puzzles aleatórios
+- ✅ Detecção inteligente de jogador sem threshold mínimo
+- ✅ Integração completa com Chess.com API (3 modos)
+- ✅ Feedback progressivo com 3 tentativas
+- ✅ Dica automática após 2 erros no repertório
+- ✅ Documentação completa e atualizada
+</current_readme>
+
+<!-- Análise de mudanças do Git -->
+<git_analysis>
+  <summary>Commit: feat: Adiciona feedback visual e debug na importação Chess.com | Features: 6 arquivos | Documentação: 3 arquivos | Total: 9 arquivos (+67/-11) | Working tree: 2 arquivos modificados</summary>
+  <stats>
+    <files_changed>9</files_changed>
+    <insertions>1549</insertions>
+    <deletions>80</deletions>
+  </stats>
+  <commit_info>
+    <hash>fc64e858</hash>
+    <author>K2 - Frederico Guilherme Klueser</author>
+    <message>feat: Adiciona feedback visual e debug na importação Chess.com</message>
+    <date>2025-10-09T13:24:58-03:00</date>
+  </commit_info>
+  <modified_files>
+    <file status="modified" insertions="0" deletions="0">caro-kann-3.0.json	docs/caro-kann-3.0.json</file>
+    <file status="added" insertions="131" deletions="0">docs/game.jsonc</file>
+    <file status="added" insertions="888" deletions="0">docs/games.jsonc</file>
+    <file status="modified" insertions="183" deletions="1">src/App.css</file>
+    <file status="modified" insertions="30" deletions="7">src/App.tsx</file>
+    <file status="modified" insertions="117" deletions="0">src/components/GameAnalyzer/index.tsx</file>
+    <file status="modified" insertions="10" deletions="8">src/components/PuzzleTrainer/index.tsx</file>
+    <file status="modified" insertions="107" deletions="0">src/services/ChessComService.ts</file>
+    <file status="modified" insertions="10" deletions="0">vite.config.ts</file>
+  </modified_files>
+</git_analysis>
+
+<!-- Seções sugeridas para atualização -->
+<sections_to_update>
+  <section>Changelog</section>
+  <section>Versão</section>
+</sections_to_update>
+
+<!-- Diff completo das mudanças -->
+<git_diff>
+diff --git a/caro-kann-3.0.json b/docs/caro-kann-3.0.json
+similarity index 100%
+rename from caro-kann-3.0.json
+rename to docs/caro-kann-3.0.json
+diff --git a/docs/game.jsonc b/docs/game.jsonc
+new file mode 100644
+index 0000000..39de4bb
+--- /dev/null
++++ b/docs/game.jsonc
+@@ -0,0 +1,131 @@
++{ //https://www.chess.com/callback/live/game/144089765146
++  "game": {
++    "areFriends": false,
++    "canSendTrophy": true,
++    "changesPlayersRating": 1,
++    "colorOfWinner": "white",
++    "id": 144089765146,
++    "uuid": "2a7548c9-a519-11f0-96d5-2653d301000f",
++    "initialSetup": "",
++    "isLiveGame": true,
++    "isAbortable": false,
++    "isAnalyzable": true,
++    "isCheckmate": true,
++    "isStalemate": false,
++    "isFinished": true,
++    "isRated": true,
++    "isResignable": false,
++    "lastMove": "n1",
++    "moveList": "mC0KfA!TltZRnD5Qgv6EpxEvdvQBvnKDcDBShf90xFTNDp0FowFMn1",
++    "plyCount": 27,
++    "ratingChange": 21,
++    "ratingChangeWhite": 21,
++    "ratingChangeBlack": -14,
++    "gameEndReason": "checkmated",
++    "resultMessage": "FredericoKluser venceu por xeque-mate",
++    "endTime": 1760018984,
++    "turnColor": "black",
++    "type": "chess",
++    "typeName": "Standard Chess",
++    "allowVacation": false,
++    "pgnHeaders": {
++      "Event": "Live Chess",
++      "Site": "Chess.com",
++      "Date": "2025.10.09",
++      "White": "FredericoKluser",
++      "Black": "Blackkk0",
++      "Result": "1-0",
++      "ECO": "C24",
++      "WhiteElo": 708,
++      "BlackElo": 656,
++      "TimeControl": "180",
++      "EndTime": "14:09:44 GMT+0000",
++      "Termination": "FredericoKluser won by checkmate",
++      "SetUp": "1",
++      "FEN": "rnbqkbnr\/pppppppp\/8\/8\/8\/8\/PPPPPPPP\/RNBQKBNR w KQkq - 0 1"
++    },
++    "moveTimestamps": "1791,1789,1782,1668,1768,1628,1751,1540,1708,1506,1683,1419,1682,1362,1513,1263,1492,1190,1361,1099,1293,1059,1130,1044,1020,790,990,790",
++    "baseTime1": 1800,
++    "timeIncrement1": 0.0
++  },
++  "players": {
++    "top": {
++      "uuid": "4abde032-b643-11ee-8fe9-47108e3a798f",
++      "isContentHidden": true,
++      "id": 339760735,
++      "isComputer": false,
++      "avatarUrl": "https:\/\/www.chess.com\/bundles\/web\/images\/noavatar_l.84a92436.gif",
++      "countryId": 138,
++      "isEnabled": true,
++      "canWinOnTime": false,
++      "color": "black",
++      "countryName": "T\u00fcrkiye",
++      "defaultTab": 1,
++      "hasMovedAtLeastOnce": false,
++      "isDrawable": false,
++      "isOnline": true,
++      "isInLivechess": true,
++      "isTouchMove": false,
++      "isVacation": false,
++      "isWhiteOnBottom": false,
++      "lastLoginDate": 1760018791,
++      "membershipLevel": 10,
++      "membershipCode": "basic",
++      "memberSince": 1705611062,
++      "postMoveAction": "next_game",
++      "rating": 656,
++      "turnTimeRemaining": "0 dias",
++      "username": "Blackkk0",
++      "vacationRemaining": "3 semanas",
++      "gamesInProgress": 0,
++      "friendRequestSent": false,
++      "friendRequestReceived": false,
++      "isBlocked": false,
++      "isFriend": false
++    },
++    "bottom": {
++      "uuid": "2c59a342-a444-11f0-9ef4-13fa9713af90",
++      "isContentHidden": false,
++      "id": 490370683,
++      "isComputer": false,
++      "avatarUrl": "https:\/\/images.chesscomfiles.com\/uploads\/v1\/user\/490370683.03f1282c.100x100o.f24886bfc872.jpg",
++      "countryId": 27,
++      "isEnabled": true,
++      "canWinOnTime": false,
++      "color": "white",
++      "countryName": "Brazil",
++      "defaultTab": 1,
++      "hasMovedAtLeastOnce": false,
++      "isDrawable": false,
++      "isOnline": true,
++      "isInLivechess": true,
++      "isTouchMove": false,
++      "isVacation": false,
++      "isWhiteOnBottom": false,
++      "lastLoginDate": 1759972917,
++      "membershipLevel": 50,
++      "membershipCode": "diamond",
++      "memberSince": 1759927315,
++      "postMoveAction": "next_game",
++      "rating": 708,
++      "turnTimeRemaining": "0 dias",
++      "flair": {
++        "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++        "images": {
++          "png": "https:\/\/images.chesscomfiles.com\/chess-flair\/membership_icons\/diamond_traditional.png",
++          "svg": "https:\/\/images.chesscomfiles.com\/chess-flair\/membership_icons\/diamond_traditional.svg",
++          "lottie": "https:\/\/images.chesscomfiles.com\/chess-flair\/membership_icons\/diamond_traditional.lottie"
++        }
++      },
++      "username": "FredericoKluser",
++      "vacationRemaining": "9 dias",
++      "gamesInProgress": 0,
++      "friendRequestSent": false,
++      "friendRequestReceived": false,
++      "isBlocked": false,
++      "isFriend": false
++    }
++  },
++  "friendRequestSent": false,
++  "friendRequestReceived": false
++}
+\ No newline at end of file
+diff --git a/docs/games.jsonc b/docs/games.jsonc
+new file mode 100644
+index 0000000..6d05cb3
+--- /dev/null
++++ b/docs/games.jsonc
+@@ -0,0 +1,888 @@
++{
++  //https://www.chess.com/callback/games/extended-archive?locale=pt_BR&username=fredericokluser&page=1&location=all
++  "data": [
++    {
++      "id": 144089765146,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 708,
++      "user2Rating": 656,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 339760735,
++        "title": null,
++        "username": "Blackkk0",
++        "countryId": 138,
++        "countryName": "Türkiye",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "2a7548c9-a519-11f0-96d5-2653d301000f",
++      "fen": "r2qk2r/ppp2Qpp/3pn3/6bn/2B1P3/3P2P1/PPP4B/RN2KR2 b Qkq - 0 14",
++      "moves": 14,
++      "highlightSquares": "f2f7",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": 76.26,
++      "user2Accuracy": 63.02,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144088674816,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 687,
++      "user2Rating": 682,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 112531098,
++        "title": null,
++        "username": "Baptistemnd",
++        "countryId": 52,
++        "countryName": "France",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "efeada1d-a514-11f0-96d5-2653d301000f",
++      "fen": "1r2kb1r/1p2p1pp/pQpn4/3p4/3P1q2/2P4P/PP3PP1/RN3RK1 w k - 0 17",
++      "moves": 16,
++      "highlightSquares": "e4f4",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144088555722,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 772,
++      "user2Rating": 713,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 202842915,
++        "title": null,
++        "username": "alftt",
++        "countryId": 148,
++        "countryName": "Venezuela",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "789ba354-a514-11f0-9d16-2ccca301000f",
++      "fen": "r3k3/p1Nn2p1/2p3p1/1p1pPn1r/3P4/2P5/PP4PP/R1B1R1K1 b q - 1 19",
++      "moves": 19,
++      "highlightSquares": "e6c7",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144088489278,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 736,
++      "user2Rating": 791,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 239235951,
++        "title": null,
++        "username": "DaniielCardooso",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "356d7476-a514-11f0-bc0b-6deafd01000f",
++      "fen": "r1bqk1nr/ppp2p1p/3p2p1/8/2n1PB2/2P5/PP3PPP/RN1QK2R w KQkq - 0 9",
++      "moves": 8,
++      "highlightSquares": "e5c4",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144088405320,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 779,
++      "user2Rating": 761,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 405157385,
++        "title": null,
++        "username": "shkodran8818",
++        "countryId": 36,
++        "countryName": "Croatia",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "e035825e-a513-11f0-ab68-2b25dc01000f",
++      "fen": "r3kq1r/p6p/1pp1Q1p1/3pP3/8/2N2P2/PPP3PP/2KR1R2 b kq - 0 18",
++      "moves": 18,
++      "highlightSquares": "f6e6",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144088224268,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 792,
++      "user2Rating": 783,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 252426665,
++        "title": null,
++        "username": "Bryanttasi",
++        "countryId": 17,
++        "countryName": "Australia",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "27e78001-a513-11f0-ab68-2b25dc01000f",
++      "fen": "1k4r1/ppp5/3p2Br/3P4/3bP3/3P2K1/P4P2/1R3R2 w - - 3 27",
++      "moves": 26,
++      "highlightSquares": "h4h6",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144083290898,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 829,
++      "user2Rating": 866,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 309414035,
++        "title": null,
++        "username": "Samsit007",
++        "countryId": 217,
++        "countryName": "Timor-Leste",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "38044ebc-a4fe-11f0-bc0b-6deafd01000f",
++      "fen": "r4rk1/p1p2pp1/1p5p/8/8/1N1Pn3/PbP2RPP/4R1K1 w - - 0 19",
++      "moves": 18,
++      "highlightSquares": "d5e3",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144083156794,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 893,
++      "user2Rating": 865,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 45753786,
++        "title": null,
++        "username": "N0_Game",
++        "countryId": 2,
++        "countryName": "United States",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "99b82a4a-a4fd-11f0-96d5-2653d301000f",
++      "fen": "2k3nr/Qp2q1bp/1n6/3rp1p1/8/2P2NB1/PP1N1PPP/R3R1K1 b - - 0 17",
++      "moves": 17,
++      "highlightSquares": "a5a7",
++      "gameEndTime": "9 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144070535094,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 906,
++      "user2Rating": 966,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 304620179,
++        "title": null,
++        "username": "Obaiii1",
++        "countryId": 3,
++        "countryName": "Canada",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "8562292d-a4af-11f0-ab68-2b25dc01000f",
++      "fen": "r4rk1/1p3ppp/p2p4/3P4/1q2Q1P1/1PbP4/P4P1P/2R1K2R w K - 0 20",
++      "moves": 19,
++      "highlightSquares": "f6c3",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": true,
++      "isArena": false
++    },
++    {
++      "id": 144065026494,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 976,
++      "user2Rating": 949,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 28230280,
++        "title": null,
++        "username": "stgu77",
++        "countryId": 132,
++        "countryName": "Sweden",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "c2b0e43a-a48a-11f0-93fb-4635dc01000f",
++      "fen": "8/8/5n2/6p1/1k2N3/4K2P/8/8 b - - 0 52",
++      "moves": 52,
++      "highlightSquares": "d2e4",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": true,
++      "isArena": false
++    },
++    {
++      "id": 144064827982,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 956,
++      "user2Rating": 1005,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 199708785,
++        "title": null,
++        "username": "jjmolino",
++        "countryId": 163,
++        "countryName": "Spain",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "c59ed203-a489-11f0-9703-fe535701000f",
++      "fen": "2kr3r/1p1n2q1/pP2p3/P2p1p2/2pP3N/2P2NP1/8/4K2R w - - 0 30",
++      "moves": 29,
++      "highlightSquares": "f6f5",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": 61.24,
++      "user2Accuracy": 64.68,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144064599658,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 943,
++      "user2Rating": 1038,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 36926888,
++        "title": null,
++        "username": "Rishabhvrm",
++        "countryId": 2,
++        "countryName": "United States",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "aab0dbbb-a488-11f0-93fb-4635dc01000f",
++      "fen": "3r1rk1/7p/4p1p1/pp3p2/4q2P/2P5/PP3Q1K/2R2R2 w - - 0 30",
++      "moves": 29,
++      "highlightSquares": "g4e4",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144062113572,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 927,
++      "user2Rating": 1009,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 487419845,
++        "title": null,
++        "username": "itayis16",
++        "countryId": 75,
++        "countryName": "Israel",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "abd119c5-a47d-11f0-93fb-4635dc01000f",
++      "fen": "r3k2r/pp3ppp/4p3/5b2/3P4/P4N2/1Pn2PPP/R3K2R w KQkq - 1 16",
++      "moves": 15,
++      "highlightSquares": "b4c2",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": 68.13,
++      "user2Accuracy": 81.18,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144061934460,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 917,
++      "user2Rating": 1036,
++      "user1Result": 0,
++      "user2Result": 1,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "user2": {
++        "id": 76516876,
++        "title": null,
++        "username": "HoleInOneHawaii",
++        "countryId": 2,
++        "countryName": "United States",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "ec7c62ee-a47c-11f0-ab68-2b25dc01000f",
++      "fen": "8/p1p1kppp/2p1p3/P3P3/5KP1/3r3P/8/1R6 w - - 0 36",
++      "moves": 35,
++      "highlightSquares": "g3d3",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": null,
++      "user2Accuracy": null,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    },
++    {
++      "id": 144061724022,
++      "baseTime1": 1800,
++      "daysPerTurn": 0,
++      "timeIncrement": 0,
++      "user1Rating": 1232,
++      "user2Rating": 1037,
++      "user1Result": 1,
++      "user2Result": 0,
++      "gameTimeClass": "blitz",
++      "gameType": {
++        "name": "Standard Chess",
++        "code": "chess",
++        "isChess960": false,
++        "isKingOfTheHill": false,
++        "isThreeCheck": false,
++        "isBughouse": false,
++        "isCrazyHouse": false
++      },
++      "user1": {
++        "id": 146459321,
++        "title": null,
++        "username": "Edcros",
++        "countryId": 164,
++        "countryName": "United Kingdom",
++        "membershipLevel": 10,
++        "flair": null
++      },
++      "user2": {
++        "id": 490370683,
++        "title": null,
++        "username": "FredericoKluser",
++        "countryId": 27,
++        "countryName": "Brazil",
++        "membershipLevel": 50,
++        "flair": {
++          "id": "abd554aa-2af1-11ee-bb50-1bb6daf0ee3e",
++          "images": {
++            "png": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.png",
++            "svg": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.svg",
++            "lottie": "https://images.chesscomfiles.com/chess-flair/membership_icons/diamond_traditional.lottie"
++          }
++        }
++      },
++      "isLive": true,
++      "isVsComputer": false,
++      "uuid": "0dd925fa-a47c-11f0-8723-656c4101000f",
++      "fen": "2r4r/5k1b/5n1p/4Q2P/Npp3P1/1P6/PP6/2KR4 w - - 1 37",
++      "moves": 36,
++      "highlightSquares": "e8f7",
++      "gameEndTime": "8 de out. de 2025",
++      "user1Accuracy": 60.44,
++      "user2Accuracy": 57.15,
++      "isTournament": false,
++      "isTeamMatch": false,
++      "isTimeout": false,
++      "isArena": false
++    }
++  ],
++  "meta": {
++    "totalCount": 18,
++    "countPerPage": 50,
++    "totalPages": 1,
++    "currentPage": 1
++  }
++}
+\ No newline at end of file
+diff --git a/src/App.css b/src/App.css
+index 25fd3cf..0fe3816 100644
+--- a/src/App.css
++++ b/src/App.css
+@@ -1,3 +1,185 @@
++:root {
++	--bg-primary: #ffffff;
++	--bg-secondary: #f8f9fa;
++	--bg-card: #ffffff;
++	--text-primary: #212529;
++	--text-secondary: #6c757d;
++	--border-color: #dee2e6;
++	--shadow: rgba(0, 0, 0, 0.1);
++	--gradient-start: #667eea;
++	--gradient-end: #764ba2;
++}
++
++[data-theme="dark"] {
++	--bg-primary: #1a1a1a;
++	--bg-secondary: #2d2d2d;
++	--bg-card: #2d2d2d;
++	--text-primary: #e0e0e0;
++	--text-secondary: #a0a0a0;
++	--border-color: #404040;
++	--shadow: rgba(0, 0, 0, 0.3);
++	--gradient-start: #4a5568;
++	--gradient-end: #2d3748;
++}
++
+ body {
+-	background-color: #222222;
++	background-color: var(--bg-secondary);
++	color: var(--text-primary);
++	transition: background-color 0.3s ease, color 0.3s ease;
++}
++
++.card {
++	background-color: var(--bg-card) !important;
++	color: var(--text-primary) !important;
++	border-color: var(--border-color) !important;
++	transition: all 0.3s ease;
++}
++
++.card-body {
++	color: var(--text-primary) !important;
++}
++
++.text-muted {
++	color: var(--text-secondary) !important;
++}
++
++.bg-white {
++	background-color: var(--bg-card) !important;
++}
++
++.hover-shadow:hover {
++	box-shadow: 0 0.5rem 1rem var(--shadow) !important;
++}
++
++.theme-toggle {
++	position: fixed;
++	top: 20px;
++	right: 20px;
++	z-index: 1000;
++	background-color: var(--bg-card);
++	border: 2px solid var(--border-color);
++	border-radius: 50%;
++	width: 50px;
++	height: 50px;
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	cursor: pointer;
++	font-size: 1.5rem;
++	transition: all 0.3s ease;
++	box-shadow: 0 2px 8px var(--shadow);
++}
++
++.theme-toggle:hover {
++	transform: scale(1.1);
++	box-shadow: 0 4px 12px var(--shadow);
++}
++
++/* Mobile Responsiveness */
++@media (max-width: 768px) {
++	.h2 {
++		font-size: 1.5rem !important;
++	}
++
++	.card-body {
++		padding: 1.25rem !important;
++	}
++
++	.theme-toggle {
++		width: 45px;
++		height: 45px;
++		top: 15px;
++		right: 15px;
++		font-size: 1.25rem;
++	}
++
++	/* Melhora espaçamento em cards no mobile */
++	.col-12.col-sm-6.col-md-4 {
++		margin-bottom: 1rem;
++	}
++
++	/* Ajusta tamanho dos ícones nos cards */
++	.card-body > div[style*="fontSize: '3rem'"] {
++		font-size: 2.5rem !important;
++	}
++
++	/* Ajusta padding do container */
++	.container-fluid.flex-grow-1 {
++		padding: 1rem !important;
++	}
++
++	/* Ajusta grid gaps */
++	.row.g-4 {
++		gap: 0.75rem !important;
++	}
++
++	/* Melhora padding dos headers */
++	.container.py-4 {
++		padding-top: 2rem !important;
++		padding-bottom: 2rem !important;
++	}
++
++	/* Ajusta badges */
++	.badge {
++		font-size: 0.875rem !important;
++		padding: 0.35em 0.65em !important;
++	}
++}
++
++@media (max-width: 576px) {
++	.card-body h5 {
++		font-size: 1rem !important;
++	}
++
++	.card-body p {
++		font-size: 0.875rem !important;
++	}
++
++	.btn {
++		font-size: 0.9rem !important;
++		padding: 0.5rem 1rem !important;
++	}
++
++	.btn-lg {
++		font-size: 1rem !important;
++	}
++
++	/* Estatísticas do footer em telas pequenas */
++	.col-6.col-md-3 h4 {
++		font-size: 1.25rem !important;
++	}
++
++	.col-6.col-md-3 small {
++		font-size: 0.75rem !important;
++	}
++
++	/* Ajusta alertas */
++	.alert {
++		font-size: 0.875rem !important;
++		padding: 0.75rem !important;
++	}
++
++	/* Headers menores */
++	h1.h2 {
++		font-size: 1.35rem !important;
++	}
++
++	/* Cards mais compactos */
++	.card {
++		margin-bottom: 0.75rem !important;
++	}
++
++	/* Padding lateral reduzido */
++	.container-fluid {
++		padding-left: 0.75rem !important;
++		padding-right: 0.75rem !important;
++	}
++}
++
++/* Landscape mode para tablets */
++@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
++	.container-fluid.flex-grow-1 {
++		padding-top: 2rem !important;
++		padding-bottom: 2rem !important;
++	}
+ }
+diff --git a/src/App.tsx b/src/App.tsx
+index 40af303..c9fcb64 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -16,6 +16,10 @@ function App() {
+ 	const [variant, setVariant] = useState<string>('');
+ 	const [data, setData] = useState<TypeStorage>({});
+ 	const [mode, setMode] = useState<'edit' | 'train' | ''>('');
++	const [darkMode, setDarkMode] = useState<boolean>(() => {
++		const saved = localStorage.getItem('darkMode');
++		return saved ? JSON.parse(saved) : false;
++	});
+ 
+ 	useEffect(() => {
+ 		if (Object.keys(data).length > 0) {
+@@ -23,6 +27,15 @@ function App() {
+ 		}
+ 	}, [data]);
+ 
++	useEffect(() => {
++		document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
++		localStorage.setItem('darkMode', JSON.stringify(darkMode));
++	}, [darkMode]);
++
++	const toggleDarkMode = () => {
++		setDarkMode(!darkMode);
++	};
++
+ 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 	const handleLoadData = (data: any) => {
+ 		console.log('data :', data);
+@@ -45,8 +58,12 @@ function App() {
+ 	if (Object.keys(data).length > 0 && !variant && !mode) {
+ 		const variants = Object.keys(data);
+ 		return (
+-			<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+-				<div className="row w-100">
++			<>
++				<div className="theme-toggle" onClick={toggleDarkMode}>
++					{darkMode ? '☀️' : '🌙'}
++				</div>
++				<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: `linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)` }}>
++					<div className="row w-100">
+ 					<div className="col-12 col-md-8 col-lg-6 col-xl-5 mx-auto">
+ 						<Card className="shadow-lg border-0">
+ 							<Card.Body className="p-4">
+@@ -111,7 +128,8 @@ function App() {
+ 						</Card>
+ 					</div>
+ 				</div>
+-			</div>
++				</div>
++			</>
+ 		);
+ 	}
+ 
+@@ -119,9 +137,13 @@ function App() {
+ 		const hasLocalData = !!localStorage.getItem('data');
+ 
+ 		return (
+-			<div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8f9fa' }}>
+-				{/* Clean Header */}
+-				<div className="bg-white shadow-sm">
++			<>
++				<div className="theme-toggle" onClick={toggleDarkMode}>
++					{darkMode ? '☀️' : '🌙'}
++				</div>
++				<div className="min-vh-100 d-flex flex-column">
++					{/* Clean Header */}
++					<div className="bg-white shadow-sm">
+ 					<div className="container py-4">
+ 						<div className="text-center">
+ 							<h1 className="h2 fw-bold text-dark mb-2">♟ Sistema de Treino de Xadrez</h1>
+@@ -309,7 +331,8 @@ function App() {
+ 						</div>
+ 					</div>
+ 				</div>
+-			</div>
++				</div>
++			</>
+ 		);
+ 	}
+ 
+diff --git a/src/components/GameAnalyzer/index.tsx b/src/components/GameAnalyzer/index.tsx
+index 50a21e7..dad8f71 100644
+--- a/src/components/GameAnalyzer/index.tsx
++++ b/src/components/GameAnalyzer/index.tsx
+@@ -5,6 +5,7 @@ import { getStockfish } from '../../services/StockfishService';
+ import puzzleService from '../../services/PuzzleService';
+ import { parseMultiplePGN, extractGamesInfo, GameInfo, ParsedGame, validatePGN, detectMostFrequentPlayer } from '../../utils/pgnParser';
+ import Gap from '../Gap';
++import chessComService from '../../services/ChessComService';
+ 
+ interface MoveAnalysis {
+   moveNumber: number;
+@@ -65,6 +66,12 @@ const GameAnalyzer: React.FC = () => {
+     frequency: number;
+   }>({ name: null, positions: new Map(), frequency: 0 });
+ 
++  // Estados para importação do Chess.com por FEN
++  const [showChessComFenModal, setShowChessComFenModal] = useState(false);
++  const [chessComUsername, setChessComUsername] = useState('fredericokluser');
++  const [loadingChessComFens, setLoadingChessComFens] = useState(false);
++  const [chessComImportProgress, setChessComImportProgress] = useState({ current: 0, total: 0 });
++
+   // Classificar movimento baseado em centipawn loss
+   const classifyMove = (cpLoss: number): MoveAnalysis['classification'] => {
+     if (cpLoss < 0) return 'brilliant'; // Ganhou material inesperado
+@@ -582,6 +589,45 @@ const GameAnalyzer: React.FC = () => {
+     window.location.reload();
+   };
+ 
++  // Importar partidas do Chess.com via FEN
++  const handleChessComFenImport = async () => {
++    if (!chessComUsername.trim()) {
++      setError('Por favor, insira um username válido');
++      return;
++    }
++
++    setLoadingChessComFens(true);
++    setError('');
++    setChessComImportProgress({ current: 0, total: 0 });
++
++    try {
++      // Buscar partidas e extrair FENs com callback de progresso
++      const fensString = await chessComService.fetchGamesAndExtractFENs(
++        chessComUsername.trim(),
++        1,
++        (current, total) => {
++          setChessComImportProgress({ current, total });
++        }
++      );
++
++      // Inserir FENs no input de PGN
++      setPgn(fensString);
++
++      // Fechar modal e limpar username
++      setShowChessComFenModal(false);
++      setChessComUsername('fredericokluser'); // Mantém o valor padrão
++
++      // Feedback ao usuário
++      const fenCount = fensString.split('\n\n').length;
++      alert(`✅ ${fenCount} posições FEN importadas com sucesso do Chess.com!`);
++    } catch (err) {
++      setError(err instanceof Error ? err.message : 'Erro ao importar partidas do Chess.com');
++    } finally {
++      setLoadingChessComFens(false);
++      setChessComImportProgress({ current: 0, total: 0 });
++    }
++  };
++
+   // Obter estatísticas de puzzles
+   const puzzleStats = puzzleService.getStats();
+ 
+@@ -789,6 +835,69 @@ const GameAnalyzer: React.FC = () => {
+         </Modal.Footer>
+       </Modal>
+ 
++      {/* Modal de importação do Chess.com via FEN */}
++      <Modal show={showChessComFenModal} onHide={() => !loadingChessComFens && setShowChessComFenModal(false)} centered>
++        <Modal.Header closeButton={!loadingChessComFens}>
++          <Modal.Title>♟️ Importar Partidas do Chess.com</Modal.Title>
++        </Modal.Header>
++        <Modal.Body>
++          <Form.Group className="mb-3">
++            <Form.Label>Digite seu nickname do Chess.com:</Form.Label>
++            <Form.Control
++              type="text"
++              placeholder="Ex: hikaru, magnuscarlsen, gothamchess"
++              value={chessComUsername}
++              onChange={(e) => setChessComUsername(e.target.value)}
++              onKeyPress={(e) => e.key === 'Enter' && !loadingChessComFens && handleChessComFenImport()}
++              disabled={loadingChessComFens}
++              autoFocus
++            />
++            <Form.Text className="text-muted">
++              Serão importadas as partidas da página 1 do seu perfil.
++            </Form.Text>
++          </Form.Group>
++
++          {loadingChessComFens && chessComImportProgress.total > 0 && (
++            <div className="mt-3">
++              <div className="mb-2">
++                <small className="text-muted">
++                  Buscando FEN das partidas... {chessComImportProgress.current}/{chessComImportProgress.total}
++                </small>
++              </div>
++              <ProgressBar
++                now={(chessComImportProgress.current / chessComImportProgress.total) * 100}
++                label={`${Math.round((chessComImportProgress.current / chessComImportProgress.total) * 100)}%`}
++                animated
++                striped
++              />
++            </div>
++          )}
++
++          {loadingChessComFens && chessComImportProgress.total === 0 && (
++            <div className="mt-3 text-center">
++              <div className="spinner-border text-primary" role="status">
++                <span className="visually-hidden">Carregando...</span>
++              </div>
++              <div className="mt-2">
++                <small className="text-muted">Buscando lista de partidas...</small>
++              </div>
++            </div>
++          )}
++        </Modal.Body>
++        <Modal.Footer>
++          <Button variant="secondary" onClick={() => setShowChessComFenModal(false)} disabled={loadingChessComFens}>
++            Cancelar
++          </Button>
++          <Button
++            variant="primary"
++            onClick={handleChessComFenImport}
++            disabled={!chessComUsername.trim() || loadingChessComFens}
++          >
++            {loadingChessComFens ? '⏳ Buscando...' : '✅ Importar'}
++          </Button>
++        </Modal.Footer>
++      </Modal>
++
+       <Button variant="secondary" onClick={handleBack}>
+         ← Voltar
+       </Button>
+@@ -853,6 +962,14 @@ const GameAnalyzer: React.FC = () => {
+                 📂 Carregar Arquivo PGN
+               </Button>
+ 
++              <Button
++                variant="success"
++                onClick={() => setShowChessComFenModal(true)}
++                disabled={isAnalyzing}
++              >
++                ♟️ Importar do Chess.com
++              </Button>
++
+               <Button
+                 variant="warning"
+                 onClick={() => analysisFileInputRef.current?.click()}
+diff --git a/src/components/PuzzleTrainer/index.tsx b/src/components/PuzzleTrainer/index.tsx
+index a5fc233..7dadcd6 100644
+--- a/src/components/PuzzleTrainer/index.tsx
++++ b/src/components/PuzzleTrainer/index.tsx
+@@ -425,14 +425,16 @@ const PuzzleTrainer: React.FC = () => {
+               evaluationLoss={session.currentPuzzle?.evaluation}
+             />
+ 
+-            <PuzzleControls
+-              onSkip={skipPuzzle}
+-              onNext={showSolution ? nextPuzzle : undefined}
+-              onReset={resetSession}
+-              onExit={() => window.location.reload()}
+-              showNext={showSolution}
+-              disableSkip={showFeedback === 'correct'}
+-            />
++            <div className="mt-3">
++              <PuzzleControls
++                onSkip={skipPuzzle}
++                onNext={showSolution ? nextPuzzle : undefined}
++                onReset={resetSession}
++                onExit={() => window.location.reload()}
++                showNext={showSolution}
++                disableSkip={showFeedback === 'correct'}
++              />
++            </div>
+           </Card.Body>
+         </Card>
+ 
+diff --git a/src/services/ChessComService.ts b/src/services/ChessComService.ts
+index f352777..d24f228 100644
+--- a/src/services/ChessComService.ts
++++ b/src/services/ChessComService.ts
+@@ -212,6 +212,113 @@ class ChessComService {
+     return games.map(game => game.pgn).join('\n\n');
+   }
+ 
++  /**
++   * Busca partidas via API de callback do Chess.com (extended-archive)
++   * Esta API retorna informações das partidas incluindo IDs
++   */
++  async getExtendedArchiveGames(username: string, page: number = 1): Promise<any> {
++    const url = `/api/chess-com/callback/games/extended-archive?locale=pt_BR&username=${username}&page=${page}&location=all`;
++
++    try {
++      const response = await fetch(url);
++
++      if (!response.ok) {
++        throw new Error(`Erro ao buscar partidas: ${response.statusText}`);
++      }
++
++      return response.json();
++    } catch (error) {
++      console.error('Erro ao buscar extended archive:', error);
++      throw error;
++    }
++  }
++
++  /**
++   * Busca detalhes de uma partida específica via API de callback (live/game)
++   * Retorna informações detalhadas incluindo FEN e moveList
++   */
++  async getGameDetails(gameId: number): Promise<any> {
++    const url = `/api/chess-com/callback/live/game/${gameId}`;
++
++    try {
++      const response = await fetch(url);
++
++      if (!response.ok) {
++        throw new Error(`Erro ao buscar detalhes da partida: ${response.statusText}`);
++      }
++
++      return response.json();
++    } catch (error) {
++      console.error('Erro ao buscar detalhes da partida:', error);
++      throw error;
++    }
++  }
++
++  /**
++   * Busca partidas de um usuário e extrai os FENs de todas elas
++   * Retorna uma string com todos os FENs concatenados
++   */
++  async fetchGamesAndExtractFENs(
++    username: string,
++    page: number = 1,
++    onProgress?: (current: number, total: number) => void
++  ): Promise<string> {
++    try {
++      // 1. Buscar lista de partidas
++      const archiveData = await this.getExtendedArchiveGames(username, page);
++
++      if (!archiveData?.data || archiveData.data.length === 0) {
++        throw new Error('Nenhuma partida encontrada para este usuário');
++      }
++
++      const games = archiveData.data;
++      const fens: string[] = [];
++
++      console.log(`🎮 Encontradas ${games.length} partidas. Buscando FENs...`);
++
++      // 2. Para cada partida, buscar detalhes e extrair FEN
++      for (let i = 0; i < games.length; i++) {
++        const game = games[i];
++
++        try {
++          if (onProgress) {
++            onProgress(i + 1, games.length);
++          }
++
++          const gameDetails = await this.getGameDetails(game.id);
++
++          console.log(`Partida ${i + 1}/${gam
+
+[... diff truncado para economia de contexto ...]
+</git_diff>
+</context>
+
+<instructions>
+Role: Documentation Update Specialist para README.md incremental
+Instructions: Atualizar arquivo README.md existente de forma INTELIGENTE baseado APENAS nas mudanças recentes
+Steps:
+  1. Usar Read tool para ler o README.md atual
+  2. Analisar profundamente o git diff para entender EXATAMENTE o que mudou
+  3. Identificar impactos das mudanças na documentação existente
+  4. Preservar TODO conteúdo existente que ainda é válido
+  5. Adicionar APENAS informações sobre as novas features/mudanças
+  6. Atualizar seções existentes APENAS onde necessário
+  7. Manter estilo e formatação consistente com README atual
+  8. Usar Edit ou MultiEdit tool para modificar o arquivo README.md
+  9. Garantir que links e referências continuam válidos
+  10. Validar que README permanece otimizado para Claude Code
+End goal: Arquivo README.md fisicamente atualizado com mudanças recentes preservando conteúdo válido
+Narrowing:
+  - Usar Edit/MultiEdit tool em /README.md
+  - NUNCA reescrever seções que não foram afetadas
+  - NUNCA remover conteúdo válido existente
+  - APENAS adicionar/modificar baseado no diff
+  - Manter 100% da estrutura atual quando possível
+  - Focar em precisão cirúrgica nas atualizações
+  - Preservar todos os metadados LLM existentes
+  - Manter compatibilidade com claude-readme.md guidelines
+</instructions>
+
+<update_strategy>
+ESTRATÉGIA DE ATUALIZAÇÃO INCREMENTAL:
+
+1. **Análise de Impacto**
+   - Mapear cada mudança no diff para seções do README
+   - Identificar dependências entre seções
+   - Determinar minimal change set necessário
+
+2. **Preservação de Conteúdo**
+   - Manter 100% do conteúdo não afetado
+   - Preservar formatação e estilo existente
+   - Reter todos os exemplos ainda válidos
+   - Conservar metadados e comentários HTML
+
+3. **Adições Inteligentes**
+   - Adicionar APENAS documentação para features novas
+   - Inserir exemplos APENAS onde necessário
+   - Atualizar comandos APENAS se mudaram
+   - Modificar configuração APENAS se alterada
+
+4. **Validação de Consistência**
+   - Verificar que todos os links permanecem válidos
+   - Confirmar que exemplos ainda funcionam
+   - Garantir que comandos estão atualizados
+   - Validar estrutura hierárquica mantida
+</update_strategy>
+
+<critical_rules>
+REGRAS CRÍTICAS (violação = falha):
+
+1. **NÃO reescrever o README inteiro**
+2. **NÃO remover seções válidas**
+3. **NÃO alterar estrutura sem necessidade**
+4. **NÃO modificar exemplos funcionais**
+5. **NÃO quebrar links existentes**
+6. **NÃO perder metadados LLM**
+7. **NÃO mudar estilo de escrita**
+8. **NÃO adicionar conteúdo especulativo**
+9. **APENAS mudanças baseadas no diff**
+10. **SEMPRE preservar contexto histórico**
+</critical_rules>
+
+<sections_analysis>
+Para cada seção sugerida para atualização, considere:
+
+
+### Changelog
+- Verificar se mudanças no código afetam esta seção
+- Identificar informações desatualizadas
+- Adicionar apenas conteúdo novo relevante
+- Preservar estrutura e formatação atual
+- Atualizar exemplos se necessário
+- Manter links e referências válidos
+
+### Versão
+- Verificar se mudanças no código afetam esta seção
+- Identificar informações desatualizadas
+- Adicionar apenas conteúdo novo relevante
+- Preservar estrutura e formatação atual
+- Atualizar exemplos se necessário
+- Manter links e referências válidos
+</sections_analysis>
+
+<validation_criteria>
+O README atualizado será considerado PERFEITO quando:
+  ✓ Reflete TODAS as mudanças relevantes do diff
+  ✓ Preserva 100% do conteúdo ainda válido
+  ✓ Mantém estrutura e formatação original
+  ✓ Adiciona documentação APENAS para mudanças novas
+  ✓ Todos os exemplos permanecem funcionais
+  ✓ Links e referências continuam válidos
+  ✓ Metadados LLM preservados integralmente
+  ✓ Estilo consistente com versão anterior
+  ✓ Changelog/versão atualizados se aplicável
+  ✓ Continua otimizado para Claude Code Opus 4.1
+</validation_criteria>
+
+<execution_requirements>
+AÇÃO OBRIGATÓRIA NO CLAUDE CODE:
+1. **USAR A FERRAMENTA Read** para ler o arquivo README.md atual
+2. **USAR A FERRAMENTA Edit ou MultiEdit** para modificar o arquivo README.md
+3. **CAMINHO DO ARQUIVO**: /README.md (raiz do projeto)
+4. **NÃO** apenas exibir as mudanças - APLICAR no arquivo físico
+5. **PRESERVAR** todo conteúdo válido existente
+
+SEQUÊNCIA DE EXECUÇÃO:
+1. Primeiro, usar Read tool para ler /README.md
+2. Analisar diff e identificar mudanças necessárias
+3. Usar Edit/MultiEdit tool para aplicar mudanças incrementais
+4. Confirmar que o arquivo foi atualizado com sucesso
+</execution_requirements>
+
+<output_format>
+AÇÃO: Atualizar arquivo README.md usando Edit/MultiEdit tool
+ESTRATÉGIA: Aplicar mudanças incrementais baseadas no diff
+
+1. Ler README existente como base com Read tool
+2. Aplicar mudanças incrementais baseadas no diff
+3. Marque mudanças com comentários HTML sutis se necessário
+4. Preserve TODA formatação e estrutura existente
+5. Adicione conteúdo novo nas seções apropriadas
+6. Atualize índice/TOC apenas se necessário
+7. Mantenha metadados LLM em comentários HTML
+8. Valide que todos os links funcionam
+9. Garanta exemplos de código corretos
+10. Use Edit/MultiEdit para aplicar as mudanças
+
+IMPORTANTE: O objetivo é uma atualização CIRÚRGICA no arquivo físico, não uma reescrita.
+</output_format>
+
+<quality_metrics>
+Métricas de qualidade para atualização incremental:
+  - Precisão: 100% das mudanças refletidas
+  - Preservação: 95%+ do conteúdo original mantido
+  - Relevância: 0% de conteúdo especulativo
+  - Consistência: 100% do estilo preservado
+  - Funcionalidade: 100% dos exemplos testáveis
+  - Otimização: Mantém score Claude Code >90%
+  - Tamanho: Crescimento proporcional às features
+  - Manutenibilidade: Facilita próximas atualizações
+  - Rastreabilidade: Mudanças mapeáveis ao diff
+  - Performance: Atualização < 5 segundos
+</quality_metrics>
+</task_name>

@@ -9,6 +9,8 @@ import PuzzleFeedback from '../PuzzleSession/PuzzleFeedback';
 import PuzzleControls from '../PuzzleSession/PuzzleControls';
 import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
+import EvaluationBar from '../EvaluationBar';
+import useStockfish from '../../hooks/useStockfish';
 import { formatTime, getElapsedTime } from '../../utils/timeUtils';
 import { convertUCItoSAN, moveToUCI } from '../../utils/chessUtils';
 
@@ -54,6 +56,13 @@ const PuzzleTrainer: React.FC = () => {
   const [wrongMovesHistory, setWrongMovesHistory] = useState<string[]>([]);
   const [showNextButton, setShowNextButton] = useState(false);
 
+  // Estados para Evaluation Bar
+  const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
+  const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+  // Hook do Stockfish
+  const { analyze, isReady } = useStockfish();
+
   // Carregar puzzles quando o modo mudar
   useEffect(() => {
     if (gameMode) {
@@ -69,6 +78,23 @@ const PuzzleTrainer: React.FC = () => {
 
     return () => clearInterval(timer);
   }, [session.startTime]);
+
+  // Função para avaliar posição com Stockfish
+  const evaluatePosition = useCallback(async (fen: string) => {
+    if (!isReady) return;
+
+    setIsEvaluating(true);
+    try {
+      const result = await analyze(fen, 12); // depth 12 para rapidez
+      if (result) {
+        setCurrentEvaluation(result.evaluation);
+      }
+    } catch (error) {
+      console.error('Evaluation failed:', error);
+    } finally {
+      setIsEvaluating(false);
+    }
+  }, [analyze, isReady]);
 
   const loadPuzzles = () => {
     // Se não há modo selecionado, não carrega ainda
@@ -136,8 +162,17 @@ const PuzzleTrainer: React.FC = () => {
       setLastWrongMove('');
       setWrongMovesHistory([]);
       setShowNextButton(false);
+
+      // Avaliar posição inicial após o contexto ser mostrado
+      if (puzzle.fenContext) {
+        setTimeout(() => {
+          evaluatePosition(puzzle.fenBefore);
+        }, 1100); // Após 1 segundo do contexto + pequeno delay
+      } else {
+        evaluatePosition(puzzle.fenBefore);
+      }
     }
-  }, [puzzles, session.puzzleIndex]);
+  }, [puzzles, session.puzzleIndex, evaluatePosition]);
 
 
   // Lidar com movimento
@@ -161,8 +196,12 @@ const PuzzleTrainer: React.FC = () => {
                        move.san === session.currentPuzzle.solution;
 
       if (isCorrect) {
+        // Avaliar posição após movimento correto
+        evaluatePosition(game.fen());
         handleCorrectMove();
       } else {
+        // Avaliar posição após movimento errado (antes de desfazer)
+        evaluatePosition(game.fen());
         // Salvar movimento errado antes de desfazer
         setLastWrongMove(move.san);
         setWrongMovesHistory(prev => [...prev, move.san]);
@@ -175,7 +214,7 @@ const PuzzleTrainer: React.FC = () => {
     } catch (error) {
       return false;
     }
-  }, [game, session.currentPuzzle, showFeedback, showingContext]);
+  }, [game, session.currentPuzzle, showFeedback, showingContext, evaluatePosition]);
 
   // Movimento correto
   const handleCorrectMove = () => {
@@ -437,12 +476,32 @@ const PuzzleTrainer: React.FC = () => {
               </Alert>
             )}
 
-            <ChessBoardWrapper
-              position={game.fen()}
-              onPieceDrop={onDrop}
-              orientation={boardOrientation}
-              isDraggable={!showFeedback && !showingContext}
-            />
+            {/* Layout com Evaluation Bar e Tabuleiro */}
+            <div className="d-flex gap-3 align-items-center justify-content-center mb-3">
+              {/* Evaluation Bar */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <EvaluationBar
+                  evaluation={currentEvaluation}
+                  height={500}
+                  showNumeric={true}
+                  animated={true}
+                  loading={isEvaluating}
+                />
+                {isEvaluating && (
+                  <small className="text-muted mt-2">Analisando...</small>
+                )}
+              </div>
+
+              {/* Tabuleiro */}
+              <div style={{ maxWidth: '500px' }}>
+                <ChessBoardWrapper
+                  position={game.fen()}
+                  onPieceDrop={onDrop}
+                  orientation={boardOrientation}
+                  isDraggable={!showFeedback && !showingContext}
+                />
+              </div>
+            </div>
 
             <PuzzleFeedback
               showFeedback={showFeedback}
