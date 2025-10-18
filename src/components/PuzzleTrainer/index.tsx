@@ -59,6 +59,7 @@ const PuzzleTrainer: React.FC = () => {
   // Estados para Evaluation Bar
   const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+  const [initialEvaluation, setInitialEvaluation] = useState<number>(0); // Guarda avaliação inicial do puzzle
 
   // Hook do Stockfish
   const { analyze, isReady } = useStockfish();
@@ -80,7 +81,7 @@ const PuzzleTrainer: React.FC = () => {
   }, [session.startTime]);
 
   // Função para avaliar posição com Stockfish
-  const evaluatePosition = useCallback(async (fen: string) => {
+  const evaluatePosition = useCallback(async (fen: string, saveAsInitial: boolean = false) => {
     if (!isReady) return;
 
     setIsEvaluating(true);
@@ -88,6 +89,9 @@ const PuzzleTrainer: React.FC = () => {
       const result = await analyze(fen, 12); // depth 12 para rapidez
       if (result) {
         setCurrentEvaluation(result.evaluation);
+        if (saveAsInitial) {
+          setInitialEvaluation(result.evaluation);
+        }
       }
     } catch (error) {
       console.error('Evaluation failed:', error);
@@ -166,10 +170,10 @@ const PuzzleTrainer: React.FC = () => {
       // Avaliar posição inicial após o contexto ser mostrado
       if (puzzle.fenContext) {
         setTimeout(() => {
-          evaluatePosition(puzzle.fenBefore);
+          evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
         }, 1100); // Após 1 segundo do contexto + pequeno delay
       } else {
-        evaluatePosition(puzzle.fenBefore);
+        evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
       }
     }
   }, [puzzles, session.puzzleIndex, evaluatePosition]);
@@ -270,12 +274,16 @@ const PuzzleTrainer: React.FC = () => {
         setShowSolution(true);
         setShowNextButton(true);
         setBackgroundStyle({});
+        // Restaurar avaliação inicial
+        setCurrentEvaluation(initialEvaluation);
       }, 1000);
     } else {
       // Limpar feedback após 2 segundos para tentar novamente
       setTimeout(() => {
         setShowFeedback(null);
         setBackgroundStyle({});
+        // Restaurar avaliação inicial (posição antes do erro)
+        setCurrentEvaluation(initialEvaluation);
       }, 2000);
     }
   };
