@@ -477,9 +477,20 @@ const PuzzleTrainer: React.FC = () => {
             )}
 
             {/* Layout com Evaluation Bar e Tabuleiro */}
-            <div className="d-flex gap-3 align-items-center justify-content-center mb-3">
+            <div style={{
+              display: 'flex',
+              gap: '20px',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              marginBottom: '1rem',
+              flexWrap: 'wrap'
+            }}>
               {/* Evaluation Bar */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
                 <EvaluationBar
                   evaluation={currentEvaluation}
                   height={500}
@@ -493,7 +504,11 @@ const PuzzleTrainer: React.FC = () => {
               </div>
 
               {/* Tabuleiro */}
-              <div style={{ maxWidth: '500px' }}>
+              <div style={{
+                flex: '1 1 auto',
+                minWidth: '320px',
+                maxWidth: '600px'
+              }}>
                 <ChessBoardWrapper
                   position={game.fen()}
                   onPieceDrop={onDrop}
