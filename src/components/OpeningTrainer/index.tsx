@@ -3,15 +3,24 @@ import { Chess } from 'chess.js';
 import { Button, Card, Alert } from 'react-bootstrap';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
+import openingService from '../../services/OpeningService';
 import Gap from '../Gap';
 import SessionStats from '../PuzzleSession/SessionStats';
 import PuzzleFeedback from '../PuzzleSession/PuzzleFeedback';
 import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
 import { getElapsedTime } from '../../utils/timeUtils';
+import {
+  TrainingPosition,
+  generateTrainingSequence,
+  shouldShowOpponentMove,
+  validateMove,
+  parseFenInfo,
+  getBoardOrientation
+} from '../../utils/trainerUtils';
 
 interface OpeningSession {
-  currentPosition: string;
+  currentPosition: TrainingPosition | null;
   positionIndex: number;
   totalPositions: number;
   correctCount: number;
@@ -20,8 +29,10 @@ interface OpeningSession {
   maxStreak: number;
   startTime: Date;
   attemptCount: number;
-  trainingPositions: string[];
+  trainingPositions: TrainingPosition[];
   showHint: boolean;
+  openingId?: string; // ID da abertura no OpeningService
+  openingColor: 'white' | 'black'; // Cor que o usuário joga
 }
 
 interface OpeningTrainerProps {
@@ -32,7 +43,7 @@ interface OpeningTrainerProps {
 
 const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }) => {
   const [session, setSession] = useState<OpeningSession>({
-    currentPosition: '',
+    currentPosition: null,
     positionIndex: 0,
     totalPositions: 0,
     correctCount: 0,
@@ -42,7 +53,8 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     startTime: new Date(),
     attemptCount: 0,
     trainingPositions: [],
-    showHint: false
+    showHint: false,
+    openingColor: 'white'
   });
 
   const [game, setGame] = useState(new Chess());
@@ -50,18 +62,42 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
-  const [comment, setComment] = useState('');
+  const [showingContext, setShowingContext] = useState(false);
 
-  // Inicializar sessão de treinamento com posições aleatórias
+  // Inicializar sessão de treinamento
   useEffect(() => {
-    const positions = openingTrainerService.generateTrainingSequence(data, variant, 20);
-    if (positions.length > 0) {
+    // Primeiro, tenta carregar do OpeningService
+    const opening = openingService.getOpeningByName(variant);
+
+    if (opening) {
+      // ✅ Abertura v2.0.0 encontrada
+      console.log(`✅ Usando abertura v2.0.0: "${variant}" (cor: ${opening.color})`);
+
+      const positions = generateTrainingSequence(opening.positions, opening.color, 20);
+
       setSession(prev => ({
         ...prev,
         trainingPositions: positions,
         totalPositions: positions.length,
-        currentPosition: positions[0]
+        currentPosition: positions[0] || null,
+        openingId: opening.id,
+        openingColor: opening.color
       }));
+    } else {
+      // ⚠️ Fallback para sistema legado (TypeStorage)
+      console.log(`⚠️ Abertura "${variant}" não encontrada no v2.0.0, usando sistema legado`);
+
+      if (data[variant]) {
+        const positions = generateTrainingSequence(data[variant], 'white', 20); // Assume brancas por padrão
+
+        setSession(prev => ({
+          ...prev,
+          trainingPositions: positions,
+          totalPositions: positions.length,
+          currentPosition: positions[0] || null,
+          openingColor: 'white'
+        }));
+      }
     }
   }, [data, variant]);
 
@@ -74,64 +110,85 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     return () => clearInterval(timer);
   }, [session.startTime]);
 
-  // Carregar posição atual
+  // Carregar posição atual (com suporte a mostrar movimento do adversário)
   useEffect(() => {
-    if (session.currentPosition && data[variant]) {
-      const newGame = new Chess(session.currentPosition);
+    if (!session.currentPosition) return;
+
+    const position = session.currentPosition;
+    const opponentMoveInfo = shouldShowOpponentMove(position);
+
+    if (opponentMoveInfo.shouldShow && position.fenContext) {
+      // 🎭 Mostrar movimento do adversário primeiro
+      setShowingContext(true);
+      const contextGame = new Chess(position.fenContext);
+      setGame(contextGame);
+
+      const contextInfo = parseFenInfo(position.fenContext);
+      setBoardOrientation(getBoardOrientation(position.color, contextInfo.turn));
+
+      console.log('🎭 Mostrando movimento do adversário...', {
+        fenContext: position.fenContext.substring(0, 30) + '...',
+        turn: contextInfo.turn
+      });
+
+      // Após 1 segundo, mostra a posição onde o usuário deve jogar
+      setTimeout(() => {
+        const newGame = new Chess(position.fen);
+        setGame(newGame);
+        setShowingContext(false);
+
+        const fenInfo = parseFenInfo(position.fen);
+        setBoardOrientation(getBoardOrientation(position.color, fenInfo.turn));
+
+        console.log('✅ Sua vez de jogar!', {
+          fen: position.fen.substring(0, 30) + '...',
+          turn: fenInfo.turn
+        });
+      }, 1000);
+    } else {
+      // 🎯 Posição sem contexto ou primeiro movimento é do usuário
+      const newGame = new Chess(position.fen);
       setGame(newGame);
+      setShowingContext(false);
 
-      // Define orientação baseada em quem deve jogar
-      const turn = newGame.turn();
-      setBoardOrientation(turn === 'w' ? 'white' : 'black');
-
-      // Carrega comentário da posição
-      const positionComment = openingTrainerService.getPositionComment(
-        data,
-        variant,
-        session.currentPosition
-      );
-      setComment(positionComment);
-
-      // Limpa feedback
-      setShowFeedback(null);
-      setBackgroundStyle({});
-      setSession(prev => ({ ...prev, attemptCount: 0, showHint: false }));
+      const fenInfo = parseFenInfo(position.fen);
+      setBoardOrientation(getBoardOrientation(position.color, fenInfo.turn));
     }
-  }, [session.currentPosition, data, variant]);
+
+    // Limpa feedback
+    setShowFeedback(null);
+    setBackgroundStyle({});
+    setSession(prev => ({ ...prev, attemptCount: 0, showHint: false }));
+  }, [session.currentPosition]);
 
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
-    if (!session.currentPosition || showFeedback) return false;
+    if (!session.currentPosition || showFeedback || showingContext) return false;
 
     try {
-      const gameCopy = new Chess(session.currentPosition);
-      const move = gameCopy.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: 'q'
-      });
+      const position = session.currentPosition;
 
-      if (!move) return false;
-
-      const newFen = gameCopy.fen();
-      const isValid = openingTrainerService.isValidMove(
-        data,
-        variant,
-        session.currentPosition,
-        newFen
+      // Valida o movimento
+      const validation = validateMove(
+        game.fen(),
+        position.color,
+        position.validNextFens || [],
+        { from: sourceSquare, to: targetSquare }
       );
 
-      if (isValid) {
-        handleCorrectMove();
-      } else {
+      if (!validation.isValid) {
         handleIncorrectMove();
+        return false;
       }
 
+      // Movimento correto
+      handleCorrectMove();
       return false; // Sempre retorna false para não mover a peça até validar
     } catch (error) {
+      console.error('Erro ao processar movimento:', error);
       return false;
     }
-  }, [data, variant, session.currentPosition, showFeedback]);
+  }, [game, session.currentPosition, showFeedback, showingContext]);
 
   // Movimento correto
   const handleCorrectMove = () => {
@@ -149,7 +206,13 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       maxStreak: Math.max(newStreak, prev.maxStreak)
     }));
 
+    // Registra no serviço global
     openingTrainerService.recordCorrectMove(newStreak);
+
+    // Registra no OpeningService se disponível
+    if (session.openingId) {
+      openingService.recordCorrectMove(session.openingId);
+    }
 
     // Próxima posição após 1.5 segundos
     setTimeout(() => {
@@ -174,9 +237,15 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       streak: 0
     }));
 
+    // Registra no serviço global
     openingTrainerService.recordIncorrectMove();
 
-    // Após 3 tentativas, mostra dica
+    // Registra no OpeningService se disponível
+    if (session.openingId) {
+      openingService.recordIncorrectMove(session.openingId);
+    }
+
+    // Após 2 tentativas, mostra dica
     if (newAttemptCount >= 2 && !session.showHint) {
       setSession(prev => ({ ...prev, showHint: true }));
     }
@@ -207,11 +276,20 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     } else {
       // Fim da sessão
       openingTrainerService.completeSession();
-      alert(`Sessão completa!
-        Acertos: ${session.correctCount}
-        Erros: ${session.incorrectCount}
-        Streak máximo: ${session.maxStreak}
-        Taxa de acerto: ${Math.round(session.correctCount / (session.correctCount + session.incorrectCount) * 100)}%`);
+
+      if (session.openingId) {
+        openingService.recordSessionCompleted(session.openingId);
+      }
+
+      const accuracy = session.correctCount / (session.correctCount + session.incorrectCount) * 100;
+
+      alert(`🎉 Sessão completa!
+
+Acertos: ${session.correctCount}
+Erros: ${session.incorrectCount}
+Streak máximo: ${session.maxStreak}
+Taxa de acerto: ${Math.round(accuracy)}%`);
+
       onExit();
     }
   };
@@ -223,18 +301,35 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
   // Mostrar solução
   const showSolution = () => {
-    const validMoves = openingTrainerService.getValidMoves(data, variant, session.currentPosition);
+    if (!session.currentPosition) return;
+
+    const validMoves = session.currentPosition.validNextFens || [];
+    const comment = session.currentPosition.comment || '';
+
     if (validMoves.length > 0) {
-      // Mostra visualmente as variantes válidas
-      alert(`Movimentos válidos: ${validMoves.length} variante(s)\n${comment}`);
+      alert(`💡 Movimentos válidos: ${validMoves.length} variante(s)\n\n${comment || 'Sem dica disponível'}`);
+    } else {
+      alert('❌ Nenhum movimento válido encontrado para esta posição');
     }
   };
 
   // Resetar sessão com novas posições aleatórias
   const resetSession = () => {
-    const positions = openingTrainerService.generateTrainingSequence(data, variant, 20);
+    const opening = openingService.getOpeningByName(variant);
+
+    let positions: TrainingPosition[] = [];
+    let color: 'white' | 'black' = 'white';
+
+    if (opening) {
+      positions = generateTrainingSequence(opening.positions, opening.color, 20);
+      color = opening.color;
+    } else if (data[variant]) {
+      positions = generateTrainingSequence(data[variant], 'white', 20);
+      color = 'white';
+    }
+
     setSession({
-      currentPosition: positions[0] || '',
+      currentPosition: positions[0] || null,
       positionIndex: 0,
       totalPositions: positions.length,
       correctCount: 0,
@@ -244,12 +339,14 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       startTime: new Date(),
       attemptCount: 0,
       trainingPositions: positions,
-      showHint: false
+      showHint: false,
+      openingId: opening?.id,
+      openingColor: color
     });
     setTimeElapsed(0);
   };
 
-  // Obter estatísticas
+  // Obter estatísticas globais
   const stats = openingTrainerService.getStats();
   const globalStats = {
     totalPuzzles: stats.totalMoves,
@@ -261,9 +358,8 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   // Obter número do lance atual
   const getMoveNumber = () => {
     if (!session.currentPosition) return 1;
-    const fen = session.currentPosition;
-    const parts = fen.split(' ');
-    return parseInt(parts[5]) || 1;
+    const fenInfo = parseFenInfo(session.currentPosition.fen);
+    return fenInfo.moveNumber;
   };
 
   // Obter cor que deve jogar
@@ -293,7 +389,14 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         <Card>
           <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className="mb-0">📚 Treinar Aberturas: {variant}</h5>
+              <div>
+                <h5 className="mb-0">
+                  📚 Treinar Aberturas: {variant}
+                </h5>
+                <small className="text-muted">
+                  Você joga com: {session.openingColor === 'white' ? '⬜ Brancas' : '⬛ Pretas'}
+                </small>
+              </div>
               <Button
                 variant="outline-secondary"
                 size="sm"
@@ -320,11 +423,17 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
         <Card>
           <Card.Body>
+            {showingContext && (
+              <Alert variant="info" className="mb-3">
+                🎭 Movimento do adversário...
+              </Alert>
+            )}
+
             <ChessBoardWrapper
               position={game.fen()}
               onPieceDrop={onDrop}
               orientation={boardOrientation}
-              isDraggable={!showFeedback}
+              isDraggable={!showFeedback && !showingContext}
             />
 
             <PuzzleFeedback
@@ -332,38 +441,38 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
               attemptCount={session.attemptCount}
             />
 
-            {session.showHint && comment && (
+            {session.showHint && session.currentPosition?.comment && (
               <Alert variant="info" className="mt-3">
-                💡 <strong>Dica:</strong> {comment}
+                💡 <strong>Dica:</strong> {session.currentPosition.comment}
               </Alert>
             )}
 
             <div className="mt-3">
-            <Gap size={8} horizontal>
-              <Button
-                variant="secondary"
-                onClick={skipPosition}
-                disabled={showFeedback === 'correct'}
-              >
-                Pular Posição
-              </Button>
+              <Gap size={8} horizontal>
+                <Button
+                  variant="secondary"
+                  onClick={skipPosition}
+                  disabled={showFeedback === 'correct' || showingContext}
+                >
+                  Pular Posição
+                </Button>
 
-              <Button
-                variant="info"
-                onClick={showSolution}
-                disabled={showFeedback === 'correct'}
-              >
-                Mostrar Variantes
-              </Button>
+                <Button
+                  variant="info"
+                  onClick={showSolution}
+                  disabled={showFeedback === 'correct' || showingContext}
+                >
+                  Mostrar Variantes
+                </Button>
 
-              <Button variant="warning" onClick={resetSession}>
-                Nova Sessão
-              </Button>
+                <Button variant="warning" onClick={resetSession}>
+                  Nova Sessão
+                </Button>
 
-              <Button variant="danger" onClick={onExit}>
-                Sair
-              </Button>
-            </Gap>
+                <Button variant="danger" onClick={onExit}>
+                  Sair
+                </Button>
+              </Gap>
             </div>
           </Card.Body>
         </Card>

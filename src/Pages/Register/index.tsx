@@ -1,10 +1,11 @@
-import { Form } from 'react-bootstrap';
+import { Form, Button, ButtonGroup } from 'react-bootstrap';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Chess, Move } from 'chess.js';
 import TypeStorage from '../../types/TypeStorage';
 import Gap from '../../components/Gap';
 import ChessGame from '../../components/ChessGame';
 import NavigationBar from '../../components/TrainingControls/NavigationBar';
+import openingService from '../../services/OpeningService';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -21,12 +22,50 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 	const [invertedBoard, setInvertedBoard] = useState(false);
 	const [game, setGame] = useState(new Chess());
 	const [comment, setComment] = useState('');
+	const [openingColor, setOpeningColor] = useState<'white' | 'black'>('white');
 
 	// const isBlackTurn = () => game.turn() === 'b';
 
 	useEffect(() => {
 		console.log('save :', save);
 	}, [save]);
+
+	// Carregar cor da abertura se já existir no OpeningService
+	useEffect(() => {
+		const existing = openingService.getOpeningByName(variant);
+		if (existing) {
+			setOpeningColor(existing.color);
+			console.log(`✅ Abertura "${variant}" carregada com cor: ${existing.color}`);
+		}
+	}, [variant]);
+
+	// Salvar abertura no OpeningService quando houver mudanças
+	const handleSaveOpening = () => {
+		if (!save[variant] || Object.keys(save[variant]).length === 0) {
+			alert('⚠️ Adicione ao menos uma posição antes de salvar!');
+			return;
+		}
+
+		const existing = openingService.getOpeningByName(variant);
+
+		if (existing) {
+			// Atualizar abertura existente
+			openingService.updateOpening(existing.id, {
+				color: openingColor,
+				positions: save[variant],
+				lastModified: new Date().toISOString()
+			});
+			alert(`✅ Abertura "${variant}" atualizada com sucesso!`);
+		} else {
+			// Criar nova abertura
+			openingService.createOpening({
+				name: variant,
+				color: openingColor,
+				positions: save[variant]
+			});
+			alert(`✅ Abertura "${variant}" criada com sucesso!`);
+		}
+	};
 
 	useEffect(() => {
 		setSave((prevSave) => {
@@ -121,12 +160,39 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
         downloadData={save}
         downloadDisabled={Object.keys(save).length === 0}
       />
-			{/* <Form.Select aria-label="Default select example">
-				<option>Selecionar variante</option>
-				<option value="1">One</option>
-				<option value="2">Two</option>
-				<option value="3">Three</option>
-			</Form.Select> */}
+
+			{/* Seleção de cor da abertura */}
+			<div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+				<div className="d-flex align-items-center gap-2">
+					<Form.Label className="mb-0 text-white fw-bold">Você joga com:</Form.Label>
+					<ButtonGroup>
+						<Button
+							variant={openingColor === 'white' ? 'light' : 'outline-light'}
+							onClick={() => setOpeningColor('white')}
+							size="sm"
+						>
+							⬜ Brancas
+						</Button>
+						<Button
+							variant={openingColor === 'black' ? 'dark' : 'outline-dark'}
+							onClick={() => setOpeningColor('black')}
+							size="sm"
+						>
+							⬛ Pretas
+						</Button>
+					</ButtonGroup>
+				</div>
+
+				<Button
+					variant="success"
+					size="sm"
+					onClick={handleSaveOpening}
+					disabled={!save[variant] || Object.keys(save[variant]).length === 0}
+				>
+					💾 Salvar Abertura
+				</Button>
+			</div>
+
 			<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} />
 			<Form>
 				<Form.Label
