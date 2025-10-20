@@ -1,198 +1,65 @@
-# Chess Training System - Sistema Completo de Treinamento de Xadrez
+<div align="center">
+
+# ♟️ Chess Training System
+
+### Sistema Completo de Treinamento de Xadrez com IA
 
 [![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/typescript-5.6.2-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.6.2-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/node.js-18+-339933.svg?logo=node.js)](https://nodejs.org/)
+[![Vite](https://img.shields.io/badge/vite-5.4.10-646cff.svg?logo=vite)](https://vitejs.dev/)
+[![Stockfish](https://img.shields.io/badge/stockfish-17-000000.svg)](https://stockfishchess.org/)
 
-## 🎯 Visão Geral do Projeto
+<p align="center">
+  <strong>Análise de partidas com Stockfish 17 • Puzzles táticos inteligentes • Repertório de aberturas personalizado</strong>
+</p>
 
-Sistema avançado de treinamento de xadrez com três módulos principais: **análise de partidas com IA**, **treinamento tático com puzzles personalizados** e **repertório de aberturas**. Agora com **Evaluation Bar em tempo real** e **validação inteligente de movimentos**.
+[Começar](#-quick-start) •
+[Documentação](#-documentação) •
+[Features](#-features) •
+[CLI Tool](#-cli-tool-análise-ultra-rápida) •
+[Roadmap](#-roadmap)
 
-## ⚡ NOVO: Análise Ultra-Rápida via CLI
+---
 
-**16x mais rápido que a versão web!** Agora você pode analisar partidas usando Stockfish nativo diretamente no terminal.
+</div>
 
-### 🚀 Uso Rápido
+## 🎯 Visão Geral
 
-```bash
-# Analisar arquivo PGN
-npm run analyze caminho/para/arquivo.pgn
+Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema de repertório de aberturas. Agora com **ferramenta CLI ultra-rápida** para análise (16x mais rápida que a versão web) e download automático de partidas do Chess.com.
 
-# Download automático do Chess.com
-npm run analyze:user SEU_USUARIO
+### 🌟 Diferenciais
 
-# Exemplos com jogadores famosos
-npm run analyze:user hikaru
-npm run analyze:user MagnusCarlsen
-npm run analyze:user GothamChess
-```
+- **🔥 16.67x Mais Rápido**: Análise via CLI com Stockfish nativo e multi-threading
+- **🤖 Validação Inteligente**: Puzzles que aceitam qualquer movimento que melhore a posição (não apenas um específico)
+- **📊 Evaluation Bar em Tempo Real**: Visualização da avaliação da posição conforme você joga
+- **🌐 Integração Chess.com**: Download automático de partidas por username
+- **📚 Sistema de Aberturas v2.0**: Cadastro com escolha de cor e treino personalizado
+- **💾 Análises Reutilizáveis**: Exporte e importe análises completas em JSON
 
-### 📊 Performance
+---
 
-| Método | Velocidade | Tempo (40 movimentos) |
-|--------|------------|----------------------|
-| **WASM (Web)** | 900 knodes/s | ~10 minutos |
-| **Native 1 thread** | 1,500 knodes/s | ~6 minutos |
-| **Native 16 threads** | 15,000 knodes/s | **~36 segundos** ⚡ |
+## 📋 Table of Contents
 
-**Resultado:** Análise **16.67x mais rápida** usando Stockfish nativo!
+- [Quick Start](#-quick-start)
+- [CLI Tool - Análise Ultra-Rápida](#-cli-tool-análise-ultra-rápida)
+- [Features](#-features)
+- [Instalação](#-instalação)
+- [Uso - Interface Web](#-uso---interface-web)
+- [Uso - CLI](#-uso---cli)
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Arquitetura](#-arquitetura)
+- [Roadmap](#-roadmap)
+- [Contribuindo](#-contribuindo)
+- [FAQ](#-faq)
+- [Changelog](#-changelog)
+- [Licença](#-licença)
 
-### 📚 Documentação Completa
+---
 
-- **[📖 Guia de Análise Rápida](scripts/ANALISE-ULTRA-RAPIDA.md)** - Começar imediatamente
-- **[📖 Guia Completo da CLI](scripts/README.md)** - Todas as opções e configurações
-- **[🌐 Guia Chess.com](scripts/CHESS-COM-GUIDE.md)** - Download automático de partidas
-- **[⚡ Análise de Performance](PERFORMANCE_ANALYSIS.md)** - Comparação WASM vs Native
-
-### ✨ Principais Features da CLI
-
-- **Download automático** de partidas do Chess.com por username
-- **Rate limiting inteligente** (respeita limites da API)
-- **Multi-threading** (usa todos os cores da CPU)
-- **Barra de progresso** em tempo real
-- **Output JSON** compatível com a interface web
-- **Configurável**: depth, threshold, threads, output
-
-### Funcionalidades Principais:
-
-**1. Análise de Partidas com Stockfish 17** ✅
-- Análise profunda de partidas (depth 18) com Stockfish WASM
-- Importação de múltiplas partidas via PGN ou Chess.com
-- **Importação direta via FEN** do Chess.com com barra de progresso
-- Detecção automática do jogador mais frequente com badge 🎯
-- Pré-seleção inteligente de partidas para análise
-- Cálculo de ACPL (Average Centipawn Loss) separado por cor
-- Classificação de movimentos em 6 categorias (brilliant, best, good, inaccuracy, mistake, blunder)
-- **Exportação de análises completas** em formato JSON com todos os dados
-- **Importação de análises salvas** com auto-salvamento de puzzles no localStorage
-- Estatísticas detalhadas por cor (blunders, mistakes, inaccuracies)
-
-**2. Sistema de Puzzles Táticos** 🎮
-- Geração automática de puzzles a partir de blunders (>300cp)
-- **🆕 Evaluation Bar em tempo real:** Veja a avaliação da posição mudando conforme você joga
-- **🆕 Validação inteligente:** Aceita qualquer movimento que melhore a posição (não apenas um específico)
-- **Três modos de treinamento:**
-  - **Modo Normal:** Puzzles sem repetição, progresso linear
-  - **Modo Rush:** 20 puzzles aleatórios com repetição permitida (treino intensivo)
-  - **Modo Opening:** Foco em erros de abertura (apenas movimentos 1-10)
-- **Sistema de contexto visual:** Mostra posição anterior por 1 segundo antes do puzzle
-- **Avaliação progressiva:**
-  - Mostra avaliação antes do movimento do oponente
-  - Atualiza após seu movimento
-  - Mostra transição ao desfazer movimento errado
-- Feedback visual instantâneo com cores (verde #90EE90 / rosa #FFB6C1)
-- Sistema de streaks e estatísticas globais persistentes
-- **Máximo de 3 tentativas** com feedback progressivo
-- Salvamento automático no localStorage
-
-**3. Repertório de Aberturas** 📚
-- Cadastro e edição de variantes personalizadas
-- Treinamento interativo com posições aleatórias
-- **Sistema de navegação em árvore** com suporte a múltiplas variantes
-- Comentários personalizados por posição
-- **Dica após 2 tentativas erradas** mostrando comentário da posição
-- Import/Export em JSON
-- Modo de edição e modo de treino com orientação automática do tabuleiro
-
-**4. Interface e UX** 🎨
-- **Tema escuro/claro** com toggle persistente (🌙/☀️)
-- **🆕 Versão exibida automaticamente** no header (v1.0.0)
-- **🆕 Interface home redesenhada:**
-  - 3 cards principais focados (Analisar, Puzzles, Aberturas)
-  - GitHub movido para footer com informação de licença
-  - Layout mais limpo e objetivo
-- **🆕 Navegação melhorada:**
-  - Botões "← Voltar" visíveis em todos os treinamentos
-  - Posicionados no topo direito para fácil acesso
-- Design responsivo otimizado para mobile e tablets
-- Transições suaves entre temas
-- Persistência da preferência de tema no localStorage
-
-## 📊 Status do Projeto
-
-### ✅ Funcionalidades Implementadas:
-
-#### **Análise de Partidas**
-- ✅ Stockfish 17 WASM integrado (depth 18, timeout 10s)
-- ✅ Importação de múltiplas partidas PGN com validação robusta
-- ✅ Integração completa com Chess.com API (múltiplos endpoints)
-- ✅ **Importação direta via FEN** do Chess.com com progresso em tempo real
-- ✅ Detecção automática do jogador principal (sem threshold mínimo)
-- ✅ Análise em lote com barra de progresso por partida
-- ✅ Classificação detalhada: brilliant (<0cp), best (<10cp), good (<50cp), inaccuracy (<100cp), mistake (<300cp), blunder (≥300cp)
-- ✅ Cálculo de ACPL separado por cor com estatísticas individuais
-- ✅ **Exportação de análises** em JSON (formato: `chess-analysis-YYYY-MM-DD.json`)
-- ✅ **Importação de análises** com auto-salvamento de puzzles
-
-#### **Sistema de Puzzles**
-- ✅ Geração automática de puzzles de blunders (>300cp, ignora primeiros 10 lances)
-- ✅ **🆕 Evaluation Bar em tempo real:** Integração com Stockfish para mostrar avaliação
-- ✅ **🆕 Validação baseada em avaliação:** Aceita qualquer movimento que melhore a posição
-  - Para brancas: movimento correto se avaliação aumenta (mais positivo)
-  - Para pretas: movimento correto se avaliação diminui (mais negativo)
-- ✅ **🆕 Sistema de avaliação progressiva:**
-  - Avalia posição de contexto (antes do movimento do oponente)
-  - Avalia posição inicial (após movimento do oponente)
-  - Avalia após movimento do jogador
-  - Mostra transição ao desfazer movimento errado (800ms delay)
-- ✅ **Modo Normal:** puzzles embaralhados sem repetição
-- ✅ **Modo Rush:** 20 puzzles aleatórios com repetição (Fisher-Yates shuffle)
-- ✅ **Modo Opening:** apenas erros de abertura (movimentos 1-10)
-- ✅ Sistema de 3 tentativas com feedback progressivo
-- ✅ **Contexto visual:** posição anterior mostrada por 1 segundo
-- ✅ Feedback colorido com transição suave (0.5s)
-- ✅ **🆕 Sistema de logs de debug:** Console logs detalhados para debugging
-- ✅ Estatísticas globais persistentes no localStorage
-- ✅ Timer em tempo real e contador de streak (máximo da sessão)
-- ✅ Orientação automática do tabuleiro baseada na cor
-
-**Modo Opening - Detalhes:**
-- Filtragem automática de puzzles até o movimento 10
-- Ideal para corrigir erros na fase de abertura
-- Mantém sistema de 3 tentativas e feedback progressivo
-- Prioriza puzzles não resolvidos, depois inclui todos
-- Fisher-Yates shuffle para variedade no treinamento
-
-#### **Repertório de Aberturas**
-- ✅ Sistema completo de cadastro com navegação em árvore
-- ✅ Modo treino com 20 posições aleatórias (Fisher-Yates)
-- ✅ Navegação: Undo/Redo/Flip com atalhos de teclado
-- ✅ Comentários personalizados por posição FEN
-- ✅ **Dica automática após 2 erros** (mostra comentário)
-- ✅ Import/Export JSON com validação TypeStorage
-- ✅ Persistência completa no localStorage (key: `data`)
-- ✅ Orientação automática baseada no turno
-
-#### **Interface e Temas**
-- ✅ **Sistema de tema escuro/claro** com toggle 🌙/☀️
-- ✅ **🆕 Versão automática no header:** Importa versão do package.json dinamicamente
-- ✅ **🆕 Interface home simplificada:**
-  - Removidos botões: Chess.com e Stockfish Test (menos poluição visual)
-  - 3 cards principais: Analisar Partidas, Treinar Puzzles, Treinar Aberturas
-  - Estatísticas em card azul centralizado
-  - GitHub no footer com versão e licença MIT
-- ✅ **🆕 Navegação aprimorada:**
-  - Botões "← Voltar" em todos os treinamentos
-  - Posicionados no topo direito (header dos cards)
-  - Sempre visíveis durante o treino
-- ✅ Persistência da preferência de tema (localStorage: `darkMode`)
-- ✅ Variáveis CSS customizáveis por tema
-- ✅ Design responsivo para mobile e tablets
-- ✅ Media queries otimizadas (@media para diferentes tamanhos)
-- ✅ Transições suaves entre temas (0.3s ease)
-
-### 🚧 Em Desenvolvimento:
-- [ ] Sistema de spaced repetition com algoritmo SM-2
-- [ ] Dashboard com gráficos de evolução temporal
-- [ ] Filtros avançados para puzzles (por tipo de erro, cor, fase do jogo)
-- [ ] Seleção de variante no Redo (múltiplas ramificações)
-- [ ] Configuração customizável de depth/timeout do Stockfish
-- [ ] Tratamento de rate limiting da API Chess.com
-
-## 🚀 Como Usar
-
-### Instalação
+## ⚡ Quick Start
 
 ```bash
 # Clone o repositório
@@ -202,274 +69,603 @@ cd opening-training
 # Instale as dependências
 npm install
 
-# Execute o projeto web
+# Execute a interface web
 npm run dev
+# Acesse http://localhost:5173
+
+# OU use a CLI ultra-rápida (requer Stockfish instalado)
+npm run analyze:user hikaru
+```
+
+### 🎮 Demo
+
+> **Nota**: Adicione screenshots ou GIFs demonstrando as principais funcionalidades:
+> - Interface de análise de partidas
+> - Sistema de puzzles com evaluation bar
+> - Editor de repertório de aberturas
+> - CLI tool em ação
+
+---
+
+## 🚀 CLI Tool: Análise Ultra-Rápida
+
+### 16.67x Mais Rápido que WASM!
+
+Analise suas partidas usando **Stockfish nativo** diretamente no terminal com multi-threading completo.
+
+#### Performance Comparativa
+
+| Método | Velocidade | Tempo (40 movimentos) | Speedup |
+|--------|------------|----------------------|---------|
+| **WASM (Browser)** | 900 knodes/s | ~10 minutos | 1x |
+| **Native 1 thread** | 1,500 knodes/s | ~6 minutos | 1.67x |
+| **Native 16 threads** | **15,000 knodes/s** | **~36 segundos** | **16.67x** ⚡ |
+
+#### Uso da CLI
+
+```bash
+# Analisar arquivo PGN local
+npm run analyze partidas.pgn
+
+# Download automático do Chess.com
+npm run analyze:user SEU_USUARIO
+
+# Exemplos com jogadores famosos
+npm run analyze:user hikaru
+npm run analyze:user MagnusCarlsen
+npm run analyze:user GothamChess
+
+# Com opções personalizadas
+npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
+```
+
+#### Opções Disponíveis
+
+| Opção | Descrição | Padrão |
+|-------|-----------|--------|
+| `--username` | Usuário Chess.com | - |
+| `--months` | Meses a baixar | 3 |
+| `--depth` | Profundidade Stockfish | 18 |
+| `--threshold` | CP mínimo para puzzle | 100 |
+| `--threads` | Threads CPU | Todos |
+| `--output` | Arquivo de saída | puzzles-output.json |
+
+#### Features da CLI
+
+- ✅ **Download automático** de partidas do Chess.com por username
+- ✅ **Rate limiting inteligente** (respeita limites da API - 1s entre requests)
+- ✅ **Multi-threading completo** (usa todos os cores da CPU)
+- ✅ **Barra de progresso** em tempo real com feedback colorido
+- ✅ **Output JSON** compatível com interface web
+- ✅ **PGN temporário** salvo automaticamente para backup
+- ✅ **Estatísticas detalhadas** (posições/segundo, velocidade, tempo)
+
+#### 📚 Documentação CLI
+
+- **[📖 Guia de Análise Rápida](scripts/ANALISE-ULTRA-RAPIDA.md)** - Começar imediatamente
+- **[📖 Guia Completo da CLI](scripts/README.md)** - Todas as opções e configurações (6000+ palavras)
+- **[🌐 Guia Chess.com](scripts/CHESS-COM-GUIDE.md)** - Download automático de partidas
+- **[⚡ Análise de Performance](PERFORMANCE_ANALYSIS.md)** - Comparação técnica WASM vs Native
+
+---
+
+## ✨ Features
+
+### 1. 📊 Análise de Partidas com Stockfish 17
+
+<details>
+<summary><strong>Ver detalhes</strong></summary>
+
+#### Interface Web (WASM)
+- ✅ Análise profunda (depth 18) com Stockfish WASM
+- ✅ Importação de múltiplas partidas via PGN ou Chess.com
+- ✅ **Importação direta via FEN** com barra de progresso
+- ✅ Detecção automática do jogador mais frequente (badge 🎯)
+- ✅ Pré-seleção inteligente de partidas para análise
+- ✅ Cálculo de **ACPL** (Average Centipawn Loss) separado por cor
+- ✅ Classificação em **6 categorias**:
+  - 💎 **Brilliant** (< 0 cp loss)
+  - ✨ **Best** (< 10 cp loss)
+  - ✅ **Good** (< 50 cp loss)
+  - ⚠️ **Inaccuracy** (< 100 cp loss)
+  - ❌ **Mistake** (< 300 cp loss)
+  - 💥 **Blunder** (≥ 300 cp loss)
+- ✅ **Exportação/Importação** de análises em JSON
+- ✅ Auto-salvamento de puzzles no localStorage
+
+#### CLI Tool (Native)
+- ✅ **16.67x mais rápido** com Stockfish nativo
+- ✅ Multi-threading completo
+- ✅ Download automático Chess.com
+- ✅ Feedback em tempo real com barra de progresso
+- ✅ Output compatível com interface web
+
+</details>
+
+### 2. 🧩 Sistema de Puzzles Táticos Inteligentes
+
+<details>
+<summary><strong>Ver detalhes</strong></summary>
+
+#### Geração Automática
+- ✅ Puzzles criados a partir de **blunders** (> 300cp)
+- ✅ Ignora primeiros 10 lances (teoria de abertura)
+- ✅ Sistema de contexto visual (mostra posição anterior)
+
+#### 🆕 Evaluation Bar em Tempo Real
+- ✅ Barra visual mostrando vantagem de brancas/pretas
+- ✅ Integração com Stockfish (depth 12) para avaliação em tempo real
+- ✅ Sequência progressiva de avaliações:
+  1. Avalia posição de contexto (antes do movimento do oponente)
+  2. Avalia posição inicial do puzzle
+  3. Avalia após movimento do jogador
+  4. Restaura avaliação inicial após erro (800ms delay)
+- ✅ Fórmula de conversão Lichess (centipawns → win percentage)
+- ✅ Animações suaves (0.6s cubic-bezier)
+
+#### 🆕 Validação Inteligente de Movimentos
+- ✅ **Não compara com movimento específico pré-definido**
+- ✅ Valida baseado em **melhoria da posição**:
+  - **Brancas**: Correto se avaliação aumenta (mais positivo)
+  - **Pretas**: Correto se avaliação diminui (mais negativo)
+- ✅ Aceita **múltiplas soluções corretas**
+- ✅ Mais educativo: ensina a melhorar, não decorar
+- ✅ Logs de debug detalhados no console
+
+#### Três Modos de Treinamento
+- **🎯 Modo Normal**: Puzzles embaralhados sem repetição, progresso linear
+- **⚡ Modo Rush**: 20 puzzles aleatórios com repetição permitida (treino intensivo)
+- **♟️ Modo Opening**: Foco em erros de abertura (apenas movimentos 1-10)
+
+#### Sistema de Tentativas e Feedback
+- ✅ Máximo **3 tentativas** com feedback progressivo
+- ✅ Auto-skip após 3 erros
+- ✅ Feedback colorido com transição suave (0.5s):
+  - 🟢 Verde (#90EE90) para movimento correto
+  - 🔴 Rosa (#FFB6C1) para movimento incorreto
+- ✅ Estatísticas globais persistentes (streak, taxa de acerto, timer)
+
+</details>
+
+### 3. 📚 Repertório de Aberturas v2.0
+
+<details>
+<summary><strong>Ver detalhes</strong></summary>
+
+#### Cadastro e Edição
+- ✅ **🆕 Escolha de cor** (branco/preto) no cadastro
+- ✅ Sistema de navegação em árvore com múltiplas variantes
+- ✅ Comentários personalizados por posição FEN
+- ✅ Undo/Redo com atalhos de teclado
+- ✅ Import/Export em JSON com validação
+- ✅ Persistência completa no localStorage
+
+#### Modo Treino Personalizado
+- ✅ **🆕 Respeita a cor escolhida** no cadastro
+- ✅ **🆕 Mostra movimento do oponente** primeiro (quando aplicável)
+- ✅ 20 posições aleatórias (Fisher-Yates shuffle)
+- ✅ Máximo 3 tentativas por posição
+- ✅ **Dica automática após 2 erros** (mostra comentário)
+- ✅ Orientação automática do tabuleiro baseada na cor
+- ✅ **🆕 Utilities compartilhadas** para evitar DRY code
+
+#### Estrutura de Dados
+```typescript
+interface Opening {
+  id: string;
+  name: string;
+  description?: string;
+  color: 'white' | 'black';  // 🆕 Cor escolhida pelo usuário
+  dateCreated: string;
+  lastModified: string;
+  positions: {
+    [fen: string]: {
+      prevFen: string;
+      comment: string;
+      nextFen: string[];
+    };
+  };
+  stats?: {
+    totalPositions: number;
+    correctMoves: number;
+    incorrectMoves: number;
+    accuracy: number;
+  };
+}
+```
+
+</details>
+
+### 4. 🎨 Interface e UX
+
+<details>
+<summary><strong>Ver detalhes</strong></summary>
+
+- ✅ **Tema escuro/claro** com toggle persistente (🌙/☀️)
+- ✅ **Versão automática** no header (importa de package.json)
+- ✅ **Interface home redesenhada**:
+  - 3 cards principais focados (Analisar, Puzzles, Aberturas)
+  - GitHub no footer com licença MIT
+  - Layout limpo e objetivo
+- ✅ **Navegação melhorada**:
+  - Botões "← Voltar" em todos os treinamentos
+  - Posicionados no topo direito (sempre visíveis)
+- ✅ Design **responsivo** para mobile e tablets
+- ✅ Transições suaves entre temas (0.3s ease)
+- ✅ Persistência de preferências no localStorage
+
+</details>
+
+---
+
+## 🛠️ Instalação
+
+### Pré-requisitos
+
+- **Node.js** 18+ e npm
+- **Navegador moderno** com suporte a Web Workers (para interface web)
+- **Stockfish nativo** (opcional, apenas para CLI ultra-rápida)
+
+### Interface Web
+
+```bash
+# Clone o repositório
+git clone https://github.com/frederico-kluser/opening-training.git
+cd opening-training
+
+# Instale as dependências
+npm install
+
+# Execute em modo desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+npm run preview
 ```
 
 Acesse http://localhost:5173
 
-### ⚡ Instalação da CLI (Análise Ultra-Rápida)
+### CLI Tool (Análise Ultra-Rápida)
 
-Para usar a ferramenta de análise ultra-rápida via terminal, você precisa instalar o Stockfish nativo:
+Para usar a ferramenta CLI com Stockfish nativo:
 
+#### macOS (Homebrew)
 ```bash
-# macOS (Homebrew)
 brew install stockfish
-
-# Linux (Ubuntu/Debian)
-sudo apt install stockfish
-
-# Linux (Fedora)
-sudo dnf install stockfish
-
-# Windows
-# Baixe de https://stockfishchess.org/download/
-# E adicione ao PATH do sistema
 ```
 
-**Verificar instalação:**
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt install stockfish
+```
+
+#### Linux (Fedora)
+```bash
+sudo dnf install stockfish
+```
+
+#### Windows
+1. Baixe de https://stockfishchess.org/download/
+2. Adicione ao PATH do sistema
+
+#### Verificar Instalação
 ```bash
 stockfish
 # Deve abrir o UCI prompt. Digite "quit" para sair.
 ```
 
-**Uso da CLI:**
+---
+
+## 📖 Uso - Interface Web
+
+### 1. Análise de Partidas
+
+1. Clique em **"📊 Analisar Partidas"**
+2. Escolha uma opção de importação:
+   - **Importar PGN**: Cole suas partidas ou use o exemplo
+   - **Chess.com**: Digite username e escolha modo:
+     - Importar Todos (jogos do mês)
+     - Importar Apenas Meus Jogos
+     - Importar Últimos 10 (rápido)
+   - **♟️ Importar do Chess.com**: Importação direta via FEN
+   - **📥 Importar Análise**: Carregue análises salvas (JSON)
+3. Para múltiplas partidas:
+   - Jogador mais frequente detectado automaticamente (badge 🎯)
+   - Partidas pré-selecionadas
+   - Escolha a cor para análise
+4. Aguarde a análise (depth 18, timeout 10s por posição)
+5. Veja estatísticas separadas por cor (ACPL, erros)
+6. **💾 Exportar Análise** para reutilizar depois
+
+### 2. Treinamento de Puzzles
+
+1. Clique em **"🧩 Treinar Puzzles"**
+2. Escolha o modo:
+   - **Normal**: Sem repetição, progresso linear
+   - **Rush**: 20 puzzles aleatórios com repetição
+   - **Opening**: Apenas erros de abertura (movimentos 1-10)
+3. Observe o contexto (posição anterior por 1 segundo)
+4. Resolva o puzzle (máximo 3 tentativas):
+   - 🟢 Verde = movimento correto
+   - 🔴 Rosa = movimento incorreto
+   - Após 3 erros, avança automaticamente
+5. Acompanhe:
+   - Evaluation bar em tempo real
+   - Progresso da sessão
+   - Taxa de acerto e streak
+   - Timer
+
+### 3. Repertório de Aberturas
+
+1. Clique em **"📚 Treinar Aberturas"**
+2. Opções:
+   - **Continuar**: Carrega dados salvos
+   - **Novo**: Cria novo repertório
+   - **Importar**: Carrega JSON
+3. **Modo Edição**:
+   - Faça movimentos para criar variantes
+   - **Escolha a cor** (branco/preto)
+   - Adicione comentários por posição
+   - Use Undo/Redo
+   - Exporte com botão Download
+4. **Modo Treino**:
+   - 20 posições aleatórias
+   - Máximo 3 tentativas
+   - Dica após 2 erros (mostra comentário)
+   - Tabuleiro orientado pela cor escolhida
+
+---
+
+## 💻 Uso - CLI
+
+### Comandos Básicos
+
 ```bash
 # Analisar arquivo PGN local
 npm run analyze caminho/para/partidas.pgn
 
-# Download automático do Chess.com
-npm run analyze:user SEU_USUARIO_CHESS_COM
-
-# Com opções personalizadas
-npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150
+# Download automático Chess.com
+npm run analyze:user SEU_USUARIO
 ```
 
-Veja a **[documentação completa da CLI](scripts/README.md)** para todas as opções disponíveis.
+### Exemplos Práticos
 
-### Fluxo de Uso
+```bash
+# Analisar últimos 3 meses do Hikaru
+npm run analyze:user hikaru
 
-#### **1. Análise de Partidas**
-1. Clique em "📊 Analisar Partidas"
-2. Escolha uma opção:
-   - **Importar PGN**: Cole suas partidas ou use o exemplo
-   - **Chess.com**: Digite username e escolha:
-     - Importar Todos (jogos do mês)
-     - Importar Apenas Meus Jogos (filtra por username)
-     - Importar Últimos 10 (importação rápida)
-   - **♟️ Importar do Chess.com**: Importação direta via FEN com progresso
-   - **📥 Importar Análise**: Carregue análises salvas (JSON)
-3. Para múltiplas partidas:
-   - Jogador mais frequente é detectado automaticamente (badge 🎯)
-   - Partidas do jogador detectado são pré-selecionadas
-   - Escolha a cor para análise (brancas ou pretas)
-4. Aguarde a análise (depth 18, timeout 10s por posição)
-5. Veja estatísticas separadas por cor (ACPL, erros)
-6. **💾 Exportar Análise**: Salve para reutilizar depois
-7. Puzzles são gerados automaticamente de blunders (>300cp)
+# Últimos 6 meses com análise profunda
+npm run analyze:user MagnusCarlsen -- --months 6 --depth 20
 
-#### **2. Treinamento de Puzzles**
-1. Clique em "🧩 Treinar Puzzles"
-2. Escolha o modo:
-   - **Normal**: Puzzles embaralhados sem repetição, progresso linear
-   - **Rush**: 20 puzzles aleatórios com repetição permitida
-   - **Opening**: Apenas erros de abertura (movimentos 1-10) sem repetição
-3. Observe o contexto (posição anterior por 1 segundo)
-4. Resolva o puzzle (máximo 3 tentativas):
-   - Feedback verde = correto
-   - Feedback rosa = incorreto
-   - Após 3 erros, avança automaticamente
-5. Acompanhe suas estatísticas:
-   - Progresso da sessão (X de Y)
-   - Taxa de acerto e streak
-   - Tentativas por puzzle
-   - Timer em tempo real
+# Apenas erros graves (>200cp)
+npm run analyze:user GothamChess -- --threshold 200
 
-#### **3. Repertório de Aberturas**
-1. Clique em "📚 Repertório"
-2. Opções disponíveis:
-   - **Continuar**: Carrega dados salvos do localStorage
-   - **Novo**: Cria novo repertório (limpa dados anteriores)
-   - **Importar**: Carrega arquivo JSON com validação
-3. **Modo Edição:**
-   - Faça movimentos para criar variantes
-   - Adicione comentários por posição
-   - Use Undo/Redo para navegar na árvore
-   - Exporte com botão Download
-4. **Modo Treino:**
-   - 20 posições aleatórias do repertório
-   - Máximo 3 tentativas por posição
-   - Dica automática após 2 erros (mostra comentário)
-   - Orientação do tabuleiro automática
+# Configuração completa personalizada
+npm run analyze:user seu_usuario -- \
+  --months 12 \
+  --depth 22 \
+  --threshold 150 \
+  --threads 8 \
+  --output minha-analise.json
+```
 
-## 🛠️ Stack Tecnológico
+### Análise de Performance
+
+```bash
+# Exemplo de output da CLI
+🚀 ANÁLISE ULTRA-RÁPIDA DE PGN - STOCKFISH NATIVO
+
+Configuração:
+  📊 Profundidade: 18
+  🧵 Threads: 16 (16x mais rápido que WASM)
+  📉 Threshold: 100cp
+  💾 Output: puzzles-output.json
+
+🌐 Baixando partidas do Chess.com...
+✅ 142 partida(s) baixada(s)
+
+🔍 Parseando partidas...
+✅ 142 partida(s) encontrada(s)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⬜ Analisando: [████████████████████] 100% (34/34)
+  💥 ERRO ENCONTRADO! Perda de 245cp - Puzzle #1 criado
+✅ Partida analisada! Erros encontrados: 2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔════════════════════════════════════════════════════════════╗
+║                    ✅ ANÁLISE COMPLETA!                    ║
+╚════════════════════════════════════════════════════════════╝
+
+Estatísticas:
+  🎮 Partidas analisadas: 142
+  📊 Posições analisadas: 3,456
+  💥 Erros encontrados: 187
+  ⏱️  Tempo decorrido: 384.2s (6.4 minutos)
+  📁 Arquivo salvo: puzzles-output.json
+
+Performance:
+  🚀 Velocidade: ~9.0 posições/segundo
+  ⚡ Speedup: 16x mais rápido que WASM
+```
+
+### Importar Resultados na Interface Web
+
+Os puzzles gerados pela CLI podem ser importados diretamente na interface web:
+
+1. Abra a interface web (http://localhost:5173)
+2. Vá em **"🧩 Treinar Puzzles"**
+3. Os puzzles do arquivo JSON serão carregados automaticamente
+4. Ou use o botão de importação para carregar outro arquivo
+
+---
+
+## 🏗️ Stack Tecnológico
 
 ### Frontend
-- **React 18.3.1** - Interface de usuário
-- **TypeScript 5.6.2** - Type safety
-- **Vite 5.4.10** - Build tool
-- **React Bootstrap 2.10.5** - Componentes UI
-- **React Icons 5.3.0** - Ícones
+
+| Tecnologia | Versão | Uso |
+|------------|--------|-----|
+| **React** | 18.3.1 | Interface de usuário |
+| **TypeScript** | 5.6.2 | Type safety |
+| **Vite** | 5.4.10 | Build tool |
+| **React Bootstrap** | 2.10.5 | Componentes UI |
+| **React Icons** | 5.3.0 | Ícones |
 
 ### Bibliotecas de Xadrez
-- **chess.js 1.0.0-beta.8** - Engine de validação de movimentos
-- **react-chessboard 4.7.2** - Tabuleiro interativo
-- **Stockfish 17 WASM** - Engine de análise (integrado)
+
+| Biblioteca | Versão | Uso |
+|------------|--------|-----|
+| **chess.js** | 1.0.0-beta.8 | Engine de validação de movimentos |
+| **react-chessboard** | 4.7.2 | Tabuleiro interativo |
+| **Stockfish 17 WASM** | 17 | Engine de análise (browser) |
+
+### Backend/CLI
+
+| Tecnologia | Uso |
+|------------|-----|
+| **Node.js** | Runtime para CLI tool |
+| **Stockfish Native** | Engine de análise (nativo) |
+| **Chess.com Public API** | Download de partidas |
 
 ### Utilitários
-- **uuid 13.0.0** - Identificadores únicos
-- **events 3.3.0** - Event emitters
 
-## 📋 Features Detalhadas
+| Biblioteca | Versão | Uso |
+|------------|--------|-----|
+| **uuid** | 13.0.0 | Identificadores únicos |
+| **events** | 3.3.0 | Event emitters |
 
-### Análise de Partidas
-- **Importação Flexível**: PGN direto, arquivo .pgn, ou Chess.com API
-- **Chess.com API Completa**:
-  - 3 modos de importação (Todos/Meus Jogos/Últimos 10)
-  - **Importação direta via FEN**: Extrai FENs de partidas em lote
-  - Preview visual com badges coloridos por tipo
-  - Barra de progresso em tempo real (X/Y partidas)
-  - Estatísticas e ratings em tempo real
-  - Múltiplos endpoints disponíveis (extended-archive, live/game)
-- **Análise em Lote**: Processa múltiplas partidas com barra de progresso
-- **Detecção Inteligente**: Identifica jogador mais frequente sem threshold mínimo
-- **Pré-seleção Automática**: Badge 🎯 e seleção do jogador detectado
-- **Classificação Precisa**:
-  - Brilliant (< 0 cp loss) - Movimento excepcional
-  - Best (< 10 cp loss) - Melhor movimento
-  - Good (< 50 cp loss) - Movimento bom
-  - Inaccuracy (< 100 cp loss) - Imprecisão
-  - Mistake (< 300 cp loss) - Erro
-  - Blunder (≥ 300 cp loss) - Grande erro
-- **Exportação/Importação**:
-  - Formato JSON completo com análises e puzzles
-  - Auto-salvamento de puzzles ao importar
-  - Nome padrão: `chess-analysis-YYYY-MM-DD.json`
+---
 
-### Sistema de Puzzles
-- **Geração Inteligente**:
-  - Apenas blunders >300cp viram puzzles
-  - Ignora primeiros 10 lances (teoria)
-  - Inclui contexto da posição anterior
-- **🆕 Evaluation Bar em Tempo Real**:
-  - Barra visual mostrando vantagem de brancas/pretas
-  - Atualização em tempo real com Stockfish (depth 12)
-  - Sequência de avaliações:
-    1. Avalia `fenContext` (posição antes do oponente)
-    2. Avalia `fenBefore` (posição inicial do puzzle)
-    3. Avalia após movimento do jogador
-    4. Restaura avaliação inicial após erro (800ms delay)
-  - Fórmula de conversão: Lichess (centipawns → win percentage)
-  - Animações suaves (0.6s cubic-bezier)
-- **🆕 Validação Inteligente de Movimentos**:
-  - Não compara com movimento específico pré-definido
-  - Valida baseado em **melhoria da posição**:
-    - **Brancas:** Correto se `newEval > oldEval` (mais positivo)
-    - **Pretas:** Correto se `newEval < oldEval` (mais negativo)
-  - Aceita múltiplas soluções corretas
-  - Mais educativo: ensina a melhorar a posição, não decorar
-- **Três Modos Distintos**:
-  - **Normal**: Sem repetição, todos os puzzles uma vez
-  - **Rush**: 20 puzzles com Fisher-Yates shuffle e repetição
-  - **Opening**: Apenas erros de abertura (movimentos 1-10) sem repetição
-- **Sistema de Tentativas**:
-  - Máximo 3 tentativas com feedback progressivo
-  - Auto-skip após 3 erros
-- **Contexto Visual**:
-  - Mostra `fenContext` por 1 segundo
-  - Tabuleiro bloqueado durante preview
-- **Feedback Colorido**:
-  - Verde (#90EE90) com transição 0.5s para acerto
-  - Rosa (#FFB6C1) com transição 0.5s para erro
-- **🆕 Sistema de Debug**:
-  - Logs detalhados no console do navegador
-  - Mostra avaliações, conversões e comparações
-  - Formato: 📊 AVALIAÇÃO, 🎯 MOVIMENTO, 🧮 Conversão
-- **Estatísticas Completas**:
-  - Taxa de acerto, streak máximo
-  - Timer em tempo real
-  - Persistência no localStorage
+## 🏗️ Arquitetura
 
-### Repertório de Aberturas
-- **Editor Visual**:
-  - Interface drag-and-drop para criar variantes
-  - Suporte a múltiplas ramificações
-  - Navegação com Undo/Redo
-- **Estrutura em Árvore**:
-  - TypeStorage com prevFen/nextFen[]
-  - Comentários únicos por FEN
-  - Validação completa na importação
-- **Modo Treino Avançado**:
-  - 20 posições com Fisher-Yates shuffle
-  - Dica após 2 tentativas (mostra comentário)
-  - Orientação automática por turno
-- **Import/Export**:
-  - JSON validado com TypeStorage
-  - Download direto do navegador
-  - Persistência em localStorage (key: `data`)
-
-
-## 🏗️ Arquitetura do Projeto
+### Estrutura de Diretórios
 
 ```
-src/
-├── components/           # Componentes React
-│   ├── ChessBoard/      # Wrapper do tabuleiro
-│   ├── ChessComImporter/# Importação Chess.com
-│   ├── ChessGame/       # Tabuleiro interativo
-│   ├── EvaluationBar/   # 🆕 Barra de avaliação em tempo real
-│   │   ├── EvaluationBar.tsx      # Componente visual da barra
-│   │   ├── evaluationUtils.ts     # Conversões e formatação
-│   │   └── EvaluationBar.css      # Estilos Chess.com-like
-│   ├── GameAnalyzer/    # Análise de partidas
-│   ├── OpeningTrainer/  # Treino de aberturas
-│   ├── PuzzleSession/   # Componentes de sessão
-│   ├── PuzzleTrainer/   # Interface de puzzles
-│   ├── StockfishTest/   # Teste do engine
-│   ├── TrainingControls/# Controles de treino
-│   ├── Download/        # Exportação JSON
-│   ├── Gap/             # Espaçamento
-│   └── Upload/          # Importação JSON
-├── hooks/
-│   └── useStockfish.ts  # Hook para Stockfish
-├── Pages/
-│   └── Register/        # Editor de repertório
-├── services/
-│   ├── ChessComService.ts       # API Chess.com (web)
-│   ├── OpeningService.ts        # 🆕 CRUD de aberturas v2.0
-│   ├── OpeningTrainerService.ts # Lógica de treino
-│   ├── PuzzleService.ts         # Gestão de puzzles
-│   └── StockfishService.ts      # Engine de análise
-├── stockfish/
-│   ├── engine.ts        # Classe Engine
-│   └── *.js/wasm        # Arquivos Stockfish
-├── types/
-│   ├── Opening.ts       # 🆕 Interface Opening expandida v2.0
-│   ├── Puzzle.ts        # Interface Puzzle
-│   └── TypeStorage.ts   # Schema repertório
-├── utils/
-│   ├── chessUtils.ts    # Utilidades xadrez
-│   ├── pgnParser.ts     # Parser PGN
-│   ├── timeUtils.ts     # Formatação tempo
-│   ├── trainerUtils.ts  # 🆕 Shared utils (evita DRY)
-│   └── isValidTypeStorage.ts
-├── App.tsx              # Roteamento principal
-└── main.tsx             # Entry point
-
-scripts/ ⚡ NOVA FERRAMENTA CLI
-├── analyze-pgn.js       # 🆕 Script principal de análise
-├── stockfish-native.js  # 🆕 Wrapper UCI Stockfish nativo
-├── chess-com-api.js     # 🆕 Cliente Chess.com API
-├── package.json         # 🆕 Configuração CommonJS
-├── example.pgn          # 🆕 Arquivo de exemplo
-├── README.md            # 🆕 Documentação completa (6000+ palavras)
-├── ANALISE-ULTRA-RAPIDA.md # 🆕 Guia quick-start
-└── CHESS-COM-GUIDE.md   # 🆕 Guia Chess.com
+opening-training/
+├── src/                      # Código fonte da interface web
+│   ├── components/           # Componentes React
+│   │   ├── ChessBoard/      # Wrapper do tabuleiro
+│   │   ├── ChessComImporter/# Importação Chess.com
+│   │   ├── ChessGame/       # Tabuleiro interativo
+│   │   ├── EvaluationBar/   # 🆕 Barra de avaliação em tempo real
+│   │   ├── GameAnalyzer/    # Análise de partidas
+│   │   ├── OpeningTrainer/  # Treino de aberturas
+│   │   ├── PuzzleTrainer/   # Interface de puzzles
+│   │   └── ...
+│   ├── hooks/
+│   │   └── useStockfish.ts  # Hook para Stockfish
+│   ├── Pages/
+│   │   └── Register/        # Editor de repertório
+│   ├── services/
+│   │   ├── ChessComService.ts       # API Chess.com (web)
+│   │   ├── OpeningService.ts        # 🆕 CRUD de aberturas v2.0
+│   │   ├── OpeningTrainerService.ts # Lógica de treino
+│   │   ├── PuzzleService.ts         # Gestão de puzzles
+│   │   └── StockfishService.ts      # Engine de análise
+│   ├── stockfish/           # Arquivos Stockfish WASM
+│   ├── types/
+│   │   ├── Opening.ts       # 🆕 Interface Opening expandida v2.0
+│   │   ├── Puzzle.ts        # Interface Puzzle
+│   │   └── TypeStorage.ts   # Schema repertório
+│   ├── utils/
+│   │   ├── chessUtils.ts    # Utilidades xadrez
+│   │   ├── pgnParser.ts     # Parser PGN
+│   │   ├── trainerUtils.ts  # 🆕 Shared utils (evita DRY)
+│   │   └── ...
+│   ├── App.tsx              # Roteamento principal
+│   └── main.tsx             # Entry point
+│
+├── scripts/ ⚡               # CLI Tool (NOVO)
+│   ├── analyze-pgn.js       # 🆕 Script principal de análise
+│   ├── stockfish-native.js  # 🆕 Wrapper UCI Stockfish nativo
+│   ├── chess-com-api.js     # 🆕 Cliente Chess.com API
+│   ├── package.json         # 🆕 Configuração CommonJS
+│   ├── example.pgn          # 🆕 Arquivo de exemplo
+│   ├── README.md            # 🆕 Documentação completa (6000+ palavras)
+│   ├── ANALISE-ULTRA-RAPIDA.md # 🆕 Guia quick-start
+│   └── CHESS-COM-GUIDE.md   # 🆕 Guia Chess.com
+│
+├── dist/                    # Build de produção
+├── node_modules/            # Dependências
+├── PERFORMANCE_ANALYSIS.md  # 🆕 Análise de performance técnica
+├── package.json             # Configuração do projeto
+├── vite.config.ts           # Configuração Vite
+├── tsconfig.json            # Configuração TypeScript
+└── README.md                # Este arquivo
 ```
+
+### Fluxo de Dados
+
+```mermaid
+graph TD
+    A[Usuário] -->|Interface Web| B[React App]
+    A -->|CLI| C[Node.js Script]
+
+    B --> D[Stockfish WASM]
+    C --> E[Stockfish Native]
+
+    B --> F[Chess.com API]
+    C --> F
+
+    D -->|Análise| G[Puzzles JSON]
+    E -->|Análise| G
+
+    G --> H[localStorage]
+    G --> I[Arquivo JSON]
+
+    H --> B
+    I --> B
+    I --> C
+```
+
+### Principais Algoritmos
+
+#### 1. Fisher-Yates Shuffle
+Embaralhamento verdadeiramente aleatório de puzzles e posições:
+
+```typescript
+for (let i = array.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [array[i], array[j]] = [array[j], array[i]];
+}
+```
+
+#### 2. Conversão UCI ↔ SAN
+Compatibilidade entre Stockfish (UCI) e chess.js (SAN):
+
+```typescript
+convertUCItoSAN('e2e4', fen) // => 'e4'
+moveToUCI('e2', 'e4', 'q')   // => 'e2e4q'
+```
+
+#### 3. Cálculo de ACPL
+Average Centipawn Loss por cor:
+
+```typescript
+const calculateACPL = (moves) => {
+  const totalCPL = moves.reduce((sum, m) => sum + m.centipawnLoss, 0);
+  return Math.round(totalCPL / moves.length);
+};
+```
+
+#### 4. Evaluation Bar (Lichess Formula)
+Conversão de centipawns para porcentagem de vitória:
+
+```typescript
+centipawnsToWinPercentage(cp: number): number {
+  // Fórmula do Lichess
+  return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
+}
+```
+
+---
 
 ## 📦 Estrutura de Dados
 
-### Puzzle - Estrutura Completa
+### Puzzle
+
 ```typescript
 interface Puzzle {
   id: string;              // UUID v4 único
@@ -487,511 +683,389 @@ interface Puzzle {
 }
 ```
 
-### TypeStorage - Formato do Repertório
+### Opening (v2.0)
+
 ```typescript
-interface TypeStorage {
-  [abertura: string]: {
+interface Opening {
+  id: string;
+  name: string;
+  description?: string;
+  color: 'white' | 'black';      // 🆕 Cor escolhida pelo usuário
+  dateCreated: string;
+  lastModified: string;
+  lastPracticed?: string;
+  positions: {
     [fen: string]: {
       prevFen: string;      // FEN anterior (para Undo)
       comment: string;      // Comentário da posição
       nextFen: string[];    // Próximas variantes (múltiplas)
-    }
-  }
-}
-```
-
-### Formato de Exportação de Análise
-```typescript
-interface ExportedAnalysis {
-  date: string;            // Data da exportação
-  pgn: string;             // PGN original
-  analysis: MoveAnalysis[]; // Análise detalhada de cada movimento
-  blunders: Puzzle[];      // Puzzles gerados
-  stats: {
-    white: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
-    black: { acpl: number; blunders: number; mistakes: number; inaccuracies: number; };
+    };
   };
-  selectedGames: GameSelection[]; // Partidas selecionadas
-  parsedGames: ParsedGame[];      // Partidas parseadas
+  stats?: {
+    totalPositions: number;
+    correctMoves: number;
+    incorrectMoves: number;
+    accuracy: number;
+    timesCompleted: number;
+  };
 }
 ```
 
-### 🆕 EvaluationBar - Componente de Avaliação
-```typescript
-// EvaluationBar.tsx
-interface EvaluationBarProps {
-  evaluation: number;      // Centipawns (+ brancas, - pretas)
-  showNumeric?: boolean;   // Mostrar valor numérico (default: true)
-  height?: number;         // Altura em pixels (default: 400)
-  animated?: boolean;      // Animações suaves (default: true)
-  loading?: boolean;       // Estado de carregamento
-}
+### localStorage Keys
 
-// evaluationUtils.ts
-centipawnsToWinPercentage(cp: number): number
-// Fórmula do Lichess: Win% = 50 + 50 * (2 / (1 + exp(-0.00368208 * cp)) - 1)
-// Retorna: 0-100 (porcentagem de vitória para brancas)
-
-formatEvaluation(cp: number): string
-// Formata: +2.5, -1.3, M#3
-// Converte centipawns para pawns (divide por 100)
-
-getEvaluationColor(cp: number): 'white' | 'black' | 'equal'
-// Determina cor da avaliação (>50cp brancas, <-50cp pretas)
-```
-
-**Layout da Barra:**
-- Parte branca (embaixo): altura proporcional à vantagem
-- Parte preta (em cima): 100% - vantagem branca
-- Linha central cinza: posição igual (0.0)
-- Indicador de mate: badge fixo no topo/base
-- Animação: `transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)`
-
-## 🔧 Configuração Avançada
-
-### Stockfish WASM
-O Stockfish 17 está integrado via WASM com as seguintes configurações:
-
-```typescript
-// Em GameAnalyzer/index.tsx
-const ANALYSIS_DEPTH = 18;     // Profundidade de análise (padrão: 18)
-
-// Em StockfishService.ts
-const ANALYSIS_TIMEOUT = 10000; // Timeout em ms (padrão: 10 segundos)
-```
-
-**Funcionalidades disponíveis:**
-- Análise com depth configurável
-- Skill level ajustável (0-20)
-- Execução em Web Worker (não bloqueia UI)
-- Detecção de mate convertida para ±100000 cp
-- Principal Variation (PV) armazenada
-
-### Proxy Vite para Chess.com
-O projeto está configurado com proxy reverso para contornar CORS:
-
-```typescript
-// vite.config.ts
-server: {
-  proxy: {
-    '/api/chess-com': {
-      target: 'https://www.chess.com',
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/api\/chess-com/, '')
-    }
-  }
-}
-```
-
-**Funcionalidades:**
-- Contorna restrições de CORS da API Chess.com
-- Permite acesso direto aos endpoints de callback
-- Usado por `getExtendedArchiveGames()` e `getGameDetails()`
-
-### localStorage - Chaves e Estruturas
-Todos os dados são salvos automaticamente no navegador:
-
-| Chave | Descrição | Estrutura |
+| Chave | Estrutura | Descrição |
 |-------|-----------|-----------|
-| `chess-puzzles` | Lista de puzzles gerados | `Puzzle[]` |
-| `opening-training-stats` | Estatísticas do repertório | `TrainingStats` |
-| `opening-training-session` | Sessão atual de treino | `TrainingSession` |
-| `data` | Repertório de aberturas | `TypeStorage` |
-| `darkMode` | Preferência de tema (escuro/claro) | `boolean` |
-
-**Estatísticas do Repertório (TrainingStats):**
-```typescript
-{
-  totalMoves: number;
-  correctMoves: number;
-  incorrectMoves: number;
-  streak: number;
-  maxStreak: number;
-  sessionsCompleted: number;
-  lastTrainingDate: string;
-  averageAccuracy: number;
-}
-```
-
-Para limpar todos os dados:
-```javascript
-localStorage.clear(); // Remove tudo
-// Ou específico:
-localStorage.removeItem('chess-puzzles');
-```
-
-## 🌐 Integração Chess.com API
-
-### Endpoints Disponíveis
-O sistema usa a API pública do Chess.com com os seguintes endpoints:
-
-```javascript
-// Base URL: https://api.chess.com/pub
-
-getPlayerProfile(username)     // Perfil completo do jogador
-getPlayerArchives(username)    // Lista de arquivos mensais
-getMonthlyGames(username, year, month) // Jogos de um mês específico
-getMonthlyPGN(username, year, month)   // PGN direto do mês
-getLatestGames(username, count)        // Últimos N jogos
-getAllGames(username, limit)           // Batch com paginação
-getPlayerStats(username)               // Estatísticas e ratings
-
-// Endpoints via Proxy (contornam CORS)
-getExtendedArchiveGames(username, page) // Lista de partidas com IDs e FENs
-getGameDetails(gameId)                  // Detalhes completos de uma partida
-fetchGamesAndExtractFENs(username, page, onProgress) // Extrai FENs em lote
-```
-
-### Funcionalidades da Integração
-- **Rate limiting:** Delay de 1s entre requisições batch
-- **User-Agent customizado:** "ChessTrainingSystem/1.0"
-- **Filtros disponíveis:**
-  - Por controle de tempo (Bullet/Blitz/Rapid/Daily)
-  - Apenas jogos ranqueados
-- **Dados extras capturados:**
-  - Accuracies (precisão de brancas/pretas)
-  - Ratings de ambos jogadores
-  - URLs das partidas
-
-## ⚙️ Algoritmos e Utilitários
-
-### Fisher-Yates Shuffle
-Usado para embaralhamento verdadeiramente aleatório de puzzles e posições:
-
-```typescript
-// OpeningTrainerService.ts e PuzzleService.ts
-for (let i = array.length - 1; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [array[i], array[j]] = [array[j], array[i]];
-}
-```
-
-### Conversão UCI ↔ SAN
-Utilitários para compatibilidade entre Stockfish (UCI) e chess.js (SAN):
-
-```typescript
-// chessUtils.ts
-convertUCItoSAN('e2e4', fen) // => 'e4'
-moveToUCI('e2', 'e4', 'q')   // => 'e2e4q'
-executeMove(game, from, to, promotion)
-```
-
-### Parser PGN Robusto
-Validação e parsing de múltiplas partidas:
-
-```typescript
-// pgnParser.ts
-validatePGN(pgn)              // Validação com mensagens específicas
-extractGamesInfo(pgn)         // Extração de metadados
-detectMostFrequentPlayer(games) // Detecção inteligente sem threshold
-getPlayerColors(games, username) // Identificação de cores jogadas
-```
-
-### Cálculo de ACPL
-Average Centipawn Loss por cor:
-
-```typescript
-// GameAnalyzer/index.tsx
-const calculateACPL = (moves) => {
-  const totalCPL = moves.reduce((sum, m) => sum + m.centipawnLoss, 0);
-  return Math.round(totalCPL / moves.length);
-};
-```
-
-## 🎨 Personalização Visual
-
-### Sistema de Temas
-O sistema suporta tema claro e escuro com variáveis CSS customizáveis:
-
-```css
-/* Tema Claro (padrão) */
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-card: #ffffff;
-  --text-primary: #212529;
-  --text-secondary: #6c757d;
-  --border-color: #dee2e6;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --gradient-start: #667eea;
-  --gradient-end: #764ba2;
-}
-
-/* Tema Escuro */
-[data-theme="dark"] {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --bg-card: #2d2d2d;
-  --text-primary: #e0e0e0;
-  --text-secondary: #a0a0a0;
-  --border-color: #404040;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --gradient-start: #4a5568;
-  --gradient-end: #2d3748;
-}
-```
-
-**Funcionalidades do Tema:**
-- Toggle visual com ícones 🌙 (escuro) / ☀️ (claro)
-- Transições suaves (0.3s ease) entre temas
-- Persistência da preferência no localStorage
-- Aplicação automática via `document.documentElement.setAttribute('data-theme')`
-- Botão fixo no canto superior direito com efeitos hover
-
-### Códigos de Cores
-```css
-/* Feedback de Movimentos */
---correct-bg: #90EE90;  /* Verde claro - movimento correto */
---incorrect-bg: #FFB6C1; /* Rosa claro - movimento incorreto */
---transition: 0.5s;      /* Duração da transição */
-
-/* Badges de Tipo de Jogo */
---bullet-badge: danger;  /* Vermelho - Bullet */
---blitz-badge: warning;  /* Amarelo - Blitz */
---rapid-badge: primary;  /* Azul - Rapid */
-```
-
-### Responsividade Mobile
-O sistema é totalmente responsivo com breakpoints otimizados:
-
-```css
-/* Tablets e smartphones */
-@media (max-width: 768px) {
-  .h2 { font-size: 1.5rem !important; }
-  .card-body { padding: 1.25rem !important; }
-  .theme-toggle { width: 45px; height: 45px; }
-}
-
-/* Smartphones pequenos */
-@media (max-width: 576px) {
-  .btn { font-size: 0.9rem !important; }
-  .card-body h5 { font-size: 1rem !important; }
-}
-
-/* Tablets landscape */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-  .container-fluid { padding-top: 2rem !important; }
-}
-```
-
-### Ícones Utilizados
-- 🎯 Jogador detectado automaticamente
-- 💾 Exportar análise
-- 📥 Importar análise
-- ♟️ Importar do Chess.com
-- 🧩 Puzzles
-- 📊 Análise
-- 📚 Repertório
-- ✅ Acerto
-- ❌ Erro
-- 🔥 Streak
-- 💡 Dica
-- 🌙 Tema escuro
-- ☀️ Tema claro
-- ♟️ Modo Opening
-
-## 🚀 Roadmap Futuro
-
-### Curto Prazo
-- [ ] Sistema de spaced repetition com algoritmo SM-2
-- [ ] Dashboard com gráficos de evolução temporal
-- [ ] Filtros avançados para puzzles (por tipo de erro)
-- [ ] Exportação de estatísticas em PDF
-
-### Médio Prazo
-- [ ] Integração com Lichess API
-- [ ] Análise de padrões de erro recorrentes
-- [ ] Sugestões personalizadas de estudo
-- [ ] Modo multiplayer para competições
-
-### Longo Prazo
-- [ ] App mobile (React Native)
-- [ ] Integração com engines alternativos (Leela, etc)
-- [ ] Sistema de coaching com IA
-- [ ] Marketplace de repertórios
-
-## 🐛 Problemas Conhecidos e Limitações
-
-### Problemas de Performance
-- Performance pode degradar com >1000 puzzles salvos no localStorage
-- Análise de partidas muito longas (>100 movimentos) pode ser lenta
-- Re-embaralhamento frequente em bibliotecas pequenas de puzzles (<20)
-
-### Limitações Técnicas
-- Chess.com API tem limite de taxa (delay fixo de 1s entre requisições)
-- Timeout do Stockfish fixo em 10 segundos (não configurável via UI)
-- Seleção de cor exclusiva em múltiplas partidas (não permite analisar ambas)
-- Redo sempre seleciona primeira variante (falta UI para escolher)
-- Primeiros 10 lances são ignorados na geração de puzzles (teoria de abertura)
-
-### TODOs Identificados no Código
-- Implementar seleção de variante no Redo (Register/index.tsx:106)
-- Adicionar configuração de depth/timeout do Stockfish via UI
-- Implementar tratamento adequado de rate limiting Chess.com
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
-
-1. Fork o projeto
-2. Crie uma feature branch (`git checkout -b feature/NovaFuncionalidade`)
-3. Commit suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
-5. Abra um Pull Request
-
-### Convenção de Commits
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `style:` Formatação
-- `refactor:` Refatoração
-- `test:` Testes
-- `chore:` Manutenção
-
-## 📄 Licença
-
-MIT License - veja [LICENSE](LICENSE) para detalhes
-
-**Você pode:**
-- ✅ Copiar e modificar o código
-- ✅ Usar comercialmente
-- ✅ Distribuir
-
-**Você deve:**
-- 📝 Dar créditos ao autor original
-- 📝 Incluir a licença MIT em cópias
-
-Copyright © 2025 Frederico Kluser
-
-## 👥 Autor
-
-**Frederico Kluser**
-- GitHub: [@frederico-kluser](https://github.com/frederico-kluser)
-- Projeto: [opening-training](https://github.com/frederico-kluser/opening-training)
-
-## 🙏 Agradecimentos
-
-- [Stockfish](https://stockfishchess.org/) - Engine de análise
-- [Chess.js](https://github.com/jhlywa/chess.js) - Biblioteca de xadrez
-- [React Chessboard](https://github.com/Clariity/react-chessboard) - Componente do tabuleiro
-- [Chess.com](https://chess.com) - API de partidas
+| `chess-puzzles` | `Puzzle[]` | Lista de puzzles gerados |
+| `opening-training-stats` | `TrainingStats` | Estatísticas do repertório |
+| `opening-training-session` | `TrainingSession` | Sessão atual de treino |
+| `data` | `TypeStorage` | Repertório de aberturas |
+| `darkMode` | `boolean` | Preferência de tema |
 
 ---
 
-**Última atualização**: 20/10/2025 | **Versão**: 2.1.0 ⚡
+## 🚀 Roadmap
+
+### v2.2.0 - Q2 2025
+
+- [ ] **Sistema de Spaced Repetition** com algoritmo SM-2
+- [ ] **Dashboard com gráficos** de evolução temporal (Chart.js)
+- [ ] **Filtros avançados** para puzzles:
+  - Por tipo de erro (blunder, mistake, inaccuracy)
+  - Por cor (brancas, pretas)
+  - Por fase do jogo (abertura, meio-jogo, final)
+  - Por rating do adversário
+- [ ] **Configuração de Stockfish** via UI (depth, timeout, hash, threads)
+- [ ] **Exportação de estatísticas** em PDF
+
+### v2.3.0 - Q3 2025
+
+- [ ] **Integração com Lichess API**
+  - Download de partidas
+  - Sincronização de estudos
+  - Import de puzzles táticos
+- [ ] **Análise de padrões** de erro recorrentes
+  - ML para detectar fraquezas
+  - Sugestões personalizadas de estudo
+- [ ] **Sistema de tags** para puzzles
+- [ ] **Modo multiplayer** para competições de puzzles
+
+### v3.0.0 - Q4 2025
+
+- [ ] **App mobile** (React Native)
+  - Sincronização com versão web
+  - Modo offline
+- [ ] **Integração com engines alternativos**:
+  - Leela Chess Zero (neural network)
+  - Comparação de análises
+- [ ] **Sistema de coaching** com IA
+  - Análise de estilo de jogo
+  - Recomendações personalizadas
+- [ ] **Marketplace de repertórios**
+  - Compartilhamento comunitário
+  - Repertórios de GMs
+
+### Futuro (Long-term)
+
+- [ ] **Backend próprio** (Node.js + PostgreSQL)
+- [ ] **Sistema de usuários** com autenticação
+- [ ] **Cloud storage** para análises
+- [ ] **Análise de vídeo** (integração com YouTube/Twitch)
+- [ ] **Torneios online** de puzzles
+- [ ] **API pública** para desenvolvedores
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são muito bem-vindas! Este projeto é open-source e cresce com a comunidade.
+
+### Como Contribuir
+
+1. **Fork** o projeto
+2. Crie uma **feature branch**: `git checkout -b feature/MinhaNovaFeature`
+3. **Commit** suas mudanças: `git commit -m 'feat: adiciona nova funcionalidade'`
+4. **Push** para a branch: `git push origin feature/MinhaNovaFeature`
+5. Abra um **Pull Request**
+
+### Convenção de Commits
+
+Seguimos a [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` Nova funcionalidade
+- `fix:` Correção de bug
+- `docs:` Documentação
+- `style:` Formatação (não afeta código)
+- `refactor:` Refatoração de código
+- `perf:` Melhoria de performance
+- `test:` Adição de testes
+- `chore:` Manutenção
+
+**Exemplos:**
+```bash
+git commit -m "feat: adiciona modo de treinamento blindfold"
+git commit -m "fix: corrige cálculo de evaluation bar para mates"
+git commit -m "docs: atualiza README com novos exemplos de CLI"
+```
+
+### Áreas que Precisam de Ajuda
+
+- 🐛 **Testes**: Adicionar testes unitários e de integração
+- 📱 **Mobile**: Melhorar responsividade para smartphones
+- 🌍 **i18n**: Internacionalização (inglês, espanhol, etc.)
+- 🎨 **UI/UX**: Melhorias de design e usabilidade
+- 📊 **Gráficos**: Dashboard de estatísticas
+- 🧠 **IA**: Análise de padrões de erro com ML
+
+### Código de Conduta
+
+Este projeto segue o [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/). Seja respeitoso e inclusivo.
+
+---
+
+## ❓ FAQ
+
+### Gerais
+
+**P: O projeto é gratuito?**
+R: Sim! Totalmente gratuito e open-source sob licença MIT.
+
+**P: Preciso criar uma conta?**
+R: Não! Tudo funciona localmente no seu navegador usando localStorage.
+
+**P: Meus dados são enviados para algum servidor?**
+R: Não! Tudo roda 100% localmente. A única conexão externa é para a API pública do Chess.com (quando você escolhe importar de lá).
+
+**P: Funciona offline?**
+R: A interface web precisa ser carregada uma vez, depois funciona offline. A CLI precisa de internet apenas para download do Chess.com.
+
+### Análise de Partidas
+
+**P: Por que a análise web é lenta?**
+R: A versão web usa Stockfish WASM que é ~16x mais lento que nativo. Use a CLI tool para análise rápida!
+
+**P: Qual a profundidade de análise?**
+R: Web: depth 18 (padrão). CLI: depth 18 (padrão), configurável até 25+.
+
+**P: Posso analisar partidas de qualquer jogador?**
+R: Sim, desde que o perfil seja público no Chess.com.
+
+**P: Há limite de partidas?**
+R: Não pelo sistema, mas muitas partidas podem demorar (use CLI para grandes volumes).
+
+### CLI Tool
+
+**P: Preciso instalar Stockfish?**
+R: Sim, para a CLI. A interface web usa WASM (não precisa instalação).
+
+**P: Funciona no Windows?**
+R: Sim! Baixe Stockfish de https://stockfishchess.org/download/ e adicione ao PATH.
+
+**P: A CLI funciona com Lichess?**
+R: Atualmente apenas Chess.com. Lichess está no roadmap v2.3.0.
+
+**P: Posso importar os resultados da CLI na interface web?**
+R: Sim! O JSON gerado é 100% compatível.
+
+### Puzzles
+
+**P: De onde vêm os puzzles?**
+R: São gerados automaticamente das suas próprias partidas analisadas.
+
+**P: Por que alguns movimentos "corretos" são marcados como errados?**
+R: A validação inteligente aceita qualquer movimento que **melhore a posição**. Se marcou errado, o movimento provavelmente piora a avaliação.
+
+**P: Posso adicionar puzzles manualmente?**
+R: Atualmente não, mas está no roadmap v2.2.0.
+
+### Repertório de Aberturas
+
+**P: Posso importar um repertório pronto?**
+R: Sim, use a função Import com arquivo JSON no formato TypeStorage.
+
+**P: Tem limite de posições no repertório?**
+R: Não há limite técnico, mas muitas posições (>1000) podem deixar o localStorage pesado.
+
+**P: Posso compartilhar meu repertório?**
+R: Sim! Use Export para gerar JSON e compartilhe. Marketplace está planejado para v3.0.0.
+
+### Problemas Comuns
+
+**P: "Stockfish não encontrado" na CLI**
+R: Instale Stockfish: `brew install stockfish` (macOS) ou veja [Instalação](#-instalação).
+
+**P: "Rate limit excedido" do Chess.com**
+R: Aguarde 5-10 minutos. Não execute múltiplas instâncias simultaneamente.
+
+**P: Puzzles não estão sendo salvos**
+R: Verifique se o localStorage está habilitado no navegador e não está cheio.
+
+**P: Build falha com erro de TypeScript**
+R: Execute `npm install` novamente e verifique Node.js versão 18+.
+
+---
 
 ## 📝 Changelog
 
-### v2.1.0 - Análise Ultra-Rápida via CLI (20/10/2025) ⚡
+### [v2.1.0](https://github.com/frederico-kluser/opening-training/releases/tag/v2.1.0) - 2025-10-20 ⚡
 
-**🚀 Nova Ferramenta CLI (16x mais rápida)**
+#### 🚀 Nova Ferramenta CLI (16x mais rápida)
+
 - ✅ **Análise via terminal** com Stockfish nativo (16.67x speedup vs WASM)
 - ✅ **Download automático do Chess.com** por username
 - ✅ **Multi-threading completo** - usa todos os cores da CPU
 - ✅ **Rate limiting inteligente** - respeita limites da API (1s entre requests)
 - ✅ **Barra de progresso** em tempo real com feedback colorido
 - ✅ **Output JSON** compatível com interface web
-- ✅ **Comandos npm:**
-  - `npm run analyze arquivo.pgn` - Análise de arquivo PGN
-  - `npm run analyze:user USERNAME` - Download automático Chess.com
-- ✅ **Opções configuráveis:**
-  - `--months N` - Baixar últimos N meses (padrão: 3)
-  - `--depth N` - Profundidade Stockfish (padrão: 18)
-  - `--threshold N` - CP mínimo para puzzle (padrão: 100)
-  - `--threads N` - Threads CPU (padrão: todos)
-  - `--output FILE` - Arquivo de saída (padrão: puzzles-output.json)
 
-**📚 Documentação Completa**
-- ✅ **[ANALISE-ULTRA-RAPIDA.md](scripts/ANALISE-ULTRA-RAPIDA.md)** - Guia quick-start
-- ✅ **[scripts/README.md](scripts/README.md)** - Documentação completa (6000+ palavras)
-- ✅ **[CHESS-COM-GUIDE.md](scripts/CHESS-COM-GUIDE.md)** - Guia Chess.com API
-- ✅ **[PERFORMANCE_ANALYSIS.md](PERFORMANCE_ANALYSIS.md)** - Análise de performance técnica
+#### 📚 Documentação Completa
 
-**🛠️ Módulos Criados**
+- ✅ [ANALISE-ULTRA-RAPIDA.md](scripts/ANALISE-ULTRA-RAPIDA.md) - Guia quick-start
+- ✅ [scripts/README.md](scripts/README.md) - Documentação completa (6000+ palavras)
+- ✅ [CHESS-COM-GUIDE.md](scripts/CHESS-COM-GUIDE.md) - Guia Chess.com API
+- ✅ [PERFORMANCE_ANALYSIS.md](PERFORMANCE_ANALYSIS.md) - Análise de performance técnica
+
+#### 🛠️ Módulos Criados
+
 - ✅ `scripts/stockfish-native.js` - Wrapper UCI para Stockfish nativo
 - ✅ `scripts/chess-com-api.js` - Cliente completo Chess.com API
 - ✅ `scripts/analyze-pgn.js` - Script principal de análise CLI
 - ✅ `scripts/package.json` - Configuração CommonJS
 
-**🔧 Melhorias Técnicas**
+#### 🔧 Melhorias Técnicas
+
 - ✅ Detecção automática de Stockfish (macOS/Linux/Windows)
-- ✅ Handling robusto de erros e timeouts
+- ✅ Handling robusto de erros e timeouts (10s)
 - ✅ PGN temporário salvo automaticamente para backup
 - ✅ Estatísticas detalhadas de performance (posições/segundo)
 - ✅ Preview colorido de partidas baixadas
 - ✅ Validação de usuário Chess.com
 
-**📊 Performance Comprovada**
+#### 📊 Performance Comprovada
+
 ```
 WASM (Web):        900 knodes/s → ~10 minutos (40 movimentos)
 Native 1 thread:  1,500 knodes/s → ~6 minutos
 Native 16 threads: 15,000 knodes/s → ~36 segundos ⚡
 ```
 
+#### 📚 Sistema de Aberturas v2.0
+
+- ✅ **Escolha de cor** (branco/preto) no cadastro
+- ✅ **Respeita cor** no modo treino
+- ✅ **Mostra movimento do oponente** primeiro (quando aplicável)
+- ✅ **Utilities compartilhadas** para evitar DRY code
+- ✅ Interface `Opening` expandida com metadata completa
+
 ---
 
-### v1.0.0 - Release Oficial (20/10/2025) 🎉
+### [v1.0.0](https://github.com/frederico-kluser/opening-training/releases/tag/v1.0.0) - 2025-10-20 🎉
 
-**🆕 Evaluation Bar em Tempo Real**
+#### 🆕 Evaluation Bar em Tempo Real
+
 - ✅ Barra visual mostrando vantagem de brancas/pretas
 - ✅ Integração com Stockfish (depth 12) para avaliação em tempo real
-- ✅ Sequência progressiva de avaliações:
-  - Avalia posição de contexto (antes do oponente)
-  - Avalia posição inicial (após oponente)
-  - Avalia após movimento do jogador
-  - Mostra transição ao desfazer erro (800ms)
+- ✅ Sequência progressiva de avaliações
 - ✅ Fórmula de conversão Lichess (centipawns → win percentage)
 - ✅ Componente `EvaluationBar` com props configuráveis
-- ✅ Utilities: `centipawnsToWinPercentage()`, `formatEvaluation()`
 
-**🆕 Validação Inteligente de Movimentos**
+#### 🆕 Validação Inteligente de Movimentos
+
 - ✅ Não compara com movimento específico pré-definido
-- ✅ Valida baseado em **melhoria da posição**:
-  - Brancas: correto se avaliação aumenta (mais positivo)
-  - Pretas: correto se avaliação diminui (mais negativo)
+- ✅ Valida baseado em **melhoria da posição**
 - ✅ Aceita múltiplas soluções corretas
 - ✅ Mais educativo: ensina a melhorar, não decorar
-- ✅ Logs de debug detalhados no console
 
-**🎨 Interface e UX**
-- ✅ **Versão automática no header:** Importa de `package.json`
-- ✅ **Home redesenhada:**
-  - Removidos: Chess.com e Stockfish Test
-  - 3 cards principais: Analisar, Puzzles, Aberturas
-  - GitHub movido para footer com licença
-- ✅ **Navegação melhorada:**
-  - Botões "← Voltar" em todos os treinamentos
-  - Posicionados no topo direito (sempre visíveis)
+#### 🎨 Interface e UX
+
+- ✅ **Versão automática no header**
+- ✅ **Home redesenhada** (3 cards principais)
+- ✅ **Navegação melhorada** (botões "← Voltar")
 - ✅ "Repertório" renomeado para "Treinar Aberturas"
 
-**📄 Licença e Documentação**
-- ✅ **Licença MIT adicionada:** Arquivo LICENSE criado
-- ✅ Copyright © 2025 Frederico Kluser
-- ✅ Permissões claras: pode copiar, modificar, usar comercialmente
-- ✅ Requer: dar créditos ao autor original
-- ✅ README completamente atualizado com novas features
-- ✅ Badges adicionados (versão, licença, React, TypeScript)
+#### 📄 Licença e Documentação
 
-**🔧 Melhorias Técnicas**
-- ✅ TypeScript: declaração de módulos JSON em `vite-env.d.ts`
-- ✅ Importação automática da versão do package.json
-- ✅ Build otimizado: 2.54s (382KB JS, 237KB CSS)
-- ✅ Todos os testes passando sem erros
+- ✅ **Licença MIT adicionada**
+- ✅ README completamente atualizado
+- ✅ Badges modernos (versão, licença, React, TypeScript)
 
 ---
 
-### v3.2.0 (18/10/2025)
+### v0.9.0 - 2025-10-18
+
 - ✅ Modo Opening - Treino focado em erros de abertura (movimentos 1-10)
-- ✅ Novo método `getOpeningPuzzles()` no PuzzleService
-- ✅ Filtro inteligente por moveNumber <= 10
-
-### v3.1.0
-- ✅ Sistema de tema escuro/claro com toggle persistente
+- ✅ Sistema de tema escuro/claro
 - ✅ Importação direta via FEN do Chess.com
-- ✅ Design responsivo melhorado
 
-### v3.0.0
+### v0.8.0 - 2025-10-15
+
 - ✅ Sistema de importação/exportação de análises
 - ✅ Sistema de contexto visual para puzzles
 - ✅ Modo Rush com 20 puzzles aleatórios
-- ✅ Integração completa com Chess.com API
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob a **MIT License** - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+### O que você pode fazer:
+
+- ✅ **Usar comercialmente**
+- ✅ **Modificar** o código
+- ✅ **Distribuir** cópias
+- ✅ **Uso privado**
+- ✅ **Sublicenciar**
+
+### O que você deve fazer:
+
+- 📝 **Incluir a licença MIT** em todas as cópias
+- 📝 **Dar créditos** ao autor original
+
+### O que você não pode fazer:
+
+- ❌ **Responsabilizar** o autor por danos
+- ❌ **Usar a marca** sem permissão
+
+---
+
+## 👥 Autor
+
+**Frederico Kluser**
+
+- GitHub: [@frederico-kluser](https://github.com/frederico-kluser)
+- Projeto: [opening-training](https://github.com/frederico-kluser/opening-training)
+
+---
+
+## 🙏 Agradecimentos
+
+Este projeto não seria possível sem:
+
+- **[Stockfish](https://stockfishchess.org/)** - O mais forte engine de xadrez open-source (GPL v3)
+- **[Chess.js](https://github.com/jhlywa/chess.js)** - Biblioteca JavaScript para validação de movimentos
+- **[React Chessboard](https://github.com/Clariity/react-chessboard)** - Componente React do tabuleiro
+- **[Chess.com](https://chess.com)** - API pública para download de partidas
+- **[Lichess](https://lichess.org)** - Fórmula de conversão de evaluation bar
+
+### Tecnologias Open-Source
+
+- [React](https://reactjs.org/) - MIT License
+- [TypeScript](https://www.typescriptlang.org/) - Apache 2.0 License
+- [Vite](https://vitejs.dev/) - MIT License
+- [Bootstrap](https://getbootstrap.com/) - MIT License
+
+---
+
+<div align="center">
+
+**Desenvolvido com ♟️ por Frederico Kluser**
+
+⭐ **Se este projeto te ajudou, considere dar uma estrela!** ⭐
+
+[⬆ Voltar ao topo](#-chess-training-system)
+
+---
+
+**Última atualização**: 20/10/2025 | **Versão**: 2.1.0 ⚡
+
+</div>
