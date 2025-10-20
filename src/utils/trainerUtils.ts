@@ -225,21 +225,14 @@ export function parseFenInfo(fen: string): FenInfo {
 
 /**
  * Calcula a orientação correta do tabuleiro
+ * A orientação deve SEMPRE ser a cor do usuário, não muda baseado em quem é a vez
  * @param userColor - Cor que o usuário joga
- * @param currentTurn - De quem é a vez
- * @returns Orientação do tabuleiro
+ * @returns Orientação do tabuleiro (sempre a cor do usuário)
  */
 export function getBoardOrientation(
-  userColor: 'white' | 'black',
-  currentTurn?: 'w' | 'b'
+  userColor: 'white' | 'black'
 ): 'white' | 'black' {
-  // Se currentTurn não for fornecido, usa a cor do usuário
-  if (!currentTurn) {
-    return userColor;
-  }
-
-  // Orientação baseada em quem deve jogar
-  return currentTurn === 'w' ? 'white' : 'black';
+  return userColor;
 }
 
 /**

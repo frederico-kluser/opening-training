@@ -117,6 +117,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     const position = session.currentPosition;
     const opponentMoveInfo = shouldShowOpponentMove(position);
 
+    // Define orientação do tabuleiro (sempre a cor do usuário)
+    setBoardOrientation(getBoardOrientation(position.color));
+
     if (opponentMoveInfo.shouldShow && position.fenContext) {
       // 🎭 Mostrar movimento do adversário primeiro
       setShowingContext(true);
@@ -124,7 +127,6 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       setGame(contextGame);
 
       const contextInfo = parseFenInfo(position.fenContext);
-      setBoardOrientation(getBoardOrientation(position.color, contextInfo.turn));
 
       console.log('🎭 Mostrando movimento do adversário...', {
         fenContext: position.fenContext.substring(0, 30) + '...',
@@ -138,7 +140,6 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         setShowingContext(false);
 
         const fenInfo = parseFenInfo(position.fen);
-        setBoardOrientation(getBoardOrientation(position.color, fenInfo.turn));
 
         console.log('✅ Sua vez de jogar!', {
           fen: position.fen.substring(0, 30) + '...',
@@ -150,9 +151,6 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       const newGame = new Chess(position.fen);
       setGame(newGame);
       setShowingContext(false);
-
-      const fenInfo = parseFenInfo(position.fen);
-      setBoardOrientation(getBoardOrientation(position.color, fenInfo.turn));
     }
 
     // Limpa feedback
