@@ -70,12 +70,14 @@ ${colors.bright}Configuração:${colors.reset}
    */
   parsePGN(pgnContent) {
     const games = [];
-    const gameRegex = /\[Event\s+"([^"]+)"\][\s\S]*?\n\n([^\[]*)/g;
+    // FIX: Regex corrigido para capturar movimentos com comentários {[%clk ...]}
+    // Usa lookahead (?=\n\n\[Event|$) para capturar até a próxima partida ou final
+    const gameRegex = /\[Event[\s\S]*?\n\n([\s\S]*?)(?=\n\n\[Event|$)/g;
     let match;
 
     while ((match = gameRegex.exec(pgnContent)) !== null) {
       const headers = match[0].match(/\[(\w+)\s+"([^"]+)"\]/g) || [];
-      const moves = match[2].trim();
+      const moves = match[1].trim();
 
       const gameData = {
         event: '',
@@ -121,8 +123,7 @@ ${colors.bright}Configuração:${colors.reset}
     return cleaned.split(/\s+/).filter(m => {
       if (!m) return false;
       if (m === '*') return false;
-      if (m.match(/^[01][-\/][01]$/)) return false; // Resultados tipo 1-0, 1/2-1/2
-      if (m.match(/^[01]-[01]$/)) return false; // Resultados tipo 1-0
+      if (m === '1-0' || m === '0-1' || m === '1/2-1/2') return false; // Resultados
       if (m.match(/^[{}]$/)) return false; // { ou } isolado
       if (m.match(/^\d+$/)) return false; // Apenas números
       if (m.length === 0) return false;

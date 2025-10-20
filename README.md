@@ -189,7 +189,7 @@ npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
 
 #### Geração Automática
 - ✅ Puzzles criados a partir de **blunders** (> 300cp)
-- ✅ Ignora primeiros 10 lances (teoria de abertura)
+- ✅ **Analisa TODOS os movimentos** (incluindo aberturas!)
 - ✅ Sistema de contexto visual (mostra posição anterior)
 
 #### 🆕 Evaluation Bar em Tempo Real
@@ -215,7 +215,7 @@ npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
 #### Três Modos de Treinamento
 - **🎯 Modo Normal**: Puzzles embaralhados sem repetição, progresso linear
 - **⚡ Modo Rush**: 20 puzzles aleatórios com repetição permitida (treino intensivo)
-- **♟️ Modo Opening**: Foco em erros de abertura (apenas movimentos 1-10)
+- **♟️ Modo Opening**: Foco em erros de abertura (movimentos 1-10, classificados automaticamente)
 
 #### Sistema de Tentativas e Feedback
 - ✅ Máximo **3 tentativas** com feedback progressivo
