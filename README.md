@@ -129,6 +129,7 @@ npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
 | `--threshold` | CP mínimo para puzzle | 100 |
 | `--threads` | Threads CPU | Todos |
 | `--output` | Arquivo de saída | puzzles-output.json |
+| `--verbose, -v` | 🆕 Modo debug detalhado | false |
 
 #### Features da CLI
 
@@ -139,6 +140,7 @@ npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
 - ✅ **Output JSON** compatível com interface web
 - ✅ **PGN temporário** salvo automaticamente para backup
 - ✅ **Estatísticas detalhadas** (posições/segundo, velocidade, tempo)
+- ✅ 🆕 **Modo verbose** com logs detalhados para debug
 
 #### 📚 Documentação CLI
 
@@ -146,6 +148,7 @@ npm run analyze:user hikaru -- --months 6 --depth 20 --threshold 150 --threads 8
 - **[📖 Guia Completo da CLI](scripts/README.md)** - Todas as opções e configurações (6000+ palavras)
 - **[🌐 Guia Chess.com](scripts/CHESS-COM-GUIDE.md)** - Download automático de partidas
 - **[⚡ Análise de Performance](PERFORMANCE_ANALYSIS.md)** - Comparação técnica WASM vs Native
+- **[🔍 Modo Verbose](VERBOSE_MODE.md)** - 🆕 Debug detalhado com logs completos
 
 ---
 
@@ -489,6 +492,28 @@ Performance:
   🚀 Velocidade: ~9.0 posições/segundo
   ⚡ Speedup: 16x mais rápido que WASM
 ```
+
+### 🔍 Modo Debug (Verbose)
+
+Para troubleshooting ou entender o processo de análise em detalhes:
+
+```bash
+# Ativar logs detalhados
+npm run analyze:user hikaru -- --verbose
+
+# Combinado com outras opções
+npm run analyze:user hikaru -- -v --depth 12 --months 1
+```
+
+**O que o modo verbose mostra:**
+- Movimentos parseados do PGN
+- Comandos UCI enviados ao Stockfish
+- Progresso de análise em cada posição (depth 1/18...18/18)
+- Evaluations antes/depois de cada movimento
+- CP loss calculado
+- Erros detalhados com FEN exato
+
+**📖 Veja [VERBOSE_MODE.md](VERBOSE_MODE.md) para guia completo de debug**
 
 ### Importar Resultados na Interface Web
 
@@ -891,7 +916,7 @@ R: Sim! Use Export para gerar JSON e compartilhe. Marketplace está planejado pa
 ### Problemas Comuns
 
 **P: "Stockfish não encontrado" na CLI**
-R: Instale Stockfish: `brew install stockfish` (macOS) ou veja [Instalação](#-instalação).
+R: Instale Stockfish: `brew install stockfish` (macOS) ou veja [Instalação](#-instalação). Use `--verbose` para ver todos os caminhos tentados.
 
 **P: "Rate limit excedido" do Chess.com**
 R: Aguarde 5-10 minutos. Não execute múltiplas instâncias simultaneamente.
@@ -902,9 +927,42 @@ R: Verifique se o localStorage está habilitado no navegador e não está cheio.
 **P: Build falha com erro de TypeScript**
 R: Execute `npm install` novamente e verifique Node.js versão 18+.
 
+**P: Análise trava ou fica lenta**
+R: Use `--verbose` para debug. Tente reduzir depth (`--depth 12`) ou aumentar threshold (`--threshold 200`).
+
 ---
 
 ## 📝 Changelog
+
+### [v2.1.1](https://github.com/frederico-kluser/opening-training/releases/tag/v2.1.1) - 2025-10-20 🔧
+
+#### 🐛 Correções Críticas
+
+- ✅ **Parser PGN corrigido** - Bug crítico que parava parsing em comentários `{[%clk ...]}`
+  - Antes: Apenas 1 movimento parseado
+  - Depois: Todos os movimentos (118+) parseados corretamente
+- ✅ **Filtro de resultados melhorado** - Agora remove corretamente `1/2-1/2`, `1-0`, `0-1`
+- ✅ **Múltiplos processos Stockfish resolvido** - Race condition que causava crashes
+- ✅ **Error handling robusto** - Try-catch em todas as análises com continue em erros
+- ✅ **Timeout aumentado** - 10s → 15s para posições complexas
+
+#### 🆕 Modo Verbose (Debug)
+
+- ✅ **Flag `--verbose` ou `-v`** - Logs detalhados para troubleshooting
+- ✅ **Parser debug** - Mostra movimentos parseados em tempo real
+- ✅ **UCI logs** - Comandos enviados ao Stockfish
+- ✅ **Progress tracking** - Depth 1/18...18/18 para cada análise
+- ✅ **Evaluations detalhadas** - CP antes/depois, CP loss calculado
+- ✅ **Error logs** - FEN exato em caso de erro
+- ✅ **Documentação completa** - [VERBOSE_MODE.md](VERBOSE_MODE.md)
+
+#### 📚 Documentação
+
+- ✅ **README atualizado** - Correção: sistema JÁ analisa desde movimento 1
+- ✅ **Modo Opening** esclarecido - Filtra puzzles por classificação, não ignora movimentos
+- ✅ **Guia Verbose** criado - Troubleshooting e resolução de problemas
+
+---
 
 ### [v2.1.0](https://github.com/frederico-kluser/opening-training/releases/tag/v2.1.0) - 2025-10-20 ⚡
 
@@ -1066,6 +1124,6 @@ Este projeto não seria possível sem:
 
 ---
 
-**Última atualização**: 20/10/2025 | **Versão**: 2.1.0 ⚡
+**Última atualização**: 20/10/2025 | **Versão**: 2.1.1 🔧
 
 </div>
