@@ -183,3 +183,93 @@ body {
 		padding-bottom: 2rem !important;
 	}
 }
+
+/* Video Background - Fullscreen & Responsive */
+.video-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	overflow: hidden;
+}
+
+.video-background video {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	min-width: 100%;
+	min-height: 100%;
+	width: auto;
+	height: auto;
+	transform: translate(-50%, -50%);
+	object-fit: cover;
+	/* Fallback para navegadores antigos */
+	-o-object-fit: cover;
+	-webkit-transform: translate(-50%, -50%);
+}
+
+/* Overlay escuro sobre o vídeo para melhorar legibilidade */
+.video-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	background: rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+}
+
+/* Ajuste para tema escuro - overlay mais transparente */
+[data-theme="dark"] .video-overlay {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+/* Garante que cards fiquem acima do vídeo */
+.home-content {
+	position: relative;
+	z-index: 1;
+}
+
+/* Melhora contraste dos cards sobre o vídeo */
+.home-content .card {
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .home-content .card {
+	background-color: rgba(45, 45, 45, 0.95) !important;
+}
+
+.home-content .bg-white {
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .home-content .bg-white {
+	background-color: rgba(45, 45, 45, 0.95) !important;
+}
+
+/* Mobile: garante que o vídeo cubra toda a tela mesmo em orientações diferentes */
+@media (max-width: 768px) {
+	.video-background video {
+		/* Em mobile, força 100% nas duas dimensões */
+		min-width: 100%;
+		min-height: 100%;
+		width: 100vw;
+		height: 100vh;
+	}
+}
+
+/* Landscape mobile: ajusta aspect ratio */
+@media (max-width: 768px) and (orientation: landscape) {
+	.video-background video {
+		width: 100vw;
+		height: auto;
+		min-height: 100vh;
+	}
+}

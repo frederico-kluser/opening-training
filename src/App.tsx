@@ -139,10 +139,26 @@ function App() {
 
 		return (
 			<>
+				{/* Video Background */}
+				<div className="video-background">
+					<video
+						autoPlay
+						loop
+						muted
+						playsInline
+						preload="auto"
+						poster="/bg-video-poster.jpg"
+					>
+						<source src="/bg-video-hd_1280_720_25fps.mp4" type="video/mp4" />
+						Seu navegador não suporta vídeos HTML5.
+					</video>
+				</div>
+				<div className="video-overlay"></div>
+
 				<div className="theme-toggle" onClick={toggleDarkMode}>
 					{darkMode ? '☀️' : '🌙'}
 				</div>
-				<div className="min-vh-100 d-flex flex-column">
+				<div className="min-vh-100 d-flex flex-column home-content">
 					{/* Clean Header */}
 					<div className="bg-white shadow-sm">
 					<div className="container py-4">
