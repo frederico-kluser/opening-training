@@ -145,17 +145,23 @@ const PuzzleTrainer: React.FC = () => {
         const contextGame = new Chess(puzzle.fenContext);
         setGame(contextGame);
 
+        // Avaliar posição de contexto (antes do movimento do oponente)
+        evaluatePosition(puzzle.fenContext, false);
+
         // Após 1 segundo, avança para a posição do puzzle
         setTimeout(() => {
           const newGame = new Chess(puzzle.fenBefore);
           setGame(newGame);
           setShowingContext(false);
+          // Avaliar posição após movimento do oponente
+          evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
         }, 1000);
       } else {
         // Se não tem contexto, carrega direto
         const newGame = new Chess(puzzle.fenBefore);
         setGame(newGame);
         setShowingContext(false);
+        evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
       }
 
       setSession(prev => ({ ...prev, currentPuzzle: puzzle, attemptCount: 0 }));
@@ -166,15 +172,6 @@ const PuzzleTrainer: React.FC = () => {
       setLastWrongMove('');
       setWrongMovesHistory([]);
       setShowNextButton(false);
-
-      // Avaliar posição inicial após o contexto ser mostrado
-      if (puzzle.fenContext) {
-        setTimeout(() => {
-          evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
-        }, 1100); // Após 1 segundo do contexto + pequeno delay
-      } else {
-        evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
-      }
     }
   }, [puzzles, session.puzzleIndex, evaluatePosition]);
 
@@ -268,22 +265,23 @@ const PuzzleTrainer: React.FC = () => {
       puzzleService.recordAttempt(session.currentPuzzle.id, false);
     }
 
+    // Restaurar avaliação inicial após um breve delay para mostrar a mudança
+    setTimeout(() => {
+      setCurrentEvaluation(initialEvaluation);
+    }, 800);
+
     // Se já errou 3 vezes, mostra a solução após 1 segundo
     if (newAttemptCount >= 3) {
       setTimeout(() => {
         setShowSolution(true);
         setShowNextButton(true);
         setBackgroundStyle({});
-        // Restaurar avaliação inicial
-        setCurrentEvaluation(initialEvaluation);
       }, 1000);
     } else {
       // Limpar feedback após 2 segundos para tentar novamente
       setTimeout(() => {
         setShowFeedback(null);
         setBackgroundStyle({});
-        // Restaurar avaliação inicial (posição antes do erro)
-        setCurrentEvaluation(initialEvaluation);
       }, 2000);
     }
   };
