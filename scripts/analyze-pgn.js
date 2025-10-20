@@ -108,14 +108,13 @@ ${colors.bright}Configuração:${colors.reset}
   parseMoves(movesString) {
     // Remove números de movimento, comentários e variações
     let cleaned = movesString
-      .replace(/\{[^}]*\}/g, '')        // Remove comentários {[%clk ...]}
-      .replace(/\{[^}]*/g, '')          // Remove comentários incompletos {... (sem fechar)
-      .replace(/\([^)]*\)/g, '')        // Remove variações ()
-      .replace(/\d+\.\.\./g, '')        // Remove números tipo "1..."
-      .replace(/\d+\./g, '')            // Remove números tipo "1."
+      .replace(/\{[^}]*\}/g, ' ')       // Remove comentários {[%clk ...]} e substitui por espaço
+      .replace(/\([^)]*\)/g, ' ')       // Remove variações () e substitui por espaço
+      .replace(/\d+\.\.\./g, ' ')       // Remove números tipo "1..." e substitui por espaço
+      .replace(/\d+\./g, ' ')           // Remove números tipo "1." e substitui por espaço
       .replace(/[!?]+/g, '')            // Remove anotações !?
       .replace(/\$/g, '')               // Remove símbolos $
-      .replace(/[{}]/g, '')             // Remove qualquer { ou } isolado
+      .replace(/[{}]/g, '')             // Remove qualquer { ou } isolado remanescente
       .trim();
 
     // Split por espaços e filtra vazios, resultados e movimentos inválidos
@@ -125,6 +124,7 @@ ${colors.bright}Configuração:${colors.reset}
       if (m.match(/^[01][-\/][01]$/)) return false; // Resultados tipo 1-0, 1/2-1/2
       if (m.match(/^[01]-[01]$/)) return false; // Resultados tipo 1-0
       if (m.match(/^[{}]$/)) return false; // { ou } isolado
+      if (m.match(/^\d+$/)) return false; // Apenas números
       if (m.length === 0) return false;
       return true;
     });
