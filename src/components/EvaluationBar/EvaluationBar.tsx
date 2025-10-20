@@ -32,6 +32,14 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
   const showInWhiteSection = whitePercentage > 50;
   const showInBlackSection = blackPercentage > 50;
 
+  console.log('📊 BARRA RENDERIZADA:', {
+    evaluation,
+    evalText,
+    whitePercentage: whitePercentage.toFixed(1) + '%',
+    blackPercentage: blackPercentage.toFixed(1) + '%',
+    visualRepresentation: '⬛'.repeat(Math.round(blackPercentage / 10)) + '⬜'.repeat(Math.round(whitePercentage / 10))
+  });
+
   return (
     <div
       className={`evaluation-bar-container ${loading ? 'loading' : ''}`}

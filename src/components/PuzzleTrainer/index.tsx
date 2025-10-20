@@ -88,9 +88,18 @@ const PuzzleTrainer: React.FC = () => {
     try {
       const result = await analyze(fen, 12); // depth 12 para rapidez
       if (result) {
+        console.log('📊 AVALIAÇÃO:', {
+          fen: fen.substring(0, 30) + '...',
+          evaluation: result.evaluation,
+          evaluationInPawns: (result.evaluation / 100).toFixed(2),
+          saveAsInitial,
+          playerColor: session.currentPuzzle?.color || 'unknown',
+          interpretation: result.evaluation > 0 ? '⬜ Brancas melhor' : result.evaluation < 0 ? '⬛ Pretas melhor' : '= Igual'
+        });
         setCurrentEvaluation(result.evaluation);
         if (saveAsInitial) {
           setInitialEvaluation(result.evaluation);
+          console.log('💾 Avaliação inicial salva:', result.evaluation);
         }
       }
     } catch (error) {
@@ -98,7 +107,7 @@ const PuzzleTrainer: React.FC = () => {
     } finally {
       setIsEvaluating(false);
     }
-  }, [analyze, isReady]);
+  }, [analyze, isReady, session.currentPuzzle?.color]);
 
   const loadPuzzles = () => {
     // Se não há modo selecionado, não carrega ainda
@@ -196,11 +205,22 @@ const PuzzleTrainer: React.FC = () => {
       const isCorrect = uciMove === session.currentPuzzle.solution ||
                        move.san === session.currentPuzzle.solution;
 
+      console.log('🎯 MOVIMENTO:', {
+        move: move.san,
+        uci: uciMove,
+        isCorrect,
+        expectedSolution: session.currentPuzzle.solution,
+        playerColor: session.currentPuzzle.color,
+        fenAfterMove: game.fen().substring(0, 30) + '...'
+      });
+
       if (isCorrect) {
+        console.log('✅ MOVIMENTO CORRETO! Avaliando nova posição...');
         // Avaliar posição após movimento correto
         evaluatePosition(game.fen());
         handleCorrectMove();
       } else {
+        console.log('❌ MOVIMENTO INCORRETO! Avaliando posição errada...');
         // Avaliar posição após movimento errado (antes de desfazer)
         evaluatePosition(game.fen());
         // Salvar movimento errado antes de desfazer
