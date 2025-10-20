@@ -154,23 +154,46 @@ const PuzzleTrainer: React.FC = () => {
         const contextGame = new Chess(puzzle.fenContext);
         setGame(contextGame);
 
-        // Avaliar posição de contexto (antes do movimento do oponente)
-        evaluatePosition(puzzle.fenContext, false);
+        // ✅ v2.0.0: Usar avaliação salva se disponível, senão reavaliar
+        if (puzzle.evalContext !== undefined) {
+          console.log('✅ Usando evalContext salvo:', puzzle.evalContext);
+          setCurrentEvaluation(puzzle.evalContext);
+        } else {
+          console.log('⚠️ evalContext não disponível, reavaliando...');
+          evaluatePosition(puzzle.fenContext, false);
+        }
 
         // Após 1 segundo, avança para a posição do puzzle
         setTimeout(() => {
           const newGame = new Chess(puzzle.fenBefore);
           setGame(newGame);
           setShowingContext(false);
-          // Avaliar posição após movimento do oponente
-          evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
+
+          // ✅ v2.0.0: Usar avaliação salva se disponível, senão reavaliar
+          if (puzzle.evalBefore !== undefined) {
+            console.log('✅ Usando evalBefore salvo:', puzzle.evalBefore);
+            setCurrentEvaluation(puzzle.evalBefore);
+            setInitialEvaluation(puzzle.evalBefore);
+          } else {
+            console.log('⚠️ evalBefore não disponível, reavaliando...');
+            evaluatePosition(puzzle.fenBefore, true);
+          }
         }, 1000);
       } else {
         // Se não tem contexto, carrega direto
         const newGame = new Chess(puzzle.fenBefore);
         setGame(newGame);
         setShowingContext(false);
-        evaluatePosition(puzzle.fenBefore, true); // true = salvar como avaliação inicial
+
+        // ✅ v2.0.0: Usar avaliação salva se disponível, senão reavaliar
+        if (puzzle.evalBefore !== undefined) {
+          console.log('✅ Usando evalBefore salvo:', puzzle.evalBefore);
+          setCurrentEvaluation(puzzle.evalBefore);
+          setInitialEvaluation(puzzle.evalBefore);
+        } else {
+          console.log('⚠️ evalBefore não disponível, reavaliando...');
+          evaluatePosition(puzzle.fenBefore, true);
+        }
       }
 
       setSession(prev => ({ ...prev, currentPuzzle: puzzle, attemptCount: 0 }));

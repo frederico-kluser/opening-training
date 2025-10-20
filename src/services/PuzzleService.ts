@@ -190,6 +190,67 @@ class PuzzleService {
       throw new Error('Invalid puzzle data format');
     }
   }
+
+  // ========== MÉTODOS DE MIGRAÇÃO (v2.0.0) ==========
+
+  /**
+   * Verifica quantos puzzles precisam ser migrados para v2.0.0
+   * @returns Número de puzzles sem dados expandidos
+   */
+  countLegacyPuzzles(): number {
+    const puzzles = this.getPuzzles();
+    return puzzles.filter(p => p.evalBefore === undefined).length;
+  }
+
+  /**
+   * Verifica se há puzzles antigos (v1.x) que precisam ser migrados
+   */
+  hasLegacyPuzzles(): boolean {
+    return this.countLegacyPuzzles() > 0;
+  }
+
+  /**
+   * Retorna estatísticas de migração
+   */
+  getMigrationStats() {
+    const puzzles = this.getPuzzles();
+    const legacy = puzzles.filter(p => p.evalBefore === undefined).length;
+    const migrated = puzzles.filter(p => p.evalBefore !== undefined).length;
+
+    return {
+      total: puzzles.length,
+      legacy,
+      migrated,
+      percentage: puzzles.length > 0 ? (migrated / puzzles.length) * 100 : 0
+    };
+  }
+
+  /**
+   * Marca um puzzle como necessitando migração
+   * (Usado para implementação futura de migração lazy/background)
+   */
+  markPuzzleForMigration(puzzleId: string): void {
+    const puzzles = this.getPuzzles();
+    const puzzle = puzzles.find(p => p.id === puzzleId);
+
+    if (puzzle && !puzzle.evalBefore) {
+      // Adiciona flag temporária para migração futura
+      (puzzle as any)._needsMigration = true;
+      this.savePuzzles(puzzles);
+    }
+  }
+
+  /**
+   * Remove puzzles legados (v1.x) - CUIDADO: operação destrutiva!
+   */
+  removeLegacyPuzzles(): number {
+    const puzzles = this.getPuzzles();
+    const migrated = puzzles.filter(p => p.evalBefore !== undefined);
+    const removed = puzzles.length - migrated.length;
+
+    this.savePuzzles(migrated);
+    return removed;
+  }
 }
 
 // Singleton instance

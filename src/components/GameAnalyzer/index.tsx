@@ -19,14 +19,30 @@ interface MoveAnalysis {
 }
 
 interface BlunderPuzzle {
+  // Dados básicos
   id: string;
-  fenBefore: string; // Posição antes do blunder
-  fenContext?: string; // Posição um movimento antes (para contexto)
-  blunderMove: string; // O movimento ruim
-  solution: string; // O melhor movimento
-  evaluation: number; // Vantagem perdida
+  fenBefore: string;
+  fenContext?: string;
+  blunderMove: string;
+  solution: string;
+  evaluation: number;
   moveNumber: number;
   color: 'white' | 'black';
+
+  // Dados expandidos (v2.0.0)
+  evalContext?: number;
+  evalBefore?: number;
+  evalAfter?: number;
+  evalBestMove?: number;
+  cpLoss?: number;
+  cpLossCategory?: 'small' | 'medium' | 'large' | 'critical';
+  hadMateAvailable?: boolean;
+  mateInMoves?: number | null;
+  blunderLeadsToMate?: boolean;
+  opponentMateInMoves?: number | null;
+  wasForcedMove?: boolean;
+  hadCheckInPosition?: boolean;
+  errorType?: 'tactical' | 'positional' | 'endgame' | 'opening' | 'missed_mate';
 }
 
 interface GameSelection {
@@ -273,8 +289,27 @@ const GameAnalyzer: React.FC = () => {
         // Pular primeiros 10 lances (teoria de abertura)
         if (i < 10) continue;
 
+        // ===== AVALIAR POSIÇÕES =====
         const evalBefore = await stockfish.analyze(positions[i], 18);
         const evalAfter = await stockfish.analyze(positions[i + 1], 18);
+
+        // Avaliar contexto se disponível
+        let evalContext = null;
+        if (i > 0) {
+          evalContext = await stockfish.analyze(positions[i - 1], 18);
+        }
+
+        // Simular melhor movimento para avaliar
+        let evalBestMove = null;
+        if (evalBefore.bestMove) {
+          try {
+            const tempGame = new Chess(positions[i]);
+            tempGame.move(evalBefore.bestMove);
+            evalBestMove = await stockfish.analyze(tempGame.fen(), 18);
+          } catch (e) {
+            // Se falhar ao simular, deixa null
+          }
+        }
 
         const isWhiteTurn = i % 2 === 0;
         const cpLoss = Math.abs(
@@ -286,15 +321,76 @@ const GameAnalyzer: React.FC = () => {
         const moveColor = isWhiteTurn ? 'white' : 'black';
 
         if (classification === 'blunder' && cpLoss > 300 && moveColor === playerColor) {
+          // ===== DETECTAR MATES =====
+          const hadMateAvailable = Math.abs(evalBefore.evaluation) >= 100000;
+          const blunderLeadsToMate = Math.abs(evalAfter.evaluation) >= 100000;
+
+          let mateInMoves = null;
+          if (hadMateAvailable) {
+            mateInMoves = evalBefore.evaluation > 0
+              ? 100000 - evalBefore.evaluation
+              : -100000 - evalBefore.evaluation;
+          }
+
+          let opponentMateInMoves = null;
+          if (blunderLeadsToMate) {
+            opponentMateInMoves = evalAfter.evaluation > 0
+              ? 100000 - evalAfter.evaluation
+              : -100000 - evalAfter.evaluation;
+          }
+
+          // ===== CLASSIFICAR CATEGORIA DE PERDA =====
+          let cpLossCategory: 'small' | 'medium' | 'large' | 'critical';
+          if (cpLoss < 500) cpLossCategory = 'small';
+          else if (cpLoss < 1000) cpLossCategory = 'medium';
+          else if (cpLoss < 2000) cpLossCategory = 'large';
+          else cpLossCategory = 'critical';
+
+          // ===== DETERMINAR TIPO DE ERRO =====
+          let errorType: 'tactical' | 'positional' | 'endgame' | 'opening' | 'missed_mate';
+          if (hadMateAvailable) {
+            errorType = 'missed_mate';
+          } else if (i < 20) {
+            errorType = 'opening';
+          } else if (moves.length - i < 15) {
+            errorType = 'endgame';
+          } else if (cpLoss > 1000) {
+            errorType = 'tactical';
+          } else {
+            errorType = 'positional';
+          }
+
+          // ===== CONTEXTO TÁTICO =====
+          const tempGameCheck = new Chess(positions[i]);
+          const hadCheckInPosition = tempGameCheck.inCheck();
+          const wasForcedMove = hadCheckInPosition; // Simplificação: xeque é movimento forçado
+
+          // ===== SALVAR PUZZLE EXPANDIDO =====
           foundBlunders.push({
+            // Dados básicos (compatibilidade)
             id: `blunder-${Date.now()}-${i}`,
             fenBefore: positions[i],
-            fenContext: i > 0 ? positions[i - 1] : undefined, // Adiciona contexto se disponível
+            fenContext: i > 0 ? positions[i - 1] : undefined,
             blunderMove: moves[i].san,
             solution: evalBefore.bestMove,
             evaluation: cpLoss,
             moveNumber: Math.floor(i / 2) + 1,
-            color: isWhiteTurn ? 'white' : 'black'
+            color: isWhiteTurn ? 'white' : 'black',
+
+            // Novos dados (v2.0.0)
+            evalContext: evalContext?.evaluation,
+            evalBefore: evalBefore.evaluation,
+            evalAfter: evalAfter.evaluation,
+            evalBestMove: evalBestMove?.evaluation,
+            cpLoss: cpLoss,
+            cpLossCategory,
+            hadMateAvailable,
+            mateInMoves,
+            blunderLeadsToMate,
+            opponentMateInMoves,
+            wasForcedMove,
+            hadCheckInPosition,
+            errorType
           });
         }
       }
