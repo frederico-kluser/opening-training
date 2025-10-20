@@ -108,14 +108,26 @@ ${colors.bright}Configuração:${colors.reset}
   parseMoves(movesString) {
     // Remove números de movimento, comentários e variações
     let cleaned = movesString
-      .replace(/\{[^}]*\}/g, '') // Remove comentários {}
-      .replace(/\([^)]*\)/g, '') // Remove variações ()
-      .replace(/\d+\./g, '')      // Remove números de movimento
-      .replace(/[!?]+/g, '')      // Remove anotações !?
+      .replace(/\{[^}]*\}/g, '')        // Remove comentários {[%clk ...]}
+      .replace(/\{[^}]*/g, '')          // Remove comentários incompletos {... (sem fechar)
+      .replace(/\([^)]*\)/g, '')        // Remove variações ()
+      .replace(/\d+\.\.\./g, '')        // Remove números tipo "1..."
+      .replace(/\d+\./g, '')            // Remove números tipo "1."
+      .replace(/[!?]+/g, '')            // Remove anotações !?
+      .replace(/\$/g, '')               // Remove símbolos $
+      .replace(/[{}]/g, '')             // Remove qualquer { ou } isolado
       .trim();
 
-    // Split por espaços e filtra vazios
-    return cleaned.split(/\s+/).filter(m => m && m !== '*' && !m.match(/^[01][-\/][01]$/));
+    // Split por espaços e filtra vazios, resultados e movimentos inválidos
+    return cleaned.split(/\s+/).filter(m => {
+      if (!m) return false;
+      if (m === '*') return false;
+      if (m.match(/^[01][-\/][01]$/)) return false; // Resultados tipo 1-0, 1/2-1/2
+      if (m.match(/^[01]-[01]$/)) return false; // Resultados tipo 1-0
+      if (m.match(/^[{}]$/)) return false; // { ou } isolado
+      if (m.length === 0) return false;
+      return true;
+    });
   }
 
   /**
@@ -145,9 +157,13 @@ ${colors.blue}━━━━━━━━━━━━━━━━━━━━━━
         if (move) {
           positions.push(game.fen());
           moveHistory.push(move);
+        } else {
+          console.error(`${colors.red}❌ Movimento inválido ${i + 1}: "${moves[i]}"${colors.reset}`);
+          break;
         }
       } catch (err) {
-        console.error(`${colors.red}❌ Erro ao processar movimento ${i + 1}: ${moves[i]}${colors.reset}`);
+        console.error(`${colors.red}❌ Erro ao processar movimento ${i + 1}: "${moves[i]}"${colors.reset}`);
+        console.error(`${colors.red}   Tipo: ${typeof moves[i]}, Erro: ${err.message}${colors.reset}`);
         break;
       }
     }
