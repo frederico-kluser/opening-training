@@ -502,18 +502,27 @@ const PuzzleTrainer: React.FC = () => {
       <Gap size={16}>
         <Card>
           <Card.Body>
-            <div className="d-flex justify-content-between align-items-start mb-3">
-              <h5>
-                {gameMode === 'rush' && '⚡ Modo Rush'}
-                {gameMode === 'normal' && '🎯 Modo Normal'}
-                {gameMode === 'opening' && '♟️ Modo Opening'}
-              </h5>
-              {gameMode === 'rush' && (
-                <small className="text-muted">Puzzles aleatórios com repetição</small>
-              )}
-              {gameMode === 'opening' && (
-                <small className="text-muted">Erros de abertura (movimentos 1-10)</small>
-              )}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 className="mb-1">
+                  {gameMode === 'rush' && '⚡ Modo Rush'}
+                  {gameMode === 'normal' && '🎯 Modo Normal'}
+                  {gameMode === 'opening' && '♟️ Modo Opening'}
+                </h5>
+                {gameMode === 'rush' && (
+                  <small className="text-muted">Puzzles aleatórios com repetição</small>
+                )}
+                {gameMode === 'opening' && (
+                  <small className="text-muted">Erros de abertura (movimentos 1-10)</small>
+                )}
+              </div>
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() => window.location.reload()}
+              >
+                ← Voltar
+              </Button>
             </div>
 
             <SessionStats

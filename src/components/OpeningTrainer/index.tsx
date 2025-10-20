@@ -292,6 +292,17 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       <Gap size={16}>
         <Card>
           <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">📚 Treinar Aberturas: {variant}</h5>
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={onExit}
+              >
+                ← Voltar
+              </Button>
+            </div>
+
             <SessionStats
               puzzleIndex={session.positionIndex}
               totalPuzzles={session.totalPositions}
@@ -309,10 +320,6 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
         <Card>
           <Card.Body>
-            <h5 className="text-center mb-3">
-              Treinando: {variant}
-            </h5>
-
             <ChessBoardWrapper
               position={game.fen()}
               onPieceDrop={onDrop}

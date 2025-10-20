@@ -1,8 +1,13 @@
 # Chess Training System - Sistema Completo de Treinamento de Xadrez
 
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.6.2-blue.svg)](https://www.typescriptlang.org/)
+
 ## 🎯 Visão Geral do Projeto
 
-Sistema avançado de treinamento de xadrez com três módulos principais: **análise de partidas com IA**, **treinamento tático com puzzles personalizados** e **repertório de aberturas**.
+Sistema avançado de treinamento de xadrez com três módulos principais: **análise de partidas com IA**, **treinamento tático com puzzles personalizados** e **repertório de aberturas**. Agora com **Evaluation Bar em tempo real** e **validação inteligente de movimentos**.
 
 ### Funcionalidades Principais:
 
@@ -20,11 +25,17 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 
 **2. Sistema de Puzzles Táticos** 🎮
 - Geração automática de puzzles a partir de blunders (>300cp)
+- **🆕 Evaluation Bar em tempo real:** Veja a avaliação da posição mudando conforme você joga
+- **🆕 Validação inteligente:** Aceita qualquer movimento que melhore a posição (não apenas um específico)
 - **Três modos de treinamento:**
   - **Modo Normal:** Puzzles sem repetição, progresso linear
   - **Modo Rush:** 20 puzzles aleatórios com repetição permitida (treino intensivo)
   - **Modo Opening:** Foco em erros de abertura (apenas movimentos 1-10)
 - **Sistema de contexto visual:** Mostra posição anterior por 1 segundo antes do puzzle
+- **Avaliação progressiva:**
+  - Mostra avaliação antes do movimento do oponente
+  - Atualiza após seu movimento
+  - Mostra transição ao desfazer movimento errado
 - Feedback visual instantâneo com cores (verde #90EE90 / rosa #FFB6C1)
 - Sistema de streaks e estatísticas globais persistentes
 - **Máximo de 3 tentativas** com feedback progressivo
@@ -41,6 +52,14 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 
 **4. Interface e UX** 🎨
 - **Tema escuro/claro** com toggle persistente (🌙/☀️)
+- **🆕 Versão exibida automaticamente** no header (v1.0.0)
+- **🆕 Interface home redesenhada:**
+  - 3 cards principais focados (Analisar, Puzzles, Aberturas)
+  - GitHub movido para footer com informação de licença
+  - Layout mais limpo e objetivo
+- **🆕 Navegação melhorada:**
+  - Botões "← Voltar" visíveis em todos os treinamentos
+  - Posicionados no topo direito para fácil acesso
 - Design responsivo otimizado para mobile e tablets
 - Transições suaves entre temas
 - Persistência da preferência de tema no localStorage
@@ -63,12 +82,22 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 
 #### **Sistema de Puzzles**
 - ✅ Geração automática de puzzles de blunders (>300cp, ignora primeiros 10 lances)
+- ✅ **🆕 Evaluation Bar em tempo real:** Integração com Stockfish para mostrar avaliação
+- ✅ **🆕 Validação baseada em avaliação:** Aceita qualquer movimento que melhore a posição
+  - Para brancas: movimento correto se avaliação aumenta (mais positivo)
+  - Para pretas: movimento correto se avaliação diminui (mais negativo)
+- ✅ **🆕 Sistema de avaliação progressiva:**
+  - Avalia posição de contexto (antes do movimento do oponente)
+  - Avalia posição inicial (após movimento do oponente)
+  - Avalia após movimento do jogador
+  - Mostra transição ao desfazer movimento errado (800ms delay)
 - ✅ **Modo Normal:** puzzles embaralhados sem repetição
 - ✅ **Modo Rush:** 20 puzzles aleatórios com repetição (Fisher-Yates shuffle)
 - ✅ **Modo Opening:** apenas erros de abertura (movimentos 1-10)
 - ✅ Sistema de 3 tentativas com feedback progressivo
 - ✅ **Contexto visual:** posição anterior mostrada por 1 segundo
 - ✅ Feedback colorido com transição suave (0.5s)
+- ✅ **🆕 Sistema de logs de debug:** Console logs detalhados para debugging
 - ✅ Estatísticas globais persistentes no localStorage
 - ✅ Timer em tempo real e contador de streak (máximo da sessão)
 - ✅ Orientação automática do tabuleiro baseada na cor
@@ -92,6 +121,16 @@ Sistema avançado de treinamento de xadrez com três módulos principais: **aná
 
 #### **Interface e Temas**
 - ✅ **Sistema de tema escuro/claro** com toggle 🌙/☀️
+- ✅ **🆕 Versão automática no header:** Importa versão do package.json dinamicamente
+- ✅ **🆕 Interface home simplificada:**
+  - Removidos botões: Chess.com e Stockfish Test (menos poluição visual)
+  - 3 cards principais: Analisar Partidas, Treinar Puzzles, Treinar Aberturas
+  - Estatísticas em card azul centralizado
+  - GitHub no footer com versão e licença MIT
+- ✅ **🆕 Navegação aprimorada:**
+  - Botões "← Voltar" em todos os treinamentos
+  - Posicionados no topo direito (header dos cards)
+  - Sempre visíveis durante o treino
 - ✅ Persistência da preferência de tema (localStorage: `darkMode`)
 - ✅ Variáveis CSS customizáveis por tema
 - ✅ Design responsivo para mobile e tablets
@@ -228,6 +267,23 @@ Acesse http://localhost:5173
   - Apenas blunders >300cp viram puzzles
   - Ignora primeiros 10 lances (teoria)
   - Inclui contexto da posição anterior
+- **🆕 Evaluation Bar em Tempo Real**:
+  - Barra visual mostrando vantagem de brancas/pretas
+  - Atualização em tempo real com Stockfish (depth 12)
+  - Sequência de avaliações:
+    1. Avalia `fenContext` (posição antes do oponente)
+    2. Avalia `fenBefore` (posição inicial do puzzle)
+    3. Avalia após movimento do jogador
+    4. Restaura avaliação inicial após erro (800ms delay)
+  - Fórmula de conversão: Lichess (centipawns → win percentage)
+  - Animações suaves (0.6s cubic-bezier)
+- **🆕 Validação Inteligente de Movimentos**:
+  - Não compara com movimento específico pré-definido
+  - Valida baseado em **melhoria da posição**:
+    - **Brancas:** Correto se `newEval > oldEval` (mais positivo)
+    - **Pretas:** Correto se `newEval < oldEval` (mais negativo)
+  - Aceita múltiplas soluções corretas
+  - Mais educativo: ensina a melhorar a posição, não decorar
 - **Três Modos Distintos**:
   - **Normal**: Sem repetição, todos os puzzles uma vez
   - **Rush**: 20 puzzles com Fisher-Yates shuffle e repetição
@@ -241,6 +297,10 @@ Acesse http://localhost:5173
 - **Feedback Colorido**:
   - Verde (#90EE90) com transição 0.5s para acerto
   - Rosa (#FFB6C1) com transição 0.5s para erro
+- **🆕 Sistema de Debug**:
+  - Logs detalhados no console do navegador
+  - Mostra avaliações, conversões e comparações
+  - Formato: 📊 AVALIAÇÃO, 🎯 MOVIMENTO, 🧮 Conversão
 - **Estatísticas Completas**:
   - Taxa de acerto, streak máximo
   - Timer em tempo real
@@ -273,6 +333,10 @@ src/
 │   ├── ChessBoard/      # Wrapper do tabuleiro
 │   ├── ChessComImporter/# Importação Chess.com
 │   ├── ChessGame/       # Tabuleiro interativo
+│   ├── EvaluationBar/   # 🆕 Barra de avaliação em tempo real
+│   │   ├── EvaluationBar.tsx      # Componente visual da barra
+│   │   ├── evaluationUtils.ts     # Conversões e formatação
+│   │   └── EvaluationBar.css      # Estilos Chess.com-like
 │   ├── GameAnalyzer/    # Análise de partidas
 │   ├── OpeningTrainer/  # Treino de aberturas
 │   ├── PuzzleSession/   # Componentes de sessão
@@ -354,6 +418,37 @@ interface ExportedAnalysis {
   parsedGames: ParsedGame[];      // Partidas parseadas
 }
 ```
+
+### 🆕 EvaluationBar - Componente de Avaliação
+```typescript
+// EvaluationBar.tsx
+interface EvaluationBarProps {
+  evaluation: number;      // Centipawns (+ brancas, - pretas)
+  showNumeric?: boolean;   // Mostrar valor numérico (default: true)
+  height?: number;         // Altura em pixels (default: 400)
+  animated?: boolean;      // Animações suaves (default: true)
+  loading?: boolean;       // Estado de carregamento
+}
+
+// evaluationUtils.ts
+centipawnsToWinPercentage(cp: number): number
+// Fórmula do Lichess: Win% = 50 + 50 * (2 / (1 + exp(-0.00368208 * cp)) - 1)
+// Retorna: 0-100 (porcentagem de vitória para brancas)
+
+formatEvaluation(cp: number): string
+// Formata: +2.5, -1.3, M#3
+// Converte centipawns para pawns (divide por 100)
+
+getEvaluationColor(cp: number): 'white' | 'black' | 'equal'
+// Determina cor da avaliação (>50cp brancas, <-50cp pretas)
+```
+
+**Layout da Barra:**
+- Parte branca (embaixo): altura proporcional à vantagem
+- Parte preta (em cima): 100% - vantagem branca
+- Linha central cinza: posição igual (0.0)
+- Indicador de mate: badge fixo no topo/base
+- Animação: `transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)`
 
 ## 🔧 Configuração Avançada
 
@@ -660,6 +755,17 @@ Contribuições são bem-vindas! Por favor:
 
 MIT License - veja [LICENSE](LICENSE) para detalhes
 
+**Você pode:**
+- ✅ Copiar e modificar o código
+- ✅ Usar comercialmente
+- ✅ Distribuir
+
+**Você deve:**
+- 📝 Dar créditos ao autor original
+- 📝 Incluir a licença MIT em cópias
+
+Copyright © 2025 Frederico Kluser
+
 ## 👥 Autor
 
 **Frederico Kluser**
@@ -675,34 +781,72 @@ MIT License - veja [LICENSE](LICENSE) para detalhes
 
 ---
 
-**Última atualização**: 18/10/2025 | **Versão**: 3.2.0
+**Última atualização**: 20/10/2025 | **Versão**: 1.0.0 🎉
 
-### 📝 Changelog v3.2.0
-- ✅ **Modo Opening adicionado** - Treino focado em erros de abertura (movimentos 1-10)
+## 📝 Changelog
+
+### v1.0.0 - Release Oficial (20/10/2025) 🎉
+
+**🆕 Evaluation Bar em Tempo Real**
+- ✅ Barra visual mostrando vantagem de brancas/pretas
+- ✅ Integração com Stockfish (depth 12) para avaliação em tempo real
+- ✅ Sequência progressiva de avaliações:
+  - Avalia posição de contexto (antes do oponente)
+  - Avalia posição inicial (após oponente)
+  - Avalia após movimento do jogador
+  - Mostra transição ao desfazer erro (800ms)
+- ✅ Fórmula de conversão Lichess (centipawns → win percentage)
+- ✅ Componente `EvaluationBar` com props configuráveis
+- ✅ Utilities: `centipawnsToWinPercentage()`, `formatEvaluation()`
+
+**🆕 Validação Inteligente de Movimentos**
+- ✅ Não compara com movimento específico pré-definido
+- ✅ Valida baseado em **melhoria da posição**:
+  - Brancas: correto se avaliação aumenta (mais positivo)
+  - Pretas: correto se avaliação diminui (mais negativo)
+- ✅ Aceita múltiplas soluções corretas
+- ✅ Mais educativo: ensina a melhorar, não decorar
+- ✅ Logs de debug detalhados no console
+
+**🎨 Interface e UX**
+- ✅ **Versão automática no header:** Importa de `package.json`
+- ✅ **Home redesenhada:**
+  - Removidos: Chess.com e Stockfish Test
+  - 3 cards principais: Analisar, Puzzles, Aberturas
+  - GitHub movido para footer com licença
+- ✅ **Navegação melhorada:**
+  - Botões "← Voltar" em todos os treinamentos
+  - Posicionados no topo direito (sempre visíveis)
+- ✅ "Repertório" renomeado para "Treinar Aberturas"
+
+**📄 Licença e Documentação**
+- ✅ **Licença MIT adicionada:** Arquivo LICENSE criado
+- ✅ Copyright © 2025 Frederico Kluser
+- ✅ Permissões claras: pode copiar, modificar, usar comercialmente
+- ✅ Requer: dar créditos ao autor original
+- ✅ README completamente atualizado com novas features
+- ✅ Badges adicionados (versão, licença, React, TypeScript)
+
+**🔧 Melhorias Técnicas**
+- ✅ TypeScript: declaração de módulos JSON em `vite-env.d.ts`
+- ✅ Importação automática da versão do package.json
+- ✅ Build otimizado: 2.54s (382KB JS, 237KB CSS)
+- ✅ Todos os testes passando sem erros
+
+---
+
+### v3.2.0 (18/10/2025)
+- ✅ Modo Opening - Treino focado em erros de abertura (movimentos 1-10)
 - ✅ Novo método `getOpeningPuzzles()` no PuzzleService
 - ✅ Filtro inteligente por moveNumber <= 10
-- ✅ Interface atualizada com botão verde e ícone ♟️
-- ✅ Fisher-Yates shuffle para variedade no treinamento
-- ✅ Documentação completa do novo modo
 
-### 📝 Changelog v3.1.0
-- ✅ **Sistema de tema escuro/claro** com toggle persistente (🌙/☀️)
-- ✅ **Importação direta via FEN** do Chess.com com barra de progresso
-- ✅ Novos endpoints Chess.com: `getExtendedArchiveGames()` e `getGameDetails()`
-- ✅ Proxy Vite configurado para contornar CORS do Chess.com
-- ✅ Design responsivo melhorado para mobile e tablets
-- ✅ Media queries otimizadas (@media breakpoints)
-- ✅ Variáveis CSS customizáveis por tema
-- ✅ Transições suaves entre temas (0.3s ease)
-- ✅ Documentação de exemplos de API em `docs/` (game.jsonc, games.jsonc)
+### v3.1.0
+- ✅ Sistema de tema escuro/claro com toggle persistente
+- ✅ Importação direta via FEN do Chess.com
+- ✅ Design responsivo melhorado
 
-### 📝 Changelog v3.0.0
-- ✅ Adicionado sistema completo de importação/exportação de análises
-- ✅ Auto-salvamento de puzzles ao importar análises
-- ✅ Sistema de contexto visual para puzzles (fenContext)
+### v3.0.0
+- ✅ Sistema de importação/exportação de análises
+- ✅ Sistema de contexto visual para puzzles
 - ✅ Modo Rush com 20 puzzles aleatórios
-- ✅ Detecção inteligente de jogador sem threshold mínimo
-- ✅ Integração completa com Chess.com API (3 modos)
-- ✅ Feedback progressivo com 3 tentativas
-- ✅ Dica automática após 2 erros no repertório
-- ✅ Documentação completa e atualizada
+- ✅ Integração completa com Chess.com API
