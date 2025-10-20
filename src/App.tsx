@@ -11,6 +11,7 @@ import GameAnalyzer from './components/GameAnalyzer';
 import PuzzleTrainer from './components/PuzzleTrainer';
 import OpeningTrainer from './components/OpeningTrainer';
 import puzzleService from './services/PuzzleService';
+import packageJson from '../package.json';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
@@ -146,7 +147,12 @@ function App() {
 					<div className="bg-white shadow-sm">
 					<div className="container py-4">
 						<div className="text-center">
-							<h1 className="h2 fw-bold text-dark mb-2">♟ Sistema de Treino de Xadrez</h1>
+							<div className="d-flex justify-content-center align-items-center gap-2 mb-2">
+								<h1 className="h2 fw-bold text-dark mb-0">♟ Sistema de Treino de Xadrez</h1>
+								<span className="badge bg-secondary" style={{ fontSize: '0.75rem' }}>
+									v{packageJson.version}
+								</span>
+							</div>
 							<p className="text-muted mb-0">Escolha uma opção para começar</p>
 						</div>
 					</div>
