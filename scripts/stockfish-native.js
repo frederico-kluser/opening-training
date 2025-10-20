@@ -12,11 +12,13 @@ class StockfishNative {
     this.depth = options.depth || 18;
     this.threads = options.threads || os.cpus().length;
     this.hash = options.hash || 2048; // MB
+    this.verbose = options.verbose || false; // 🆕 Modo debug
     this.stockfishPath = this.getStockfishPath();
     this.process = null;
     this.ready = false;
     this.isAnalyzing = false;
     this.outputBuffer = [];
+    this.analyzeCount = 0; // 🆕 Contador de análises
   }
 
   /**
@@ -105,25 +107,32 @@ class StockfishNative {
     return new Promise((resolve) => {
       let processError = false;
       let readyOk = false;
+      let localProcess = null;
 
       try {
-        this.process = spawn(stockfishPath);
+        localProcess = spawn(stockfishPath);
+        this.process = localProcess; // Guarda referência
       } catch (err) {
         resolve(false);
         return;
       }
 
       // Se houver erro ao spawnar
-      this.process.on('error', () => {
+      localProcess.on('error', () => {
         processError = true;
+        if (this.process === localProcess) {
+          this.process = null;
+        }
         resolve(false);
       });
 
       // Timeout de 5 segundos para este caminho
       const timeout = setTimeout(() => {
         if (!this.ready || !readyOk) {
-          if (this.process) {
-            this.process.kill();
+          if (localProcess && !localProcess.killed) {
+            localProcess.kill();
+          }
+          if (this.process === localProcess) {
             this.process = null;
           }
           resolve(false);
@@ -131,7 +140,7 @@ class StockfishNative {
       }, 5000);
 
       // Handler de saída de dados
-      this.process.stdout.on('data', (data) => {
+      localProcess.stdout.on('data', (data) => {
         const output = data.toString();
         this.outputBuffer.push(output);
 
@@ -146,34 +155,50 @@ class StockfishNative {
         }
       });
 
-      this.process.stderr.on('data', (data) => {
+      localProcess.stderr.on('data', (data) => {
         // Ignora stderr silenciosamente durante init
       });
 
-      this.process.on('close', (code) => {
+      localProcess.on('close', (code) => {
         if (code !== 0 && !processError) {
           processError = true;
+          if (this.process === localProcess) {
+            this.process = null;
+          }
           resolve(false);
         }
       });
 
       // Aguardar um pouco e então enviar comandos UCI
       setTimeout(() => {
-        if (processError || !this.process) {
+        if (processError || !localProcess || localProcess.killed) {
           resolve(false);
           return;
         }
 
         // Inicializar UCI
-        this.sendCommand('uci');
+        if (localProcess.stdin) {
+          localProcess.stdin.write('uci\n');
+          if (this.verbose) {
+            console.log(`[UCI →] uci`);
+          }
+        }
 
         // Aguardar UCI ready
         setTimeout(() => {
-          if (this.ready && !processError && this.process) {
+          if (this.ready && !processError && localProcess && !localProcess.killed) {
             // Configurar opções
-            this.sendCommand(`setoption name Threads value ${this.threads}`);
-            this.sendCommand(`setoption name Hash value ${this.hash}`);
-            this.sendCommand('isready');
+            if (localProcess.stdin) {
+              localProcess.stdin.write(`setoption name Threads value ${this.threads}\n`);
+              localProcess.stdin.write(`setoption name Hash value ${this.hash}\n`);
+              localProcess.stdin.write('isready\n');
+
+              if (this.verbose) {
+                console.log(`[UCI →] setoption name Threads value ${this.threads}`);
+                console.log(`[UCI →] setoption name Hash value ${this.hash}`);
+                console.log(`[UCI →] isready`);
+              }
+            }
           } else if (!processError) {
             resolve(false);
           }
@@ -187,6 +212,9 @@ class StockfishNative {
    */
   sendCommand(command) {
     if (this.process && this.process.stdin) {
+      if (this.verbose && !command.startsWith('position')) {
+        console.log(`[UCI →] ${command}`);
+      }
       this.process.stdin.write(command + '\n');
     }
   }
@@ -195,9 +223,17 @@ class StockfishNative {
    * Analisa uma posição FEN
    */
   async analyze(fen, depth = this.depth) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (this.isAnalyzing) {
         console.warn('⚠️ Análise já em andamento, aguardando...');
+      }
+
+      this.analyzeCount++;
+      const analyzeId = this.analyzeCount;
+
+      if (this.verbose) {
+        console.log(`\n[Análise #${analyzeId}] Iniciando (depth: ${depth})`);
+        console.log(`[Análise #${analyzeId}] FEN: ${fen.substring(0, 50)}...`);
       }
 
       this.isAnalyzing = true;
@@ -207,9 +243,30 @@ class StockfishNative {
       let evaluation = 0;
       let isMate = false;
       let mateIn = 0;
+      let receivedBestMove = false;
+
+      // Timeout de 15 segundos
+      const timeout = setTimeout(() => {
+        if (!receivedBestMove) {
+          if (this.process && this.process.stdout) {
+            this.process.stdout.removeListener('data', dataHandler);
+          }
+          this.isAnalyzing = false;
+          console.error(`\n❌ [Análise #${analyzeId}] TIMEOUT após 15s!`);
+          console.error(`   FEN: ${fen}`);
+          reject(new Error(`Análise timeout após 15s`));
+        }
+      }, 15000);
 
       const dataHandler = (data) => {
         const output = data.toString();
+
+        if (this.verbose && output.includes('depth')) {
+          const depthMatch = output.match(/depth (\d+)/);
+          if (depthMatch) {
+            process.stdout.write(`\r[Análise #${analyzeId}] depth ${depthMatch[1]}/${depth} `);
+          }
+        }
 
         // Parse evaluation
         if (output.includes('score cp')) {
@@ -237,8 +294,17 @@ class StockfishNative {
             bestMove = match[1];
           }
 
+          receivedBestMove = true;
+          clearTimeout(timeout);
+
+          if (this.verbose) {
+            console.log(`\n[Análise #${analyzeId}] Completa! bestmove: ${bestMove}, eval: ${evaluation}cp`);
+          }
+
           // Limpar listener e resolver
-          this.process.stdout.removeListener('data', dataHandler);
+          if (this.process && this.process.stdout) {
+            this.process.stdout.removeListener('data', dataHandler);
+          }
           this.isAnalyzing = false;
 
           resolve({

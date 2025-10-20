@@ -36,6 +36,7 @@ class PGNAnalyzer {
     this.threshold = options.threshold || 100;
     this.threads = options.threads || require('os').cpus().length;
     this.outputFile = options.output || 'puzzles-output.json';
+    this.verbose = options.verbose || false; // 🆕 Modo debug
     this.stockfish = null;
     this.puzzles = [];
     this.stats = {
@@ -138,6 +139,11 @@ ${colors.bright}Configuração:${colors.reset}
     const game = new Chess();
     const moves = this.parseMoves(gameData.moves);
 
+    if (this.verbose) {
+      console.log(`\n${colors.yellow}[DEBUG] Movimentos parseados: ${JSON.stringify(moves.slice(0, 10))}...${colors.reset}`);
+      console.log(`${colors.yellow}[DEBUG] Total de movimentos: ${moves.length}${colors.reset}`);
+    }
+
     console.log(`
 ${colors.bright}${colors.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}
 ${colors.bright}Partida ${gameIndex + 1}/${totalGames}${colors.reset}
@@ -154,19 +160,29 @@ ${colors.blue}━━━━━━━━━━━━━━━━━━━━━━
     // Executar todos os movimentos
     for (let i = 0; i < moves.length; i++) {
       try {
+        if (this.verbose && i < 5) {
+          console.log(`${colors.yellow}[DEBUG] Processando movimento ${i + 1}: "${moves[i]}"${colors.reset}`);
+        }
+
         const move = game.move(moves[i]);
         if (move) {
           positions.push(game.fen());
           moveHistory.push(move);
         } else {
           console.error(`${colors.red}❌ Movimento inválido ${i + 1}: "${moves[i]}"${colors.reset}`);
+          console.error(`${colors.red}   FEN atual: ${game.fen()}${colors.reset}`);
           break;
         }
       } catch (err) {
         console.error(`${colors.red}❌ Erro ao processar movimento ${i + 1}: "${moves[i]}"${colors.reset}`);
         console.error(`${colors.red}   Tipo: ${typeof moves[i]}, Erro: ${err.message}${colors.reset}`);
+        console.error(`${colors.red}   FEN atual: ${game.fen()}${colors.reset}`);
         break;
       }
+    }
+
+    if (this.verbose) {
+      console.log(`${colors.yellow}[DEBUG] Posições geradas: ${positions.length}${colors.reset}`);
     }
 
     // Analisar cada posição
@@ -183,14 +199,40 @@ ${colors.blue}━━━━━━━━━━━━━━━━━━━━━━
 
       this.stats.positionsAnalyzed++;
 
+      if (this.verbose) {
+        console.log(`${colors.yellow}\n[DEBUG] Analisando posição ${i + 1}/${positions.length - 1}${colors.reset}`);
+      }
+
       // Avaliar posição ANTES do movimento
-      const evalBefore = await this.stockfish.analyze(positions[i], this.depth);
+      let evalBefore;
+      try {
+        evalBefore = await this.stockfish.analyze(positions[i], this.depth);
+        if (this.verbose) {
+          console.log(`${colors.yellow}[DEBUG] Eval ANTES: ${evalBefore.evaluation}cp, bestMove: ${evalBefore.bestMove}${colors.reset}`);
+        }
+      } catch (err) {
+        console.error(`${colors.red}❌ Erro na análise ANTES (pos ${i}): ${err.message}${colors.reset}`);
+        continue;
+      }
 
       // Avaliar posição DEPOIS do movimento
-      const evalAfter = await this.stockfish.analyze(positions[i + 1], this.depth);
+      let evalAfter;
+      try {
+        evalAfter = await this.stockfish.analyze(positions[i + 1], this.depth);
+        if (this.verbose) {
+          console.log(`${colors.yellow}[DEBUG] Eval DEPOIS: ${evalAfter.evaluation}cp${colors.reset}`);
+        }
+      } catch (err) {
+        console.error(`${colors.red}❌ Erro na análise DEPOIS (pos ${i + 1}): ${err.message}${colors.reset}`);
+        continue;
+      }
 
       // Calcular perda de centipawns
       const cpLoss = this.calculateCpLoss(evalBefore.evaluation, evalAfter.evaluation, i % 2 === 0);
+
+      if (this.verbose && cpLoss > 50) {
+        console.log(`${colors.yellow}[DEBUG] CP Loss: ${cpLoss}cp (threshold: ${this.threshold})${colors.reset}`);
+      }
 
       // Se foi um erro significativo, criar puzzle
       if (cpLoss >= this.threshold) {
@@ -379,7 +421,8 @@ ${colors.bright}Performance:${colors.reset}
       this.stockfish = new StockfishNative({
         depth: this.depth,
         threads: this.threads,
-        hash: 2048
+        hash: 2048,
+        verbose: this.verbose // 🆕 Passar modo debug
       });
 
       await this.stockfish.init();
@@ -426,6 +469,7 @@ ${colors.bright}Opções:${colors.reset}
   --threshold <n>   Threshold em centipawns (padrão: 100)
   --output <file>   Arquivo de saída JSON (padrão: puzzles-output.json)
   --threads <n>     Número de threads (padrão: todos os cores)
+  --verbose, -v     Modo debug com logs detalhados
   --help, -h        Mostra esta ajuda
 
 ${colors.bright}Exemplos:${colors.reset}
@@ -484,6 +528,8 @@ ${colors.bright}Performance:${colors.reset}
     } else if (args[i] === '--threads' && args[i + 1]) {
       options.threads = parseInt(args[i + 1]);
       i++;
+    } else if (args[i] === '--verbose' || args[i] === '-v') {
+      options.verbose = true;
     }
   }
 
