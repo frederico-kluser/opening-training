@@ -1,8 +1,11 @@
 {
   "name": "opening-training",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "license": "MIT",
+  "author": "Frederico Kluser",
+  "description": "Sistema de treino de xadrez com análise de partidas, puzzles táticos e treinamento de aberturas",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -201,7 +201,7 @@ function App() {
 								</Card>
 							</div>
 
-							{/* Repertório de Aberturas */}
+							{/* Treinar Aberturas */}
 							<div className="col-12 col-sm-6 col-md-4">
 								<Card
 									className="h-100 border-0 shadow-sm"
@@ -209,7 +209,7 @@ function App() {
 								>
 									<Card.Body className="text-center p-4">
 										<div className="mb-3" style={{ fontSize: '3rem' }}>📚</div>
-										<h5 className="fw-bold mb-3">Repertório</h5>
+										<h5 className="fw-bold mb-3">Treinar Aberturas</h5>
 
 										<div className="d-grid gap-2">
 											{hasLocalData && (
@@ -244,68 +244,6 @@ function App() {
 									</Card.Body>
 								</Card>
 							</div>
-
-							{/* Segunda linha - Ferramentas auxiliares */}
-							<div className="col-12 col-sm-6 col-md-4">
-								<Card
-									className="h-100 border-0 shadow-sm hover-shadow"
-									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-									onClick={() => setVariant('stockfish-test')}
-								>
-									<Card.Body className="text-center p-4">
-										<div className="mb-3" style={{ fontSize: '3rem' }}>🤖</div>
-										<h5 className="fw-bold mb-2">Stockfish</h5>
-										<p className="text-muted small mb-0">
-											Teste o engine de análise
-										</p>
-									</Card.Body>
-								</Card>
-							</div>
-
-							{/* Chess.com */}
-							<div className="col-12 col-sm-6 col-md-4">
-								<Card
-									className="h-100 border-0 shadow-sm hover-shadow"
-									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-									onClick={() => {
-										const user = prompt('Usuário do Chess.com:', 'hikaru');
-										if (user) {
-											window.open(`https://www.chess.com/member/${user}/games`);
-										}
-									}}
-								>
-									<Card.Body className="text-center p-4">
-										<div className="mb-3" style={{ fontSize: '3rem' }}>🌐</div>
-										<h5 className="fw-bold mb-2">Chess.com</h5>
-										<p className="text-muted small mb-0">
-											Ver perfil no site
-										</p>
-									</Card.Body>
-								</Card>
-							</div>
-
-							{/* GitHub */}
-							<div className="col-12 col-sm-6 col-md-4">
-								<Card
-									className="h-100 border-0 shadow-sm hover-shadow"
-									style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-									onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-									onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-									onClick={() => window.open('https://github.com/frederico-kluser/opening-training')}
-								>
-									<Card.Body className="text-center p-4">
-										<div className="mb-3" style={{ fontSize: '3rem' }}>💻</div>
-										<h5 className="fw-bold mb-2">GitHub</h5>
-										<p className="text-muted small mb-0">
-											Código fonte e docs
-										</p>
-									</Card.Body>
-								</Card>
-							</div>
 						</div>
 
 						{/* Statistics Footer */}
@@ -333,6 +271,28 @@ function App() {
 										</div>
 									</Card.Body>
 								</Card>
+							</div>
+						</div>
+
+						{/* GitHub Footer */}
+						<div className="row mt-3">
+							<div className="col-12">
+								<div className="text-center">
+									<Button
+										variant="outline-secondary"
+										size="sm"
+										onClick={() => window.open('https://github.com/frederico-kluser/opening-training')}
+										className="d-inline-flex align-items-center gap-2"
+									>
+										<span>💻</span>
+										<span>Código Fonte no GitHub</span>
+									</Button>
+									<div className="mt-2">
+										<small className="text-muted">
+											v{packageJson.version} • Licença MIT
+										</small>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
