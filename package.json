@@ -11,7 +11,8 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"analyze": "node scripts/analyze-pgn.js"
+		"analyze": "node scripts/analyze-pgn.js",
+		"analyze:user": "node scripts/analyze-pgn.js --username"
 	},
 	"dependencies": {
 		"bootstrap": "^5.3.3",

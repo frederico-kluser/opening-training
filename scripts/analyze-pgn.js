@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const { Chess } = require('chess.js');
 const StockfishNative = require('./stockfish-native');
+const ChessComAPI = require('./chess-com-api');
 
 // Cores para console (compatível com todos os terminais)
 const colors = {
@@ -309,17 +310,43 @@ ${colors.bright}Performance:${colors.reset}
   /**
    * Executa análise completa
    */
-  async run(pgnPath) {
+  async run(source, isUsername = false) {
     try {
       this.showBanner();
 
-      // Verificar arquivo
-      if (!fs.existsSync(pgnPath)) {
-        throw new Error(`Arquivo não encontrado: ${pgnPath}`);
-      }
+      let pgnContent;
 
-      console.log(`${colors.cyan}📖 Lendo arquivo PGN...${colors.reset}`);
-      const pgnContent = fs.readFileSync(pgnPath, 'utf-8');
+      if (isUsername) {
+        // Baixar partidas do Chess.com
+        console.log(`${colors.cyan}🌐 Baixando partidas do Chess.com...${colors.reset}`);
+        const api = new ChessComAPI();
+
+        const months = this.chessComMonths || 3; // Padrão: últimos 3 meses
+        pgnContent = await api.getRecentGames(source, months);
+
+        console.log(); // Nova linha após progress bar
+
+        const gameCount = api.countGames(pgnContent);
+        console.log(`${colors.green}✅ ${gameCount} partida(s) baixada(s)${colors.reset}\n`);
+
+        if (gameCount === 0) {
+          throw new Error('Nenhuma partida encontrada para este usuário');
+        }
+
+        // Salvar PGN temporário
+        const tempFile = `temp-${source}-${Date.now()}.pgn`;
+        fs.writeFileSync(tempFile, pgnContent);
+        console.log(`${colors.blue}💾 PGN salvo temporariamente: ${tempFile}${colors.reset}\n`);
+
+      } else {
+        // Ler arquivo PGN
+        if (!fs.existsSync(source)) {
+          throw new Error(`Arquivo não encontrado: ${source}`);
+        }
+
+        console.log(`${colors.cyan}📖 Lendo arquivo PGN...${colors.reset}`);
+        pgnContent = fs.readFileSync(source, 'utf-8');
+      }
 
       console.log(`${colors.cyan}🔍 Parseando partidas...${colors.reset}`);
       const games = this.parsePGN(pgnContent);
@@ -373,8 +400,11 @@ ${colors.cyan}${colors.bright}Análise Ultra-Rápida de PGN - Stockfish Nativo${
 
 ${colors.bright}Uso:${colors.reset}
   node scripts/analyze-pgn.js <arquivo.pgn> [opções]
+  node scripts/analyze-pgn.js --username <usuario> [opções]
 
 ${colors.bright}Opções:${colors.reset}
+  --username <user> Baixa partidas do Chess.com automaticamente
+  --months <n>      Quantidade de meses a baixar (padrão: 3, com --username)
   --depth <n>       Profundidade de análise (padrão: 18)
   --threshold <n>   Threshold em centipawns (padrão: 100)
   --output <file>   Arquivo de saída JSON (padrão: puzzles-output.json)
@@ -382,22 +412,50 @@ ${colors.bright}Opções:${colors.reset}
   --help, -h        Mostra esta ajuda
 
 ${colors.bright}Exemplos:${colors.reset}
+  ${colors.green}# Analisar arquivo PGN${colors.reset}
   node scripts/analyze-pgn.js minhas-partidas.pgn
   node scripts/analyze-pgn.js partidas.pgn --depth 20 --threshold 150
-  node scripts/analyze-pgn.js partidas.pgn --output meus-puzzles.json --threads 8
+
+  ${colors.green}# Baixar e analisar do Chess.com${colors.reset}
+  node scripts/analyze-pgn.js --username hikaru
+  node scripts/analyze-pgn.js --username MagnusCarlsen --months 6
+  node scripts/analyze-pgn.js --username seu_usuario --depth 20 --output meus-puzzles.json
 
 ${colors.bright}Performance:${colors.reset}
   🚀 Até 16x mais rápido que análise no navegador!
   ⚡ Usa todos os cores da CPU para máxima velocidade
+  🌐 Download automático do Chess.com!
 `);
     process.exit(0);
   }
 
-  const pgnFile = args[0];
+  let source = null;
+  let isUsername = false;
   const options = {};
 
-  for (let i = 1; i < args.length; i++) {
-    if (args[i] === '--depth' && args[i + 1]) {
+  // Detectar se é username ou arquivo
+  if (args[0] === '--username' && args[1]) {
+    source = args[1];
+    isUsername = true;
+  } else if (!args[0].startsWith('--')) {
+    source = args[0];
+    isUsername = false;
+  }
+
+  if (!source) {
+    console.error(`${colors.red}❌ Erro: Especifique um arquivo PGN ou --username${colors.reset}\n`);
+    console.log(`Use --help para ver os comandos disponíveis`);
+    process.exit(1);
+  }
+
+  // Parse opções
+  const startIndex = isUsername ? 2 : 1;
+
+  for (let i = startIndex; i < args.length; i++) {
+    if (args[i] === '--months' && args[i + 1]) {
+      options.months = parseInt(args[i + 1]);
+      i++;
+    } else if (args[i] === '--depth' && args[i + 1]) {
       options.depth = parseInt(args[i + 1]);
       i++;
     } else if (args[i] === '--threshold' && args[i + 1]) {
@@ -412,10 +470,16 @@ ${colors.bright}Performance:${colors.reset}
     }
   }
 
-  return { pgnFile, options };
+  return { source, isUsername, options };
 }
 
 // Executar
-const { pgnFile, options } = parseArgs();
+const { source, isUsername, options } = parseArgs();
 const analyzer = new PGNAnalyzer(options);
-analyzer.run(pgnFile);
+
+// Configurar meses se baixando do Chess.com
+if (isUsername && options.months) {
+  analyzer.chessComMonths = options.months;
+}
+
+analyzer.run(source, isUsername);

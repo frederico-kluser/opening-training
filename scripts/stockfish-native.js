@@ -68,71 +68,102 @@ class StockfishNative {
         : [this.stockfishPath];
 
       let stockfishFound = false;
+      let lastError = null;
 
       for (const stockfishPath of stockfishPaths) {
         try {
           console.log(`🔍 Tentando Stockfish em: ${stockfishPath}`);
           this.process = spawn(stockfishPath);
-          stockfishFound = true;
-          break;
+
+          // Verificar se o processo foi criado com sucesso
+          this.process.on('error', (err) => {
+            lastError = err;
+          });
+
+          // Aguardar um pouco para ver se há erro imediato
+          setTimeout(() => {
+            if (!lastError) {
+              stockfishFound = true;
+            }
+          }, 100);
+
+          if (stockfishFound || !lastError) {
+            stockfishFound = true;
+            break;
+          }
         } catch (err) {
+          lastError = err;
           continue;
         }
       }
 
-      if (!stockfishFound) {
-        return reject(new Error(
-          `❌ Stockfish não encontrado!\n\n` +
-          `Instale o Stockfish:\n` +
-          `- macOS: brew install stockfish\n` +
-          `- Linux: sudo apt install stockfish\n` +
-          `- Windows: baixe de https://stockfishchess.org/\n\n` +
-          `Ou coloque o binário em: ${path.join(__dirname, '..', 'stockfish')}`
-        ));
-      }
-
-      this.process.stdout.on('data', (data) => {
-        const output = data.toString();
-        this.outputBuffer.push(output);
-
-        if (output.includes('uciok')) {
-          this.ready = true;
-        }
-      });
-
-      this.process.stderr.on('data', (data) => {
-        console.error(`Stockfish error: ${data}`);
-      });
-
-      this.process.on('close', (code) => {
-        console.log(`Stockfish process exited with code ${code}`);
-      });
-
-      // Inicializar UCI
-      this.sendCommand('uci');
-
-      // Aguardar ready
-      const checkReady = setInterval(() => {
-        if (this.ready) {
-          clearInterval(checkReady);
-
-          // Configurar opções
-          this.sendCommand(`setoption name Threads value ${this.threads}`);
-          this.sendCommand(`setoption name Hash value ${this.hash}`);
-          this.sendCommand('isready');
-
-          console.log(`✅ Stockfish iniciado: ${this.threads} threads, ${this.hash}MB hash`);
-          resolve();
-        }
-      }, 100);
-
-      // Timeout de 5 segundos
+      // Aguardar verificação do spawn
       setTimeout(() => {
-        if (!this.ready) {
-          clearInterval(checkReady);
-          reject(new Error('Timeout ao inicializar Stockfish'));
+        if (!stockfishFound || !this.process || this.process.killed) {
+          return reject(new Error(
+            `❌ Stockfish não encontrado!\n\n` +
+            `Instale o Stockfish:\n` +
+            `- macOS: brew install stockfish\n` +
+            `- Linux: sudo apt install stockfish\n` +
+            `- Windows: baixe de https://stockfishchess.org/\n\n` +
+            `Ou coloque o binário em: ${path.join(__dirname, '..', 'stockfish')}\n\n` +
+            `Último erro: ${lastError?.message || 'Desconhecido'}`
+          ));
         }
-      }, 5000);
+
+        let readyOk = false;
+
+        this.process.stdout.on('data', (data) => {
+          const output = data.toString();
+          this.outputBuffer.push(output);
+
+          if (output.includes('uciok')) {
+            this.ready = true;
+          }
+
+          if (output.includes('readyok')) {
+            readyOk = true;
+          }
+        });
+
+        this.process.stderr.on('data', (data) => {
+          console.error(`Stockfish error: ${data}`);
+        });
+
+        this.process.on('close', (code) => {
+          console.log(`Stockfish process exited with code ${code}`);
+        });
+
+        // Inicializar UCI
+        this.sendCommand('uci');
+
+        // Aguardar ready
+        let checkInterval;
+        const checkReady = () => {
+          if (this.ready && !readyOk) {
+            // Configurar opções
+            this.sendCommand(`setoption name Threads value ${this.threads}`);
+            this.sendCommand(`setoption name Hash value ${this.hash}`);
+            this.sendCommand('isready');
+          }
+
+          if (this.ready && readyOk) {
+            clearInterval(checkInterval);
+            clearTimeout(timeoutHandle);
+            console.log(`✅ Stockfish iniciado: ${this.threads} threads, ${this.hash}MB hash`);
+            resolve();
+          }
+        };
+
+        checkInterval = setInterval(checkReady, 100);
+
+        // Timeout de 10 segundos (aumentado para sistemas lentos)
+        const timeoutHandle = setTimeout(() => {
+          clearInterval(checkInterval);
+          this.quit();
+          reject(new Error('Timeout ao inicializar Stockfish (10s). Verifique se o binário funciona corretamente.'));
+        }, 10000);
+      }, 150);
     });
   }
 
