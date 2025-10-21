@@ -194,25 +194,29 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 			</div>
 
 			<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} />
-			<Form>
-				<Form.Label
-					style={{
-						color: 'white',
-					}}
-				>
-					Comentários
-				</Form.Label>
-				<Form.Control
-					type="email"
-					placeholder="Comente sobre a posição atual"
-					as="textarea"
-					rows={3}
-					value={comment}
-					onChange={(e) => {
-						setComment(e.target.value);
-					}}
-				/>
-			</Form>
+			<div style={{ display: 'flex', justifyContent: 'center' }}>
+				<div style={{ width: 'min(500px, 90vw, 70vh)' }}>
+					<Form>
+						<Form.Label
+							style={{
+								color: 'white',
+							}}
+						>
+							Comentários
+						</Form.Label>
+						<Form.Control
+							type="email"
+							placeholder="Comente sobre a posição atual"
+							as="textarea"
+							rows={3}
+							value={comment}
+							onChange={(e) => {
+								setComment(e.target.value);
+							}}
+						/>
+					</Form>
+				</div>
+			</div>
 		</Gap>
 	);
 };

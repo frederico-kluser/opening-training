@@ -25,8 +25,8 @@ const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
   };
 
   const boardStyle: React.CSSProperties = {
-    width,
-    maxWidth: typeof width === 'string' ? '500px' : width
+    width: 'min(500px, 90vw, 70vh)', // Usa o menor valor entre 500px, 90% da largura e 70% da altura
+    aspectRatio: '1/1' // Mantém o tabuleiro quadrado
   };
 
   return (

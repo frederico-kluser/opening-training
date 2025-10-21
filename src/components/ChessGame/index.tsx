@@ -55,23 +55,27 @@ const ChessGame = ({ invertedBoard, game, onDropCallback }: ChessGameProps) => {
 	}, []);
 
 	return (
-		<Chessboard
-			id="BasicBoard"
-			boardOrientation={invertedBoard ? 'black' : 'white'}
-			position={game.fen()}
-			onPieceDrop={onDrop}
-			customPieces={customPieces}
-			customBoardStyle={{
-				borderRadius: '4px',
-				boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-			}}
-			customDarkSquareStyle={{
-				backgroundColor: '#779952',
-			}}
-			customLightSquareStyle={{
-				backgroundColor: '#edeed1',
-			}}
-		/>
+		<div style={{ display: 'flex', justifyContent: 'center' }}>
+			<div style={{ width: 'min(500px, 90vw, 70vh)', aspectRatio: '1/1' }}>
+				<Chessboard
+					id="BasicBoard"
+					boardOrientation={invertedBoard ? 'black' : 'white'}
+					position={game.fen()}
+					onPieceDrop={onDrop}
+					customPieces={customPieces}
+					customBoardStyle={{
+						borderRadius: '4px',
+						boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+					}}
+					customDarkSquareStyle={{
+						backgroundColor: '#779952',
+					}}
+					customLightSquareStyle={{
+						backgroundColor: '#edeed1',
+					}}
+				/>
+			</div>
+		</div>
 	);
 };
 
