@@ -1,11 +1,13 @@
 import { Form, Button, ButtonGroup } from 'react-bootstrap';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState, useCallback } from 'react';
 import { Chess, Move } from 'chess.js';
 import TypeStorage from '../../types/TypeStorage';
 import Gap from '../../components/Gap';
 import ChessGame from '../../components/ChessGame';
 import NavigationBar from '../../components/TrainingControls/NavigationBar';
 import openingService from '../../services/OpeningService';
+import EvaluationBar from '../../components/EvaluationBar';
+import useStockfish from '../../hooks/useStockfish';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -24,7 +26,37 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 	const [comment, setComment] = useState('');
 	const [openingColor, setOpeningColor] = useState<'white' | 'black'>('white');
 
+	// Estados para Evaluation Bar
+	const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
+	const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+	// Hook do Stockfish
+	const { analyze, isReady } = useStockfish();
+
 	// const isBlackTurn = () => game.turn() === 'b';
+
+	// Função para avaliar posição com Stockfish
+	const evaluatePosition = useCallback(async (fen: string) => {
+		if (!isReady) return;
+
+		setIsEvaluating(true);
+		try {
+			const result = await analyze(fen, 12); // depth 12 para rapidez
+			if (result) {
+				console.log('📊 AVALIAÇÃO (Register):', {
+					fen: fen.substring(0, 30) + '...',
+					evaluation: result.evaluation,
+					evaluationInPawns: (result.evaluation / 100).toFixed(2),
+					interpretation: result.evaluation > 0 ? '⬜ Brancas melhor' : result.evaluation < 0 ? '⬛ Pretas melhor' : '= Igual'
+				});
+				setCurrentEvaluation(result.evaluation);
+			}
+		} catch (error) {
+			console.error('Evaluation failed:', error);
+		} finally {
+			setIsEvaluating(false);
+		}
+	}, [analyze, isReady]);
 
 	useEffect(() => {
 		console.log('save :', save);
@@ -95,7 +127,10 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 
 		setComment(comment);
-	}, [actualFen, save, variant]);
+
+		// Avaliar nova posição
+		evaluatePosition(actualFen);
+	}, [actualFen, save, variant, evaluatePosition]);
 
 	const updateActualFen = (newFen: string) => {
 		setSave((prevSave) => {
@@ -193,7 +228,43 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 				</Button>
 			</div>
 
-			<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} />
+			{/* Layout com Evaluation Bar e Tabuleiro */}
+			<div style={{
+				display: 'flex',
+				gap: '20px',
+				alignItems: 'flex-start',
+				justifyContent: 'center',
+				marginBottom: '1rem',
+				flexWrap: 'wrap'
+			}}>
+				{/* Evaluation Bar */}
+				<div style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center'
+				}}>
+					<EvaluationBar
+						evaluation={currentEvaluation}
+						height={500}
+						showNumeric={true}
+						animated={true}
+						loading={isEvaluating}
+					/>
+					{isEvaluating && (
+						<small style={{ color: 'white', marginTop: '8px' }}>Analisando...</small>
+					)}
+				</div>
+
+				{/* Tabuleiro */}
+				<div style={{
+					flex: '1 1 auto',
+					minWidth: '320px',
+					maxWidth: '600px'
+				}}>
+					<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} />
+				</div>
+			</div>
+
 			<div style={{ display: 'flex', justifyContent: 'center' }}>
 				<div style={{ width: 'min(500px, 90vw, 70vh)' }}>
 					<Form>

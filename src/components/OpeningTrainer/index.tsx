@@ -9,6 +9,8 @@ import SessionStats from '../PuzzleSession/SessionStats';
 import PuzzleFeedback from '../PuzzleSession/PuzzleFeedback';
 import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
+import EvaluationBar from '../EvaluationBar';
+import useStockfish from '../../hooks/useStockfish';
 import { getElapsedTime } from '../../utils/timeUtils';
 import {
   TrainingPosition,
@@ -64,6 +66,13 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [showingContext, setShowingContext] = useState(false);
 
+  // Estados para Evaluation Bar
+  const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
+  const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+  // Hook do Stockfish
+  const { analyze, isReady } = useStockfish();
+
   // Inicializar sessão de treinamento
   useEffect(() => {
     // Primeiro, tenta carregar do OpeningService
@@ -110,6 +119,29 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     return () => clearInterval(timer);
   }, [session.startTime]);
 
+  // Função para avaliar posição com Stockfish
+  const evaluatePosition = useCallback(async (fen: string) => {
+    if (!isReady) return;
+
+    setIsEvaluating(true);
+    try {
+      const result = await analyze(fen, 12); // depth 12 para rapidez
+      if (result) {
+        console.log('📊 AVALIAÇÃO (Opening):', {
+          fen: fen.substring(0, 30) + '...',
+          evaluation: result.evaluation,
+          evaluationInPawns: (result.evaluation / 100).toFixed(2),
+          interpretation: result.evaluation > 0 ? '⬜ Brancas melhor' : result.evaluation < 0 ? '⬛ Pretas melhor' : '= Igual'
+        });
+        setCurrentEvaluation(result.evaluation);
+      }
+    } catch (error) {
+      console.error('Evaluation failed:', error);
+    } finally {
+      setIsEvaluating(false);
+    }
+  }, [analyze, isReady]);
+
   // Carregar posição atual (com suporte a mostrar movimento do adversário)
   useEffect(() => {
     if (!session.currentPosition) return;
@@ -133,6 +165,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         turn: contextInfo.turn
       });
 
+      // Avaliar posição de contexto
+      evaluatePosition(position.fenContext);
+
       // Após 1 segundo, mostra a posição onde o usuário deve jogar
       setTimeout(() => {
         const newGame = new Chess(position.fen);
@@ -145,19 +180,25 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
           fen: position.fen.substring(0, 30) + '...',
           turn: fenInfo.turn
         });
+
+        // Avaliar posição atual
+        evaluatePosition(position.fen);
       }, 1000);
     } else {
       // 🎯 Posição sem contexto ou primeiro movimento é do usuário
       const newGame = new Chess(position.fen);
       setGame(newGame);
       setShowingContext(false);
+
+      // Avaliar posição atual
+      evaluatePosition(position.fen);
     }
 
     // Limpa feedback
     setShowFeedback(null);
     setBackgroundStyle({});
     setSession(prev => ({ ...prev, attemptCount: 0, showHint: false }));
-  }, [session.currentPosition]);
+  }, [session.currentPosition, evaluatePosition]);
 
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
@@ -422,17 +463,52 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
         <Card>
           <Card.Body>
             {showingContext && (
-              <Alert variant="info" className="mb-3">
-                🎭 Movimento do adversário...
+              <Alert variant="info" className="mb-3 text-center">
+                <strong>🎭 Movimento do adversário...</strong>
               </Alert>
             )}
 
-            <ChessBoardWrapper
-              position={game.fen()}
-              onPieceDrop={onDrop}
-              orientation={boardOrientation}
-              isDraggable={!showFeedback && !showingContext}
-            />
+            {/* Layout com Evaluation Bar e Tabuleiro */}
+            <div style={{
+              display: 'flex',
+              gap: '20px',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              marginBottom: '1rem',
+              flexWrap: 'wrap'
+            }}>
+              {/* Evaluation Bar */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                <EvaluationBar
+                  evaluation={currentEvaluation}
+                  height={500}
+                  showNumeric={true}
+                  animated={true}
+                  loading={isEvaluating}
+                />
+                {isEvaluating && (
+                  <small className="text-muted mt-2">Analisando...</small>
+                )}
+              </div>
+
+              {/* Tabuleiro */}
+              <div style={{
+                flex: '1 1 auto',
+                minWidth: '320px',
+                maxWidth: '600px'
+              }}>
+                <ChessBoardWrapper
+                  position={game.fen()}
+                  onPieceDrop={onDrop}
+                  orientation={boardOrientation}
+                  isDraggable={!showFeedback && !showingContext}
+                />
+              </div>
+            </div>
 
             <PuzzleFeedback
               showFeedback={showFeedback}
