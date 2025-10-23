@@ -123,7 +123,7 @@ class StockfishService extends EventEmitter {
     });
   }
 
-  async analyze(fen: string, depth: number = 15): Promise<StockfishAnalysis> {
+  async analyze(fen: string, depth: number = 20): Promise<StockfishAnalysis> {
     // Wait for engine to be ready
     await this.waitForReady();
 
@@ -131,8 +131,8 @@ class StockfishService extends EventEmitter {
       this.currentFen = fen;
       this.analysisCallbacks.set(fen, resolve);
 
-      // Reset evaluation values
-      this.lastEvaluation = 0;
+      // 🔄 NÃO resetar evaluation para 0 - mantém valores anteriores até nova análise completar
+      // Apenas reseta depth e PV que são específicos da análise atual
       this.lastDepth = 0;
       this.lastPV = [];
 
@@ -145,7 +145,7 @@ class StockfishService extends EventEmitter {
           this.analysisCallbacks.delete(fen);
           resolve({
             bestMove: '',
-            evaluation: 0,
+            evaluation: this.lastEvaluation, // 🔄 Retorna última avaliação ao invés de 0
             depth: 0,
             pv: []
           });

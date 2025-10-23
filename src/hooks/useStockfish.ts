@@ -37,7 +37,7 @@ export const useStockfish = (): UseStockfishReturn => {
     };
   }, [stockfish]);
 
-  const analyze = useCallback(async (fen: string, depth: number = 15): Promise<StockfishAnalysis | null> => {
+  const analyze = useCallback(async (fen: string, depth: number = 20): Promise<StockfishAnalysis | null> => {
     if (!isReady) {
       console.warn('Stockfish not ready yet');
       return null;

@@ -86,7 +86,7 @@ const PuzzleTrainer: React.FC = () => {
 
     setIsEvaluating(true);
     try {
-      const result = await analyze(fen, 12); // depth 12 para rapidez
+      const result = await analyze(fen, 20); // depth 20 para análise mais profunda
       if (result) {
         console.log('📊 AVALIAÇÃO:', {
           fen: fen.substring(0, 30) + '...',
@@ -147,6 +147,11 @@ const PuzzleTrainer: React.FC = () => {
   useEffect(() => {
     if (puzzles.length > 0 && session.puzzleIndex < puzzles.length) {
       const puzzle = puzzles[session.puzzleIndex];
+
+      // 🔄 RESETAR a barra de avaliação para 0 ao mudar de puzzle (recomeça do zero)
+      console.log('🔄 Resetando barra de avaliação para 0 (novo puzzle)');
+      setCurrentEvaluation(0);
+      setInitialEvaluation(0);
 
       // Se tem contexto (movimento anterior), mostra primeiro ele
       if (puzzle.fenContext) {
@@ -242,7 +247,7 @@ const PuzzleTrainer: React.FC = () => {
       (async () => {
         if (!currentPuzzle) return;
 
-        const result = await analyze(fenAfterMove, 12);
+        const result = await analyze(fenAfterMove, 20);
 
         if (!result) {
           console.error('❌ Falha ao avaliar movimento');

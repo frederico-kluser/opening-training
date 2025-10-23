@@ -125,7 +125,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
     setIsEvaluating(true);
     try {
-      const result = await analyze(fen, 12); // depth 12 para rapidez
+      const result = await analyze(fen, 20); // depth 20 para análise mais profunda
       if (result) {
         console.log('📊 AVALIAÇÃO (Opening):', {
           fen: fen.substring(0, 30) + '...',
@@ -148,6 +148,10 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
     const position = session.currentPosition;
     const opponentMoveInfo = shouldShowOpponentMove(position);
+
+    // 🔄 RESETAR a barra de avaliação para 0 ao mudar de posição (recomeça do zero)
+    console.log('🔄 Resetando barra de avaliação para 0 (nova posição)');
+    setCurrentEvaluation(0);
 
     // Define orientação do tabuleiro (sempre a cor do usuário)
     setBoardOrientation(getBoardOrientation(position.color));

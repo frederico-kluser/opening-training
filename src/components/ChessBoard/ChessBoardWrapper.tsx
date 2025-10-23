@@ -15,7 +15,6 @@ const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
   onPieceDrop,
   orientation = 'white',
   isDraggable = true,
-  width = '100%',
   style = {}
 }) => {
   const containerStyle: React.CSSProperties = {

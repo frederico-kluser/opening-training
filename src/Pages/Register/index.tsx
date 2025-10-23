@@ -41,7 +41,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 		setIsEvaluating(true);
 		try {
-			const result = await analyze(fen, 12); // depth 12 para rapidez
+			const result = await analyze(fen, 20); // depth 20 para análise mais profunda
 			if (result) {
 				console.log('📊 AVALIAÇÃO (Register):', {
 					fen: fen.substring(0, 30) + '...',

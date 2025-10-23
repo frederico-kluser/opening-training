@@ -76,7 +76,7 @@ export default class Engine {
 		});
 	}
 
-	evaluatePosition(fen: string, depth = 12) {
+	evaluatePosition(fen: string, depth = 20) {
 		if (depth > 24) depth = 24;
 
 		this.stockfish.postMessage(`position fen ${fen}`);
