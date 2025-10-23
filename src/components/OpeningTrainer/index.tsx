@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Card, Alert } from 'react-bootstrap';
+import { Button, Card, Alert, Modal } from 'react-bootstrap';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
 import openingService from '../../services/OpeningService';
@@ -65,6 +65,10 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [showingContext, setShowingContext] = useState(false);
+
+  // Modal de anotações
+  const [showAnnotationModal, setShowAnnotationModal] = useState(false);
+  const [modalType, setModalType] = useState<'correct' | 'failed'>('correct');
 
   // Estados para Evaluation Bar
   const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
@@ -269,10 +273,11 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       openingService.recordCorrectMove(session.openingId);
     }
 
-    // Próxima posição após 1.5 segundos
+    // Mostrar modal com anotações ao invés de avançar automaticamente
+    setModalType('correct');
     setTimeout(() => {
-      nextPosition();
-    }, 1500);
+      setShowAnnotationModal(true);
+    }, 500); // Pequeno delay para mostrar feedback visual primeiro
   };
 
   // Movimento incorreto
@@ -305,11 +310,12 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       setSession(prev => ({ ...prev, showHint: true }));
     }
 
-    // Após 3 tentativas, vai para próxima
+    // Após 3 tentativas, mostra modal ao invés de avançar automaticamente
     if (newAttemptCount >= 3) {
+      setModalType('failed');
       setTimeout(() => {
-        nextPosition();
-      }, 2000);
+        setShowAnnotationModal(true);
+      }, 500);
     } else {
       // Limpa feedback após 2 segundos
       setTimeout(() => {
@@ -317,6 +323,18 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         setBackgroundStyle({});
       }, 2000);
     }
+  };
+
+  // Fechar modal e ir para próxima posição
+  const handleModalNext = () => {
+    setShowAnnotationModal(false);
+    setShowFeedback(null);
+    setBackgroundStyle({});
+
+    // Pequeno delay antes de carregar próxima posição
+    setTimeout(() => {
+      nextPosition();
+    }, 300);
   };
 
   // Próxima posição
@@ -426,8 +444,8 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
   if (session.trainingPositions.length === 0) {
     return (
       <Gap size={16} padding={16}>
-        <Button variant="secondary" onClick={onExit}>
-          ← Voltar
+        <Button variant="primary" onClick={onExit}>
+          ← Trocar Abertura
         </Button>
 
         <Alert variant="warning">
@@ -453,11 +471,11 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                 </small>
               </div>
               <Button
-                variant="outline-secondary"
+                variant="outline-primary"
                 size="sm"
                 onClick={onExit}
               >
-                ← Voltar
+                🔄 Trocar Abertura
               </Button>
             </div>
 
@@ -556,11 +574,11 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                 </Button>
 
                 <Button variant="warning" onClick={resetSession}>
-                  Nova Sessão
+                  🔄 Nova Sessão
                 </Button>
 
-                <Button variant="danger" onClick={onExit}>
-                  Sair
+                <Button variant="primary" onClick={onExit}>
+                  🔄 Trocar Abertura
                 </Button>
               </Gap>
             </div>
@@ -569,6 +587,48 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
 
         <GlobalStats stats={globalStats} />
       </Gap>
+
+      {/* Modal de Anotações */}
+      <Modal
+        show={showAnnotationModal}
+        onHide={() => {}} // Não permite fechar clicando fora
+        centered
+        backdrop="static" // Não fecha clicando no backdrop
+        keyboard={false} // Não fecha com ESC
+      >
+        <Modal.Header>
+          <Modal.Title>
+            {modalType === 'correct' ? (
+              <>✅ Movimento Correto!</>
+            ) : (
+              <>❌ Fim das Tentativas</>
+            )}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {session.currentPosition?.comment ? (
+            <div>
+              <h6>📝 Anotações do Movimento:</h6>
+              <p className="mb-0">{session.currentPosition.comment}</p>
+            </div>
+          ) : (
+            <p className="text-muted mb-0">Sem anotações para esta posição.</p>
+          )}
+
+          {modalType === 'failed' && (
+            <Alert variant="warning" className="mt-3 mb-0">
+              💡 Você esgotou as 3 tentativas. Revise esta posição e tente novamente na próxima sessão!
+            </Alert>
+          )}
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleModalNext} size="lg" className="w-100">
+            Próximo Movimento →
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

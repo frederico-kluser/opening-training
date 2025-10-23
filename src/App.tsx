@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Badge } from 'react-bootstrap';
 import TypeStorage from './types/TypeStorage';
 import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
@@ -11,6 +11,7 @@ import GameAnalyzer from './components/GameAnalyzer';
 import PuzzleTrainer from './components/PuzzleTrainer';
 import OpeningTrainer from './components/OpeningTrainer';
 import puzzleService from './services/PuzzleService';
+import openingService from './services/OpeningService';
 import packageJson from '../package.json';
 
 function App() {
@@ -55,6 +56,28 @@ function App() {
 		setMode('');
 	};
 
+	// Deletar abertura
+	const handleDeleteOpening = (variantName: string) => {
+		const confirmed = window.confirm(`Tem certeza que deseja deletar a abertura "${variantName}"?`);
+		if (!confirmed) return;
+
+		// Deletar do formato v2.0.0 (OpeningService)
+		const opening = openingService.getOpeningByName(variantName);
+		if (opening) {
+			openingService.deleteOpening(opening.id);
+			console.log(`✅ Abertura "${variantName}" deletada do OpeningService`);
+		}
+
+		// Deletar do formato legado (localStorage 'data')
+		const newData = { ...data };
+		delete newData[variantName];
+		setData(newData);
+		localStorage.setItem('data', JSON.stringify(newData));
+		console.log(`✅ Abertura "${variantName}" deletada do formato legado`);
+
+		alert(`Abertura "${variantName}" foi deletada com sucesso!`);
+	};
+
 	// Tela de seleção de modo quando há dados carregados mas nenhum modo selecionado
 	if (Object.keys(data).length > 0 && !variant && !mode) {
 		const variants = Object.keys(data);
@@ -65,56 +88,79 @@ function App() {
 				</div>
 				<div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ background: `linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%)` }}>
 					<div className="row w-100">
-					<div className="col-12 col-md-8 col-lg-6 col-xl-5 mx-auto">
+					<div className="col-12 col-md-10 col-lg-8 mx-auto">
 						<Card className="shadow-lg border-0">
 							<Card.Body className="p-4">
-								<h2 className="text-center mb-3">📚 Repertório Carregado</h2>
-								<div className="alert alert-success text-center">
-									<strong>Variantes disponíveis:</strong>
-									<div className="mt-2">
-										{variants.map((v, i) => (
-											<span key={i} className="badge bg-primary me-2 mb-1">{v}</span>
-										))}
-									</div>
+								<h2 className="text-center mb-4">📚 Minhas Aberturas</h2>
+
+								{/* Lista de aberturas */}
+								<div className="mb-4">
+									{variants.map((variantName, index) => {
+										const opening = openingService.getOpeningByName(variantName);
+										const positionCount = opening
+											? opening.stats?.totalPositions || 0
+											: Object.keys(data[variantName]).length;
+										const color = opening?.color || 'white';
+										const colorIcon = color === 'white' ? '⬜' : '⬛';
+
+										return (
+											<Card key={index} className="mb-3 shadow-sm">
+												<Card.Body className="p-3">
+													<div className="d-flex justify-content-between align-items-center">
+														<div className="flex-grow-1">
+															<h5 className="mb-1">
+																{colorIcon} {variantName}
+															</h5>
+															<div className="text-muted small">
+																{positionCount} posições disponíveis
+																{opening && opening.stats && (
+																	<> • {Math.round(opening.stats.accuracy)}% de acerto</>
+																)}
+															</div>
+														</div>
+
+														<div className="d-flex gap-2">
+															<Button
+																variant="success"
+																size="sm"
+																onClick={() => {
+																	setVariant(variantName);
+																	setMode('train');
+																}}
+																title="Treinar esta abertura"
+															>
+																🎯 Treinar
+															</Button>
+
+															<Button
+																variant="info"
+																size="sm"
+																onClick={() => {
+																	setVariant(variantName);
+																	setMode('edit');
+																}}
+																title="Editar esta abertura"
+															>
+																✏️ Editar
+															</Button>
+
+															<Button
+																variant="danger"
+																size="sm"
+																onClick={() => handleDeleteOpening(variantName)}
+																title="Deletar esta abertura"
+															>
+																🗑️
+															</Button>
+														</div>
+													</div>
+												</Card.Body>
+											</Card>
+										);
+									})}
 								</div>
 
-								<Gap size={16}>
-									<Button
-										variant="primary"
-										size="lg"
-										className="w-100"
-										onClick={() => {
-											const selectedVariant = variants.length === 1
-												? variants[0]
-												: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
-											if (selectedVariant && data[selectedVariant]) {
-												setVariant(selectedVariant);
-												setMode('train');
-											}
-										}}
-									>
-										🎯 Treinar Abertura
-										<small className="d-block mt-1">Pratique com posições aleatórias</small>
-									</Button>
-
-									<Button
-										variant="info"
-										size="lg"
-										className="w-100"
-										onClick={() => {
-											const selectedVariant = variants.length === 1
-												? variants[0]
-												: prompt(`Escolha uma variante: ${variants.join(', ')}`, variants[0]);
-											if (selectedVariant && data[selectedVariant]) {
-												setVariant(selectedVariant);
-												setMode('edit');
-											}
-										}}
-									>
-										✏️ Editar Repertório
-										<small className="d-block mt-1">Adicione ou modifique variantes</small>
-									</Button>
-
+								<Gap size={12}>
 									<hr className="w-100" />
 
 									<Button
@@ -122,7 +168,7 @@ function App() {
 										className="w-100"
 										onClick={handleExist}
 									>
-										← Voltar ao Menu
+										← Voltar ao Menu Principal
 									</Button>
 								</Gap>
 							</Card.Body>
