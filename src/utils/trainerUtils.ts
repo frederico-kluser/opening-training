@@ -97,11 +97,38 @@ export function generateTrainingSequence(
   color: 'white' | 'black',
   count: number = 20
 ): TrainingPosition[] {
-  // Filtra apenas posições treináveis (que têm nextFen)
+  // Filtra apenas posições treináveis (que têm nextFen) E onde é a vez da cor do usuário
   const trainablePositions = Object.keys(positions).filter(fen => {
     const pos = positions[fen];
-    return pos.nextFen && pos.nextFen.length > 0;
+
+    // Verificar se tem movimentos válidos
+    if (!pos.nextFen || pos.nextFen.length === 0) {
+      return false;
+    }
+
+    // ✅ NOVO: Verificar se é a vez da cor do usuário jogar
+    try {
+      const game = new Chess(fen);
+      const currentTurn = game.turn(); // 'w' ou 'b'
+      const expectedTurn = color === 'white' ? 'w' : 'b';
+
+      // Só inclui se for a vez da cor correta
+      return currentTurn === expectedTurn;
+    } catch (error) {
+      console.error('❌ Erro ao validar FEN:', fen, error);
+      return false;
+    }
   });
+
+  // Log para debug
+  const totalPositions = Object.keys(positions).length;
+  console.log(`📚 Posições filtradas: ${trainablePositions.length} de ${totalPositions} posições são da vez de ${color === 'white' ? '⬜ brancas' : '⬛ pretas'} jogarem`);
+
+  // Avisar se não houver posições da cor correta
+  if (trainablePositions.length === 0) {
+    console.warn(`⚠️ ATENÇÃO: Nenhuma posição encontrada onde é a vez de ${color} jogar! Verifique se a abertura foi cadastrada corretamente.`);
+    return [];
+  }
 
   // Embaralha usando Fisher-Yates
   const shuffled = [...trainablePositions];

@@ -5,7 +5,7 @@ interface ChessBoardWrapperProps {
   position: string;
   onPieceDrop: (sourceSquare: string, targetSquare: string) => boolean;
   orientation?: 'white' | 'black';
-  isDraggable?: boolean;
+  isDraggable?: boolean | ((args: { piece: string; sourceSquare: string }) => boolean);
   width?: number | string;
   style?: React.CSSProperties;
 }

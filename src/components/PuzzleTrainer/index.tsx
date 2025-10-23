@@ -213,6 +213,18 @@ const PuzzleTrainer: React.FC = () => {
   }, [puzzles, session.puzzleIndex, evaluatePosition]);
 
 
+  // Verificar se peça pode ser arrastada (apenas da cor do jogador)
+  const canDragPiece = useCallback(({ piece }: { piece: string; sourceSquare: string }) => {
+    // Bloquear se está mostrando feedback ou contexto
+    if (showFeedback || showingContext || !session.currentPuzzle) return false;
+
+    // Peças brancas começam com 'w', pretas com 'b'
+    const pieceColor = piece[0] === 'w' ? 'white' : 'black';
+
+    // Só permite arrastar peças da cor do jogador no puzzle
+    return pieceColor === session.currentPuzzle.color;
+  }, [showFeedback, showingContext, session.currentPuzzle]);
+
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
     if (!session.currentPuzzle || showFeedback || showingContext) return false;
@@ -613,7 +625,7 @@ const PuzzleTrainer: React.FC = () => {
                   position={game.fen()}
                   onPieceDrop={onDrop}
                   orientation={boardOrientation}
-                  isDraggable={!showFeedback && !showingContext}
+                  isDraggable={canDragPiece}
                 />
               </div>
             </div>

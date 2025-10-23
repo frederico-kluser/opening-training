@@ -204,6 +204,18 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     setSession(prev => ({ ...prev, attemptCount: 0, showHint: false }));
   }, [session.currentPosition, evaluatePosition]);
 
+  // Verificar se peça pode ser arrastada (apenas da cor do jogador)
+  const canDragPiece = useCallback(({ piece }: { piece: string; sourceSquare: string }) => {
+    // Bloquear se está mostrando feedback ou contexto
+    if (showFeedback || showingContext) return false;
+
+    // Peças brancas começam com 'w', pretas com 'b'
+    const pieceColor = piece[0] === 'w' ? 'white' : 'black';
+
+    // Só permite arrastar peças da cor do jogador
+    return pieceColor === session.openingColor;
+  }, [showFeedback, showingContext, session.openingColor]);
+
   // Lidar com movimento
   const onDrop = useCallback((sourceSquare: string, targetSquare: string) => {
     if (!session.currentPosition || showFeedback || showingContext) return false;
@@ -509,7 +521,7 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                   position={game.fen()}
                   onPieceDrop={onDrop}
                   orientation={boardOrientation}
-                  isDraggable={!showFeedback && !showingContext}
+                  isDraggable={canDragPiece}
                 />
               </div>
             </div>
