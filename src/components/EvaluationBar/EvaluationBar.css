@@ -1,4 +1,4 @@
-/* Evaluation Bar - Chess.com style */
+/* Evaluation Bar - GPU-Accelerated com Transform */
 
 .evaluation-bar-container {
   position: relative;
@@ -10,6 +10,10 @@
   overflow: hidden;
   background-color: #000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  /* Otimizações de rendering */
+  contain: layout style paint;
+  backface-visibility: hidden;
 }
 
 .evaluation-bar {
@@ -20,29 +24,41 @@
   flex-direction: column-reverse; /* Brancas embaixo */
 }
 
-/* Seção Branca */
+/* Seção Branca - Agora usa transform para GPU acceleration */
 .eval-section.white-section {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  min-height: 5%;
+
+  /* Transform ao invés de height - GPU accelerated */
+  transform-origin: bottom center;
+  will-change: transform;
 }
 
 /* Seção Preta */
 .eval-section.black-section {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  min-height: 5%;
+
+  /* Transform ao invés de height */
+  transform-origin: top center;
+  will-change: transform;
 }
 
-/* Animação Suave */
+/* Animação Suave com Transform (GPU-accelerated) */
 .eval-section.animated {
-  transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* Texto de Avaliação */
@@ -120,6 +136,7 @@
     transparent 100%
   );
   animation: loading-pulse 1.5s ease-in-out infinite;
+  z-index: 20;
 }
 
 @keyframes loading-pulse {
@@ -171,4 +188,27 @@
 
 [data-theme="dark"] .evaluation-bar-container:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Reduzir movimento para acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  .eval-section.animated {
+    transition: none;
+  }
+
+  .eval-center-line {
+    transition: none;
+  }
+
+  .evaluation-bar-container.loading::after {
+    animation: none;
+  }
+}
+
+/* Hack para forçar GPU layer em browsers antigos */
+.eval-section {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }

@@ -32,13 +32,12 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
   const showInWhiteSection = whitePercentage > 50;
   const showInBlackSection = blackPercentage > 50;
 
-  console.log('📊 BARRA RENDERIZADA:', {
-    evaluation,
-    evalText,
-    whitePercentage: whitePercentage.toFixed(1) + '%',
-    blackPercentage: blackPercentage.toFixed(1) + '%',
-    visualRepresentation: '⬛'.repeat(Math.round(blackPercentage / 10)) + '⬜'.repeat(Math.round(whitePercentage / 10))
-  });
+  // Calcular transforms - GPU accelerated
+  // Brancas (bottom): scale de 0 a 1 baseado em whitePercentage
+  const whiteScaleY = whitePercentage / 100;
+
+  // Pretas (top): scale de 0 a 1 baseado em blackPercentage
+  const blackScaleY = blackPercentage / 100;
 
   return (
     <div
@@ -47,20 +46,24 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
     >
       {/* Barra Visual */}
       <div className="evaluation-bar">
-        {/* Parte Branca (bottom) */}
+        {/* Parte Branca (bottom) - usa scaleY */}
         <div
           className={`eval-section white-section ${animated ? 'animated' : ''}`}
-          style={{ height: `${whitePercentage}%` }}
+          style={{
+            transform: `scaleY(${whiteScaleY})`
+          }}
         >
           {showNumeric && showInWhiteSection && !isMate && (
             <span className="eval-text white-text">{evalText}</span>
           )}
         </div>
 
-        {/* Parte Preta (top) */}
+        {/* Parte Preta (top) - usa scaleY */}
         <div
           className={`eval-section black-section ${animated ? 'animated' : ''}`}
-          style={{ height: `${blackPercentage}%` }}
+          style={{
+            transform: `scaleY(${blackScaleY})`
+          }}
         >
           {showNumeric && showInBlackSection && !isMate && (
             <span className="eval-text black-text">{evalText}</span>

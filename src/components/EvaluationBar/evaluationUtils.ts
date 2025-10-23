@@ -15,13 +15,6 @@ export function centipawnsToWinPercentage(centipawns: number): number {
   // Clamp entre 0 e 100
   const result = Math.max(0, Math.min(100, winProbability));
 
-  console.log('🧮 Conversão:', {
-    centipawns,
-    pawns: (centipawns / 100).toFixed(2),
-    whiteWinPercentage: result.toFixed(1) + '%',
-    blackWinPercentage: (100 - result).toFixed(1) + '%'
-  });
-
   return result;
 }
 
