@@ -78,8 +78,134 @@ export function shouldShowOpponentMove(position: TrainingPosition): OpponentMove
 }
 
 /**
- * Gera sequência de posições de treinamento com contexto
- * Similar ao Fisher-Yates shuffle mas mantém informações de contexto
+ * Sistema de rastreamento de frequência de posições (localStorage)
+ */
+const POSITION_FREQUENCY_KEY = 'opening-trainer-position-frequency';
+
+interface PositionFrequency {
+  [fen: string]: number; // FEN -> número de vezes mostrada
+}
+
+function getPositionFrequencies(): PositionFrequency {
+  try {
+    const stored = localStorage.getItem(POSITION_FREQUENCY_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePositionFrequencies(frequencies: PositionFrequency): void {
+  try {
+    localStorage.setItem(POSITION_FREQUENCY_KEY, JSON.stringify(frequencies));
+  } catch (error) {
+    console.warn('⚠️ Não foi possível salvar frequências de posições:', error);
+  }
+}
+
+export function recordPositionShown(fen: string): void {
+  const frequencies = getPositionFrequencies();
+  frequencies[fen] = (frequencies[fen] || 0) + 1;
+  savePositionFrequencies(frequencies);
+}
+
+/**
+ * Reseta todas as estatísticas de frequência de posições
+ * Útil para "começar do zero" o balanceamento
+ */
+export function resetPositionFrequencies(): void {
+  try {
+    localStorage.removeItem(POSITION_FREQUENCY_KEY);
+    console.log('🔄 Estatísticas de frequência resetadas');
+  } catch (error) {
+    console.warn('⚠️ Não foi possível resetar frequências:', error);
+  }
+}
+
+/**
+ * Obtém estatísticas sobre o balanceamento de posições
+ */
+export function getBalancingStats(): {
+  totalPositionsTracked: number;
+  mostSeenPosition: { fen: string; count: number } | null;
+  leastSeenPosition: { fen: string; count: number } | null;
+  averageViews: number;
+} {
+  const frequencies = getPositionFrequencies();
+  const entries = Object.entries(frequencies);
+
+  if (entries.length === 0) {
+    return {
+      totalPositionsTracked: 0,
+      mostSeenPosition: null,
+      leastSeenPosition: null,
+      averageViews: 0
+    };
+  }
+
+  const counts = entries.map(([_, count]) => count);
+  const total = counts.reduce((sum, c) => sum + c, 0);
+
+  const sorted = entries.sort((a, b) => b[1] - a[1]);
+
+  return {
+    totalPositionsTracked: entries.length,
+    mostSeenPosition: { fen: sorted[0][0], count: sorted[0][1] },
+    leastSeenPosition: { fen: sorted[sorted.length - 1][0], count: sorted[sorted.length - 1][1] },
+    averageViews: total / entries.length
+  };
+}
+
+/**
+ * Sorteia posições usando sistema de pesos balanceados
+ * Posições menos vistas têm maior probabilidade de serem escolhidas
+ */
+function weightedRandomSelection(
+  fens: string[],
+  frequencies: PositionFrequency,
+  count: number
+): string[] {
+  const selected: string[] = [];
+  const available = [...fens];
+
+  for (let i = 0; i < count && available.length > 0; i++) {
+    // Calcula pesos: quanto menos vezes vista, maior o peso
+    // Fórmula: peso = 1 / (frequência + 1)
+    const weights = available.map(fen => {
+      const frequency = frequencies[fen] || 0;
+      return 1 / (frequency + 1);
+    });
+
+    // Soma total dos pesos
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+    // Sorteia baseado nos pesos
+    let random = Math.random() * totalWeight;
+    let selectedIndex = 0;
+
+    for (let j = 0; j < weights.length; j++) {
+      random -= weights[j];
+      if (random <= 0) {
+        selectedIndex = j;
+        break;
+      }
+    }
+
+    // Adiciona à seleção e remove dos disponíveis (evita repetição na mesma sessão)
+    selected.push(available[selectedIndex]);
+    available.splice(selectedIndex, 1);
+  }
+
+  return selected;
+}
+
+/**
+ * Gera sequência de posições de treinamento com contexto e balanceamento inteligente
+ *
+ * MELHORIAS v2.1.0:
+ * - ✅ Filtra apenas posições da cor do usuário
+ * - ✅ Balanceia baseado em frequência histórica
+ * - ✅ Evita repetição excessiva da mesma posição
  *
  * @param positions - Mapa de posições (FEN -> dados)
  * @param color - Cor que o usuário joga
@@ -106,7 +232,7 @@ export function generateTrainingSequence(
       return false;
     }
 
-    // ✅ NOVO: Verificar se é a vez da cor do usuário jogar
+    // ✅ Verificar se é a vez da cor do usuário jogar
     try {
       const game = new Chess(fen);
       const currentTurn = game.turn(); // 'w' ou 'b'
@@ -130,28 +256,32 @@ export function generateTrainingSequence(
     return [];
   }
 
-  // Embaralha usando Fisher-Yates
-  const shuffled = [...trainablePositions];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  // ⚖️ BALANCEAMENTO INTELIGENTE: Obtém frequências históricas
+  const frequencies = getPositionFrequencies();
+
+  // Mostrar estatísticas de balanceamento
+  const avgFrequency = trainablePositions.reduce((sum, fen) => sum + (frequencies[fen] || 0), 0) / trainablePositions.length;
+  console.log(`⚖️ Balanceamento: média de ${avgFrequency.toFixed(1)} visualizações por posição`);
+
+  // Sorteia posições com pesos balanceados
+  let selectedFens: string[] = [];
+
+  if (trainablePositions.length >= count) {
+    // Temos posições suficientes: usa sorteio balanceado
+    selectedFens = weightedRandomSelection(trainablePositions, frequencies, count);
+  } else {
+    // Precisamos repetir algumas posições
+    const iterations = Math.ceil(count / trainablePositions.length);
+
+    for (let i = 0; i < iterations; i++) {
+      const batch = weightedRandomSelection(trainablePositions, frequencies, trainablePositions.length);
+      selectedFens.push(...batch);
+    }
+
+    selectedFens = selectedFens.slice(0, count);
   }
 
-  // Se precisa de mais posições que as disponíveis, repete com re-embaralhamento
-  let selectedFens: string[] = [];
-  if (shuffled.length < count && shuffled.length > 0) {
-    while (selectedFens.length < count) {
-      const reShuffled = [...shuffled];
-      for (let i = reShuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [reShuffled[i], reShuffled[j]] = [reShuffled[j], reShuffled[i]];
-      }
-      selectedFens.push(...reShuffled);
-    }
-    selectedFens = selectedFens.slice(0, count);
-  } else {
-    selectedFens = shuffled.slice(0, Math.min(count, shuffled.length));
-  }
+  console.log(`🎲 ${selectedFens.length} posições sorteadas com balanceamento`);
 
   // Converte para TrainingPosition com contexto
   return selectedFens.map(fen => {

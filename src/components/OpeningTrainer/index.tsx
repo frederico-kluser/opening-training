@@ -18,7 +18,8 @@ import {
   shouldShowOpponentMove,
   validateMove,
   parseFenInfo,
-  getBoardOrientation
+  getBoardOrientation,
+  recordPositionShown
 } from '../../utils/trainerUtils';
 
 interface OpeningSession {
@@ -184,14 +185,19 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       return;
     }
 
+    // ✅ Posição válida! Registra que foi mostrada (para balanceamento futuro)
+    recordPositionShown(position.fen);
+
     const opponentMoveInfo = shouldShowOpponentMove(position);
 
     // 🔄 RESETAR a barra de avaliação para 0 ao mudar de posição (recomeça do zero)
     console.log('🔄 Resetando barra de avaliação para 0 (nova posição)');
     setCurrentEvaluation(0);
 
-    // Define orientação do tabuleiro (sempre a cor do usuário)
-    setBoardOrientation(getBoardOrientation(position.color));
+    // 🎨 Define orientação do tabuleiro (SEMPRE a cor escolhida pelo usuário)
+    setBoardOrientation(session.openingColor);
+
+    console.log(`🎨 Orientação do tabuleiro: ${session.openingColor === 'white' ? '⬜ Brancas embaixo' : '⬛ Pretas embaixo'} (cor escolhida: ${session.openingColor})`);
 
     if (opponentMoveInfo.shouldShow && position.fenContext) {
       // 🎭 Mostrar movimento do adversário primeiro
