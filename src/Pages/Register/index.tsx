@@ -1,5 +1,5 @@
 import { Form, Button, ButtonGroup } from 'react-bootstrap';
-import { Dispatch, SetStateAction, useEffect, useState, useCallback } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState, useCallback, useRef } from 'react';
 import { Chess, Move } from 'chess.js';
 import TypeStorage from '../../types/TypeStorage';
 import Gap from '../../components/Gap';
@@ -29,6 +29,9 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 	// Estados para Evaluation Bar
 	const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
 	const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+	// Ref para rastrear o último FEN avaliado
+	const lastEvaluatedFen = useRef<string>('');
 
 	// Hook do Stockfish
 	const { analyze, isReady } = useStockfish();
@@ -128,8 +131,11 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 		setComment(comment);
 
-		// Avaliar nova posição
-		evaluatePosition(actualFen);
+		// ✅ Só avaliar se o FEN realmente mudou (não reavaliar quando apenas o comment muda)
+		if (lastEvaluatedFen.current !== actualFen) {
+			lastEvaluatedFen.current = actualFen;
+			evaluatePosition(actualFen);
+		}
 	}, [actualFen, save, variant, evaluatePosition]);
 
 	const updateActualFen = (newFen: string) => {
@@ -199,17 +205,17 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 			{/* Seleção de cor da abertura */}
 			<div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
 				<div className="d-flex align-items-center gap-2">
-					<Form.Label className="mb-0 text-white fw-bold">Você joga com:</Form.Label>
+					<Form.Label className="mb-0 fw-bold">Você joga com:</Form.Label>
 					<ButtonGroup>
 						<Button
-							variant={openingColor === 'white' ? 'light' : 'outline-light'}
+							variant={openingColor === 'white' ? 'primary' : 'outline-primary'}
 							onClick={() => setOpeningColor('white')}
 							size="sm"
 						>
 							⬜ Brancas
 						</Button>
 						<Button
-							variant={openingColor === 'black' ? 'dark' : 'outline-dark'}
+							variant={openingColor === 'black' ? 'secondary' : 'outline-secondary'}
 							onClick={() => setOpeningColor('black')}
 							size="sm"
 						>
@@ -251,7 +257,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 						loading={isEvaluating}
 					/>
 					{isEvaluating && (
-						<small style={{ color: 'white', marginTop: '8px' }}>Analisando...</small>
+						<small className="text-muted" style={{ marginTop: '8px' }}>Analisando...</small>
 					)}
 				</div>
 
@@ -268,11 +274,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 			<div style={{ display: 'flex', justifyContent: 'center' }}>
 				<div style={{ width: 'min(500px, 90vw, 70vh)' }}>
 					<Form>
-						<Form.Label
-							style={{
-								color: 'white',
-							}}
-						>
+						<Form.Label>
 							Comentários
 						</Form.Label>
 						<Form.Control

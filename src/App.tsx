@@ -206,11 +206,11 @@ function App() {
 				</div>
 				<div className="min-vh-100 d-flex flex-column home-content">
 					{/* Clean Header */}
-					<div className="bg-white shadow-sm">
+					<div className="shadow-sm" style={{ backgroundColor: 'var(--bg-card)' }}>
 					<div className="container py-4">
 						<div className="text-center">
 							<div className="d-flex justify-content-center align-items-center gap-2 mb-2">
-								<h1 className="h2 fw-bold text-dark mb-0">♟ Sistema de Treino de Xadrez</h1>
+								<h1 className="h2 fw-bold mb-0">♟ Sistema de Treino de Xadrez</h1>
 								<span className="badge bg-secondary" style={{ fontSize: '0.75rem' }}>
 									v{packageJson.version}
 								</span>

@@ -15,7 +15,7 @@
 	--bg-secondary: #2d2d2d;
 	--bg-card: #2d2d2d;
 	--text-primary: #e0e0e0;
-	--text-secondary: #a0a0a0;
+	--text-secondary: #b8b8b8; /* Melhorado de #a0a0a0 para melhor contraste (5.1:1) */
 	--border-color: #404040;
 	--shadow: rgba(0, 0, 0, 0.3);
 	--gradient-start: #4a5568;
@@ -45,6 +45,55 @@ body {
 
 .bg-white {
 	background-color: var(--bg-card) !important;
+}
+
+/* Garante que títulos respeitem o tema */
+h1, h2, h3, h4, h5, h6 {
+	color: var(--text-primary) !important;
+}
+
+/* Form labels e textos auxiliares */
+.form-label {
+	color: var(--text-primary) !important;
+}
+
+.form-text {
+	color: var(--text-secondary) !important;
+}
+
+/* Inputs e selects */
+.form-control, .form-select {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+.form-control:focus, .form-select:focus {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+/* Alerts */
+.alert {
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+/* ListGroup items */
+.list-group-item {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+/* Tables */
+.table {
+	color: var(--text-primary) !important;
+}
+
+.table th, .table td {
+	border-color: var(--border-color) !important;
 }
 
 .hover-shadow:hover {

@@ -857,13 +857,9 @@ const GameAnalyzer: React.FC = () => {
                     </td>
                     <td className="text-center">
                       <Badge bg={
-                        game.result === '1-0' ? 'light' :
-                        game.result === '0-1' ? 'dark' :
+                        game.result === '1-0' ? 'success' :
+                        game.result === '0-1' ? 'danger' :
                         'secondary'
-                      } text={
-                        game.result === '1-0' ? 'dark' :
-                        game.result === '0-1' ? 'light' :
-                        'light'
                       }>
                         {game.result}
                       </Badge>
