@@ -611,17 +611,19 @@ const PuzzleTrainer: React.FC = () => {
                 display: 'flex',
                 flexDirection: isPortrait ? 'row' : 'column',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+              maxWidth: isPortrait ? '90vw' : 'auto',
+              width: isPortrait ? '100%' : 'auto'
               }}>
                 <EvaluationBar
                   evaluation={currentEvaluation}
-                  height={500}
+                  height={isPortrait ? Math.min(500, window.innerWidth * 0.85) : 500}
                   showNumeric={false}
                   animated={true}
                   loading={isEvaluating}
                   orientation={isPortrait ? 'horizontal' : 'vertical'}
                 />
-                {isEvaluating && (
+                {isEvaluating && !isPortrait && (
                   <small className="text-muted">Analisando...</small>
                 )}
               </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 import { Button, Card, Alert, Modal } from 'react-bootstrap';
-import { FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
+import { FaSearchPlus, FaSearchMinus, FaWindowMinimize, FaWindowMaximize } from 'react-icons/fa';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
 import openingService from '../../services/OpeningService';
@@ -72,6 +72,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
   // Modal de anotações
   const [showAnnotationModal, setShowAnnotationModal] = useState(false);
+  const [isModalMinimized, setIsModalMinimized] = useState(false);
   const [modalType, setModalType] = useState<'correct' | 'failed'>('correct');
   const [reachedPositionComment, setReachedPositionComment] = useState<string>('');
 
@@ -392,6 +393,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   // Fechar modal e ir para próxima posição
   const handleModalNext = () => {
     setShowAnnotationModal(false);
+    setIsModalMinimized(false); // Reset minimize state
     setShowFeedback(null);
     setBackgroundStyle({});
     setReachedPositionComment(''); // Limpa comentário da posição anterior
@@ -582,17 +584,19 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                 display: 'flex',
                 flexDirection: isPortrait ? 'row' : 'column',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+              maxWidth: isPortrait ? '90vw' : 'auto',
+              width: isPortrait ? '100%' : 'auto'
               }}>
                 <EvaluationBar
                   evaluation={currentEvaluation}
-                  height={500}
+                  height={isPortrait ? Math.min(500, window.innerWidth * 0.85) : 500}
                   showNumeric={false}
                   animated={true}
                   loading={isEvaluating}
                   orientation={isPortrait ? 'horizontal' : 'vertical'}
                 />
-                {isEvaluating && (
+                {isEvaluating && !isPortrait && (
                   <small className="text-muted">Analisando...</small>
                 )}
               </div>
@@ -672,20 +676,29 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
 
       {/* Modal de Anotações */}
       <Modal
-        show={showAnnotationModal}
+        show={showAnnotationModal && !isModalMinimized}
         onHide={() => {}} // Não permite fechar clicando fora
-        centered
+        fullscreen
         backdrop="static" // Não fecha clicando no backdrop
         keyboard={false} // Não fecha com ESC
       >
         <Modal.Header>
-          <Modal.Title>
-            {modalType === 'correct' ? (
-              <>✅ Movimento Correto!</>
-            ) : (
-              <>❌ Fim das Tentativas</>
-            )}
-          </Modal.Title>
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+            <Modal.Title>
+              {modalType === 'correct' ? (
+                <>✅ Movimento Correto!</>
+              ) : (
+                <>❌ Fim das Tentativas</>
+              )}
+            </Modal.Title>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={() => setIsModalMinimized(true)}
+            >
+              <FaWindowMinimize />
+            </Button>
+          </div>
         </Modal.Header>
 
         <Modal.Body>
@@ -719,6 +732,30 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Floating Maximize Button */}
+      {showAnnotationModal && isModalMinimized && (
+        <Button
+          onClick={() => setIsModalMinimized(false)}
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          variant="primary"
+          size="lg"
+        >
+          <FaWindowMaximize />
+        </Button>
+      )}
     </div>
   );
 };
