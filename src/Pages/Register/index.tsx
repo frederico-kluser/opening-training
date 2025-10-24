@@ -74,6 +74,14 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 	}, [variant]);
 
+	// 🎯 Sincronizar orientação do tabuleiro com a cor escolhida
+	useEffect(() => {
+		// Se escolheu pretas, inverte o tabuleiro (pretas embaixo)
+		// Se escolheu brancas, não inverte (brancas embaixo)
+		setInvertedBoard(openingColor === 'black');
+		console.log(`🎨 Tabuleiro orientado: ${openingColor === 'white' ? '⬜ Brancas embaixo' : '⬛ Pretas embaixo'}`);
+	}, [openingColor]);
+
 	// Salvar abertura no OpeningService quando houver mudanças
 	const handleSaveOpening = () => {
 		if (!save[variant] || Object.keys(save[variant]).length === 0) {
