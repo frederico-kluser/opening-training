@@ -528,12 +528,12 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
       <Gap size={16}>
         <Card>
           <Card.Body>
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
               <div>
                 <h5 className="mb-0">
                   📚 Treinar Aberturas: {variant}
                 </h5>
-                <small className="text-muted">
+                <small style={{ opacity: 0.8 }}>
                   Você joga com: {session.openingColor === 'white' ? '⬜ Brancas' : '⬛ Pretas'}
                 </small>
               </div>
@@ -562,7 +562,7 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
         </Card>
 
         <Card>
-          <Card.Body>
+          <Card.Body style={{ overflowX: 'hidden' }}>
             {showingContext && (
               <Alert variant="info" className="mb-3 text-center">
                 <strong>🎭 Movimento do adversário...</strong>
@@ -577,7 +577,8 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '1rem',
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              maxWidth: '100%'
             }}>
               {/* Evaluation Bar */}
               <div style={{
