@@ -11,6 +11,7 @@ import useStockfish from '../../hooks/useStockfish';
 import useBoardSize from '../../hooks/useBoardSize';
 import useScreenOrientation from '../../hooks/useScreenOrientation';
 import { populateEmptyComment, syncCommentToAllFens } from '../../utils/fenSyncUtils';
+import MoveSelectionModal from '../../components/MoveSelectionModal';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -32,6 +33,10 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 	// Estados para Evaluation Bar
 	const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
 	const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+	// Estados para o modal de seleção de movimentos
+	const [showMoveSelectionModal, setShowMoveSelectionModal] = useState(false);
+	const [availableMoves, setAvailableMoves] = useState<string[]>([]);
 
 	// Ref para rastrear o último FEN avaliado
 	const lastEvaluatedFen = useRef<string>('');
@@ -212,9 +217,21 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
   const handleRedo = () => {
     if (save[variant][actualFen]?.nextFen.length > 0) {
-      // TODO: Implementar a seleção de variações
-      setActualFen(save[variant][actualFen]?.nextFen[0]);
+      const nextFens = save[variant][actualFen]?.nextFen;
+
+      // Se houver apenas um avanço, vai direto
+      if (nextFens.length === 1) {
+        setActualFen(nextFens[0]);
+      } else {
+        // Se houver múltiplos avanços, mostra o modal
+        setAvailableMoves(nextFens);
+        setShowMoveSelectionModal(true);
+      }
     }
+  };
+
+  const handleMoveSelection = (selectedFen: string) => {
+    setActualFen(selectedFen);
   };
 
 	return (
@@ -328,6 +345,15 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 					</Form>
 				</div>
 			</div>
+
+			{/* Modal de seleção de movimentos */}
+			<MoveSelectionModal
+				show={showMoveSelectionModal}
+				currentFen={actualFen}
+				nextFens={availableMoves}
+				onSelectMove={handleMoveSelection}
+				onHide={() => setShowMoveSelectionModal(false)}
+			/>
 		</Gap>
 	);
 };
