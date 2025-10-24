@@ -3,17 +3,19 @@ import { useState, useEffect, useCallback } from 'react';
 /**
  * Hook para gerenciar o tamanho do tabuleiro de xadrez
  *
- * Fornece controles de zoom com 5 níveis de tamanho:
+ * Fornece controles de zoom com 7 níveis de tamanho:
  * - Extra pequeno: 350px
  * - Pequeno: 400px
  * - Médio: 500px (padrão)
  * - Grande: 600px
  * - Extra grande: 700px
+ * - 2XL: 850px
+ * - 3XL: 1000px
  *
  * O tamanho selecionado é persistido no localStorage
  */
 
-export type BoardSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type BoardSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 const BOARD_SIZES: Record<BoardSize, number> = {
   xs: 350,
@@ -21,9 +23,11 @@ const BOARD_SIZES: Record<BoardSize, number> = {
   md: 500, // padrão
   lg: 600,
   xl: 700,
+  '2xl': 850,
+  '3xl': 1000,
 };
 
-const SIZE_ORDER: BoardSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+const SIZE_ORDER: BoardSize[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
 const DEFAULT_SIZE: BoardSize = 'md';
 const STORAGE_KEY = 'chess-board-size';
 
