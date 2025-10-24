@@ -73,6 +73,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   // Modal de anotações
   const [showAnnotationModal, setShowAnnotationModal] = useState(false);
   const [modalType, setModalType] = useState<'correct' | 'failed'>('correct');
+  const [reachedPositionComment, setReachedPositionComment] = useState<string>('');
 
   // Estados para Evaluation Bar
   const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
@@ -288,14 +289,29 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         return false;
       }
 
-      // Movimento correto
+      // Movimento correto - busca comentário da posição resultante
+      if (validation.resultingFen) {
+        // Busca o comentário da posição alcançada
+        const opening = openingService.getOpeningByName(variant);
+        let comment = '';
+
+        if (opening && opening.positions[validation.resultingFen]) {
+          comment = opening.positions[validation.resultingFen].comment || '';
+        } else if (data[variant] && data[variant][validation.resultingFen]) {
+          // Fallback para data legacy
+          comment = data[variant][validation.resultingFen].comment || '';
+        }
+
+        setReachedPositionComment(comment);
+      }
+
       handleCorrectMove();
       return false; // Sempre retorna false para não mover a peça até validar
     } catch (error) {
       console.error('Erro ao processar movimento:', error);
       return false;
     }
-  }, [game, session.currentPosition, showFeedback, showingContext]);
+  }, [game, session.currentPosition, showFeedback, showingContext, variant, data]);
 
   // Movimento correto
   const handleCorrectMove = () => {
@@ -378,6 +394,7 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     setShowAnnotationModal(false);
     setShowFeedback(null);
     setBackgroundStyle({});
+    setReachedPositionComment(''); // Limpa comentário da posição anterior
 
     // Pequeno delay antes de carregar próxima posição
     setTimeout(() => {
@@ -601,12 +618,6 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
               attemptCount={session.attemptCount}
             />
 
-            {session.showHint && session.currentPosition?.comment && (
-              <Alert variant="info" className="mt-3">
-                💡 <strong>Dica:</strong> {session.currentPosition.comment}
-              </Alert>
-            )}
-
             <div className="mt-3">
               <Gap size={8} horizontal>
                 <Button
@@ -678,19 +689,27 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
         </Modal.Header>
 
         <Modal.Body>
-          {session.currentPosition?.comment ? (
+          {modalType === 'correct' && reachedPositionComment ? (
             <div>
-              <h6>📝 Anotações do Movimento:</h6>
-              <p className="mb-0">{session.currentPosition.comment}</p>
+              <h6>📝 Anotações da Posição Alcançada:</h6>
+              <p className="mb-0">{reachedPositionComment}</p>
             </div>
-          ) : (
+          ) : modalType === 'correct' ? (
             <p className="text-muted mb-0">Sem anotações para esta posição.</p>
-          )}
+          ) : null}
 
           {modalType === 'failed' && (
-            <Alert variant="warning" className="mt-3 mb-0">
-              💡 Você esgotou as 3 tentativas. Revise esta posição e tente novamente na próxima sessão!
-            </Alert>
+            <>
+              {session.currentPosition?.comment && (
+                <div className="mb-3">
+                  <h6>💡 Dica para esta posição:</h6>
+                  <p className="mb-0">{session.currentPosition.comment}</p>
+                </div>
+              )}
+              <Alert variant="warning" className="mb-0">
+                ⚠️ Você esgotou as 3 tentativas. Revise esta posição e tente novamente na próxima sessão!
+              </Alert>
+            </>
           )}
         </Modal.Body>
 
