@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Card, Alert, Modal } from 'react-bootstrap';
-import { FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
+import { Button, Card, Alert, Modal, Form } from 'react-bootstrap';
+import { FaSearchPlus, FaSearchMinus, FaWindowMinimize, FaWindowMaximize } from 'react-icons/fa';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
 import openingService from '../../services/OpeningService';
@@ -72,8 +72,11 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
   // Modal de anotações
   const [showAnnotationModal, setShowAnnotationModal] = useState(false);
+  const [isModalMinimized, setIsModalMinimized] = useState(false);
   const [modalType, setModalType] = useState<'correct' | 'failed'>('correct');
   const [reachedPositionComment, setReachedPositionComment] = useState<string>('');
+  const [editableComment, setEditableComment] = useState<string>('');
+  const [reachedPositionFen, setReachedPositionFen] = useState<string>(''); // Para salvar o comentário editado
 
   // Estados para Evaluation Bar
   const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
@@ -276,7 +279,20 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     try {
       const position = session.currentPosition;
 
-      // Valida o movimento
+      // Primeiro, tenta fazer o movimento no game
+      const gameCopy = new Chess(game.fen());
+      const move = gameCopy.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q'
+      });
+
+      if (!move) {
+        // Movimento inválido pelas regras do xadrez
+        return false;
+      }
+
+      // Valida se o movimento está nas variantes corretas
       const validation = validateMove(
         game.fen(),
         position.color,
@@ -285,11 +301,16 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       );
 
       if (!validation.isValid) {
+        // Movimento válido no xadrez, mas não está nas variantes
+        // Aplica o movimento para mostrar visualmente
+        setGame(gameCopy);
         handleIncorrectMove();
-        return false;
+        return true;
       }
 
-      // Movimento correto - busca comentário da posição resultante
+      // Movimento correto - aplica ao game e busca comentário da posição resultante
+      setGame(gameCopy);
+
       if (validation.resultingFen) {
         // Busca o comentário da posição alcançada
         const opening = openingService.getOpeningByName(variant);
@@ -303,10 +324,12 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         }
 
         setReachedPositionComment(comment);
+        setEditableComment(comment);
+        setReachedPositionFen(validation.resultingFen);
       }
 
       handleCorrectMove();
-      return false; // Sempre retorna false para não mover a peça até validar
+      return true;
     } catch (error) {
       console.error('Erro ao processar movimento:', error);
       return false;
@@ -381,20 +404,53 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         setShowAnnotationModal(true);
       }, 500);
     } else {
-      // Limpa feedback após 2 segundos
+      // Limpa feedback e reseta posição após 2 segundos
       setTimeout(() => {
         setShowFeedback(null);
         setBackgroundStyle({});
+        // Reseta o tabuleiro para a posição original
+        if (session.currentPosition) {
+          setGame(new Chess(session.currentPosition.fen));
+        }
       }, 2000);
+    }
+  };
+
+  // Salvar comentário editado
+  const handleSaveComment = () => {
+    if (reachedPositionFen && session.openingId) {
+      // Salva no OpeningService
+      const opening = openingService.getOpeningByName(variant);
+      if (opening) {
+        const updatedPositions = {
+          ...opening.positions,
+          [reachedPositionFen]: {
+            ...opening.positions[reachedPositionFen],
+            comment: editableComment
+          }
+        };
+        openingService.updateOpening(session.openingId, {
+          positions: updatedPositions
+        });
+        console.log('💾 Comentário salvo com sucesso');
+      }
     }
   };
 
   // Fechar modal e ir para próxima posição
   const handleModalNext = () => {
+    // Salva o comentário antes de fechar
+    if (editableComment !== reachedPositionComment) {
+      handleSaveComment();
+    }
+
     setShowAnnotationModal(false);
+    setIsModalMinimized(false); // Reset minimize state
     setShowFeedback(null);
     setBackgroundStyle({});
     setReachedPositionComment(''); // Limpa comentário da posição anterior
+    setEditableComment('');
+    setReachedPositionFen('');
 
     // Pequeno delay antes de carregar próxima posição
     setTimeout(() => {
@@ -526,12 +582,12 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
       <Gap size={16}>
         <Card>
           <Card.Body>
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
               <div>
                 <h5 className="mb-0">
                   📚 Treinar Aberturas: {variant}
                 </h5>
-                <small className="text-muted">
+                <small style={{ opacity: 0.8 }}>
                   Você joga com: {session.openingColor === 'white' ? '⬜ Brancas' : '⬛ Pretas'}
                 </small>
               </div>
@@ -560,7 +616,7 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
         </Card>
 
         <Card>
-          <Card.Body>
+          <Card.Body style={{ overflowX: 'hidden' }}>
             {showingContext && (
               <Alert variant="info" className="mb-3 text-center">
                 <strong>🎭 Movimento do adversário...</strong>
@@ -575,24 +631,27 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '1rem',
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              maxWidth: '100%'
             }}>
               {/* Evaluation Bar */}
               <div style={{
                 display: 'flex',
                 flexDirection: isPortrait ? 'row' : 'column',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
+              maxWidth: isPortrait ? '90vw' : 'auto',
+              width: isPortrait ? '100%' : 'auto'
               }}>
                 <EvaluationBar
                   evaluation={currentEvaluation}
-                  height={500}
+                  height={isPortrait ? Math.min(500, window.innerWidth * 0.85) : 500}
                   showNumeric={false}
                   animated={true}
                   loading={isEvaluating}
                   orientation={isPortrait ? 'horizontal' : 'vertical'}
                 />
-                {isEvaluating && (
+                {isEvaluating && !isPortrait && (
                   <small className="text-muted">Analisando...</small>
                 )}
               </div>
@@ -672,38 +731,59 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
 
       {/* Modal de Anotações */}
       <Modal
-        show={showAnnotationModal}
+        show={showAnnotationModal && !isModalMinimized}
         onHide={() => {}} // Não permite fechar clicando fora
-        centered
+        fullscreen
         backdrop="static" // Não fecha clicando no backdrop
         keyboard={false} // Não fecha com ESC
       >
         <Modal.Header>
-          <Modal.Title>
-            {modalType === 'correct' ? (
-              <>✅ Movimento Correto!</>
-            ) : (
-              <>❌ Fim das Tentativas</>
-            )}
-          </Modal.Title>
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+            <Modal.Title>
+              {modalType === 'correct' ? (
+                <>✅ Movimento Correto!</>
+              ) : (
+                <>❌ Fim das Tentativas</>
+              )}
+            </Modal.Title>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={() => setIsModalMinimized(true)}
+            >
+              <FaWindowMinimize />
+            </Button>
+          </div>
         </Modal.Header>
 
         <Modal.Body>
-          {modalType === 'correct' && reachedPositionComment ? (
+          {modalType === 'correct' && (
             <div>
               <h6>📝 Anotações da Posição Alcançada:</h6>
-              <p className="mb-0">{reachedPositionComment}</p>
+              <Form.Control
+                as="textarea"
+                rows={5}
+                value={editableComment}
+                onChange={(e) => setEditableComment(e.target.value)}
+                placeholder="Adicione suas anotações sobre esta posição..."
+              />
+              <small className="text-muted mt-2 d-block">
+                💡 Suas anotações serão salvas automaticamente ao avançar
+              </small>
             </div>
-          ) : modalType === 'correct' ? (
-            <p className="text-muted mb-0">Sem anotações para esta posição.</p>
-          ) : null}
+          )}
 
           {modalType === 'failed' && (
             <>
               {session.currentPosition?.comment && (
                 <div className="mb-3">
                   <h6>💡 Dica para esta posição:</h6>
-                  <p className="mb-0">{session.currentPosition.comment}</p>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={session.currentPosition.comment}
+                    readOnly
+                  />
                 </div>
               )}
               <Alert variant="warning" className="mb-0">
@@ -719,6 +799,30 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Floating Maximize Button */}
+      {showAnnotationModal && isModalMinimized && (
+        <Button
+          onClick={() => setIsModalMinimized(false)}
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          variant="primary"
+          size="lg"
+        >
+          <FaWindowMaximize />
+        </Button>
+      )}
     </div>
   );
 };

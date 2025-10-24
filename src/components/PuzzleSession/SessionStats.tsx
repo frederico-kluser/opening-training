@@ -67,7 +67,7 @@ const SessionStats: React.FC<SessionStatsProps> = ({
         <Col xs={12} md={6} className="text-md-end text-start mt-3 mt-md-0">
           {color && (
             <div>
-              <Badge bg={color === 'white' ? 'light' : 'dark'}>
+              <Badge bg={color === 'white' ? 'light' : 'dark'} text={color === 'white' ? 'dark' : 'light'}>
                 {color === 'white' ? 'Brancas' : 'Pretas'}
               </Badge>
               {attemptCount > 0 && (

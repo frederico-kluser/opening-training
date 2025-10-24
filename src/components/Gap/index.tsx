@@ -35,6 +35,9 @@ const Gap = ({ horizontal = false, size, padding, children, centralize }: GapPro
 		display: horizontal ? 'flex' : 'grid',
 		gap: `${size}px`,
 		padding: padding ? `${padding}px` : 0,
+		...(horizontal && {
+			flexWrap: 'wrap',
+		}),
 		...(centralize && {
 			alignContent: 'center',
 			alignItems: 'center',
