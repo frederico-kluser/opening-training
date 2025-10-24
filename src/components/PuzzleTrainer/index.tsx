@@ -11,6 +11,8 @@ import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
 import EvaluationBar from '../EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
+import useBoardSize from '../../hooks/useBoardSize';
+import useScreenOrientation from '../../hooks/useScreenOrientation';
 import { formatTime, getElapsedTime } from '../../utils/timeUtils';
 import { convertUCItoSAN, moveToUCI } from '../../utils/chessUtils';
 
@@ -63,6 +65,12 @@ const PuzzleTrainer: React.FC = () => {
 
   // Hook do Stockfish
   const { analyze, isReady } = useStockfish();
+
+  // Hook para controle de zoom do tabuleiro
+  const { boardWidth, zoomIn, zoomOut, canZoomIn, canZoomOut } = useBoardSize();
+
+  // Hook para detectar orientação da tela
+  const { isPortrait } = useScreenOrientation();
 
   // Carregar puzzles quando o modo mudar
   useEffect(() => {
@@ -591,8 +599,9 @@ const PuzzleTrainer: React.FC = () => {
             {/* Layout com Evaluation Bar e Tabuleiro */}
             <div style={{
               display: 'flex',
+              flexDirection: isPortrait ? 'column' : 'row',
               gap: '20px',
-              alignItems: 'flex-start',
+              alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '1rem',
               flexWrap: 'wrap'
@@ -600,18 +609,20 @@ const PuzzleTrainer: React.FC = () => {
               {/* Evaluation Bar */}
               <div style={{
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
+                flexDirection: isPortrait ? 'row' : 'column',
+                alignItems: 'center',
+                gap: '8px'
               }}>
                 <EvaluationBar
                   evaluation={currentEvaluation}
                   height={500}
-                  showNumeric={true}
+                  showNumeric={false}
                   animated={true}
                   loading={isEvaluating}
+                  orientation={isPortrait ? 'horizontal' : 'vertical'}
                 />
                 {isEvaluating && (
-                  <small className="text-muted mt-2">Analisando...</small>
+                  <small className="text-muted">Analisando...</small>
                 )}
               </div>
 
@@ -626,6 +637,7 @@ const PuzzleTrainer: React.FC = () => {
                   onPieceDrop={onDrop}
                   orientation={boardOrientation}
                   isDraggable={canDragPiece}
+                  width={boardWidth}
                 />
               </div>
             </div>
@@ -648,6 +660,10 @@ const PuzzleTrainer: React.FC = () => {
                 onExit={() => window.location.reload()}
                 showNext={showNextButton}
                 disableSkip={showFeedback === 'correct' || showNextButton}
+                onZoomIn={zoomIn}
+                onZoomOut={zoomOut}
+                canZoomIn={canZoomIn}
+                canZoomOut={canZoomOut}
               />
             </div>
           </Card.Body>

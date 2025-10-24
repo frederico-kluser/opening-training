@@ -5,9 +5,10 @@ import './EvaluationBar.css';
 interface EvaluationBarProps {
   evaluation: number; // Centipawns (positivo = brancas, negativo = pretas)
   showNumeric?: boolean; // Mostrar valor numérico
-  height?: number; // Altura em pixels
+  height?: number; // Altura em pixels (modo vertical) ou largura (modo horizontal)
   animated?: boolean; // Animações suaves
   loading?: boolean; // Estado de carregamento
+  orientation?: 'vertical' | 'horizontal'; // Orientação da barra
 }
 
 export const EvaluationBar: React.FC<EvaluationBarProps> = ({
@@ -15,7 +16,8 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
   showNumeric = true,
   height = 400,
   animated = true,
-  loading = false
+  loading = false,
+  orientation = 'vertical'
 }) => {
   // Converte centipawns para porcentagem (0-100)
   const whitePercentage = centipawnsToWinPercentage(evaluation);
@@ -33,24 +35,29 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
   const showInBlackSection = blackPercentage > 50;
 
   // Calcular transforms - GPU accelerated
-  // Brancas (bottom): scale de 0 a 1 baseado em whitePercentage
-  const whiteScaleY = whitePercentage / 100;
+  // Para vertical: scaleY, para horizontal: scaleX
+  const whiteScale = whitePercentage / 100;
+  const blackScale = blackPercentage / 100;
 
-  // Pretas (top): scale de 0 a 1 baseado em blackPercentage
-  const blackScaleY = blackPercentage / 100;
+  const isHorizontal = orientation === 'horizontal';
+
+  // Estilos dinâmicos baseados na orientação
+  const containerStyle: React.CSSProperties = isHorizontal
+    ? { width: `${height}px`, height: '40px' }
+    : { height: `${height}px` };
 
   return (
     <div
-      className={`evaluation-bar-container ${loading ? 'loading' : ''}`}
-      style={{ height: `${height}px` }}
+      className={`evaluation-bar-container ${loading ? 'loading' : ''} ${isHorizontal ? 'horizontal' : 'vertical'}`}
+      style={containerStyle}
     >
       {/* Barra Visual */}
       <div className="evaluation-bar">
-        {/* Parte Branca (bottom) - usa scaleY */}
+        {/* Parte Branca - usa scaleY (vertical) ou scaleX (horizontal) */}
         <div
           className={`eval-section white-section ${animated ? 'animated' : ''}`}
           style={{
-            transform: `scaleY(${whiteScaleY})`
+            transform: isHorizontal ? `scaleX(${whiteScale})` : `scaleY(${whiteScale})`
           }}
         >
           {showNumeric && showInWhiteSection && !isMate && (
@@ -58,11 +65,11 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
           )}
         </div>
 
-        {/* Parte Preta (top) - usa scaleY */}
+        {/* Parte Preta - usa scaleY (vertical) ou scaleX (horizontal) */}
         <div
           className={`eval-section black-section ${animated ? 'animated' : ''}`}
           style={{
-            transform: `scaleY(${blackScaleY})`
+            transform: isHorizontal ? `scaleX(${blackScale})` : `scaleY(${blackScale})`
           }}
         >
           {showNumeric && showInBlackSection && !isMate && (
@@ -75,7 +82,7 @@ export const EvaluationBar: React.FC<EvaluationBarProps> = ({
       {!isMate && (
         <div
           className="eval-center-line"
-          style={{ bottom: `${whitePercentage}%` }}
+          style={isHorizontal ? { left: `${whitePercentage}%` } : { bottom: `${whitePercentage}%` }}
         />
       )}
 

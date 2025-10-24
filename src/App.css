@@ -230,6 +230,55 @@ textarea.form-control:-ms-input-placeholder {
 	box-shadow: 0 4px 12px var(--shadow);
 }
 
+/* Modais - Suporte para tema dark */
+.modal-content {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+.modal-header {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+	border-bottom-color: var(--border-color) !important;
+}
+
+.modal-title {
+	color: var(--text-primary) !important;
+}
+
+.modal-body {
+	background-color: var(--bg-card) !important;
+	color: var(--text-primary) !important;
+}
+
+.modal-body h6 {
+	color: var(--text-primary) !important;
+}
+
+.modal-body p {
+	color: var(--text-primary) !important;
+}
+
+.modal-footer {
+	background-color: var(--bg-card) !important;
+	border-top-color: var(--border-color) !important;
+}
+
+/* Backdrop do modal no tema dark */
+[data-theme="dark"] .modal-backdrop {
+	background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Botão de fechar (X) do modal */
+.modal-header .btn-close {
+	filter: var(--bs-btn-close-white-filter, none);
+}
+
+[data-theme="dark"] .modal-header .btn-close {
+	filter: invert(1) grayscale(100%) brightness(200%);
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
 	.h2 {
