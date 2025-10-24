@@ -151,6 +151,39 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     if (!session.currentPosition) return;
 
     const position = session.currentPosition;
+
+    // ✅ VALIDAÇÃO EXTRA: Verifica se é realmente a vez da cor do usuário jogar
+    const testGame = new Chess(position.fen);
+    const currentTurn = testGame.turn(); // 'w' ou 'b'
+    const expectedTurn = session.openingColor === 'white' ? 'w' : 'b';
+
+    if (currentTurn !== expectedTurn) {
+      console.error(`❌ ERRO: Posição com cor errada detectada!`, {
+        positionFen: position.fen.substring(0, 50) + '...',
+        expectedColor: session.openingColor,
+        actualTurn: currentTurn === 'w' ? 'white' : 'black',
+        positionIndex: session.positionIndex
+      });
+
+      // Pula automaticamente para a próxima posição
+      console.warn(`⏭️ Pulando posição ${session.positionIndex + 1} automaticamente...`);
+
+      // Avança para próxima posição inline (evita dependências circulares)
+      if (session.positionIndex < session.trainingPositions.length - 1) {
+        const nextIndex = session.positionIndex + 1;
+        setSession(prev => ({
+          ...prev,
+          positionIndex: nextIndex,
+          currentPosition: prev.trainingPositions[nextIndex]
+        }));
+      } else {
+        // Se acabaram as posições, retorna ao menu
+        console.error('❌ Todas as posições têm cor errada! Verifique se a abertura foi importada corretamente.');
+        alert('⚠️ Erro: Nenhuma posição válida encontrada para treino.\n\nVerifique se a abertura foi importada com a cor correta.');
+      }
+      return;
+    }
+
     const opponentMoveInfo = shouldShowOpponentMove(position);
 
     // 🔄 RESETAR a barra de avaliação para 0 ao mudar de posição (recomeça do zero)
