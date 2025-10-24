@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import { FaRedo, FaUndo } from 'react-icons/fa';
+import { FaRedo, FaUndo, FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
 import { RiFlipVerticalFill, RiFlipVerticalLine } from 'react-icons/ri';
 import { ImExit } from 'react-icons/im';
 import Gap from '../Gap';
@@ -16,6 +16,10 @@ interface NavigationBarProps {
   canRedo: boolean;
   downloadData?: any;
   downloadDisabled?: boolean;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  canZoomIn?: boolean;
+  canZoomOut?: boolean;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -27,7 +31,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   canUndo,
   canRedo,
   downloadData,
-  downloadDisabled = true
+  downloadDisabled = true,
+  onZoomIn,
+  onZoomOut,
+  canZoomIn = true,
+  canZoomOut = true
 }) => {
   return (
     <Gap size={16} horizontal>
@@ -54,6 +62,29 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       >
         <FaRedo />
       </Button>
+
+      {/* Controles de Zoom */}
+      {onZoomOut && (
+        <Button
+          variant="info"
+          onClick={onZoomOut}
+          disabled={!canZoomOut}
+          title="Diminuir tabuleiro"
+        >
+          <FaSearchMinus />
+        </Button>
+      )}
+
+      {onZoomIn && (
+        <Button
+          variant="info"
+          onClick={onZoomIn}
+          disabled={!canZoomIn}
+          title="Aumentar tabuleiro"
+        >
+          <FaSearchPlus />
+        </Button>
+      )}
 
       {downloadData && (
         <Download data={downloadData} disabled={downloadDisabled} />

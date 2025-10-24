@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 import { Button, Card, Alert, Modal } from 'react-bootstrap';
+import { FaSearchPlus, FaSearchMinus } from 'react-icons/fa';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
 import openingService from '../../services/OpeningService';
@@ -11,6 +12,7 @@ import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
 import EvaluationBar from '../EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
+import useBoardSize from '../../hooks/useBoardSize';
 import { getElapsedTime } from '../../utils/timeUtils';
 import {
   TrainingPosition,
@@ -77,6 +79,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
 
   // Hook do Stockfish
   const { analyze, isReady } = useStockfish();
+
+  // Hook para controle de zoom do tabuleiro
+  const { boardWidth, zoomIn, zoomOut, canZoomIn, canZoomOut } = useBoardSize();
 
   // Inicializar sessão de treinamento
   useEffect(() => {
@@ -579,6 +584,7 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                   onPieceDrop={onDrop}
                   orientation={boardOrientation}
                   isDraggable={canDragPiece}
+                  width={boardWidth}
                 />
               </div>
             </div>
@@ -618,6 +624,25 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
 
                 <Button variant="primary" onClick={onExit}>
                   🔄 Trocar Abertura
+                </Button>
+
+                {/* Controles de Zoom */}
+                <Button
+                  variant="info"
+                  onClick={zoomOut}
+                  disabled={!canZoomOut}
+                  title="Diminuir tabuleiro"
+                >
+                  <FaSearchMinus />
+                </Button>
+
+                <Button
+                  variant="info"
+                  onClick={zoomIn}
+                  disabled={!canZoomIn}
+                  title="Aumentar tabuleiro"
+                >
+                  <FaSearchPlus />
                 </Button>
               </Gap>
             </div>

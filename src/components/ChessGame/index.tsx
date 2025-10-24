@@ -7,9 +7,10 @@ interface ChessGameProps {
 	invertedBoard: boolean;
 	game: Chess;
 	onDropCallback: (move: Move) => void;
+	boardWidth?: string;
 }
 
-const ChessGame = ({ invertedBoard, game, onDropCallback }: ChessGameProps) => {
+const ChessGame = ({ invertedBoard, game, onDropCallback, boardWidth = 'min(500px, 90vw, 70vh)' }: ChessGameProps) => {
 	const makeAMove = (move: any) => {
 		const gameCopy = new Chess();
 		gameCopy.load(game.fen());
@@ -56,7 +57,7 @@ const ChessGame = ({ invertedBoard, game, onDropCallback }: ChessGameProps) => {
 
 	return (
 		<div style={{ display: 'flex', justifyContent: 'center' }}>
-			<div style={{ width: 'min(500px, 90vw, 70vh)', aspectRatio: '1/1' }}>
+			<div style={{ width: boardWidth, aspectRatio: '1/1' }}>
 				<Chessboard
 					id="BasicBoard"
 					boardOrientation={invertedBoard ? 'black' : 'white'}

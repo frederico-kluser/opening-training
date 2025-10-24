@@ -8,6 +8,7 @@ import NavigationBar from '../../components/TrainingControls/NavigationBar';
 import openingService from '../../services/OpeningService';
 import EvaluationBar from '../../components/EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
+import useBoardSize from '../../hooks/useBoardSize';
 import { populateEmptyComment, syncCommentToAllFens } from '../../utils/fenSyncUtils';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -36,6 +37,9 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 	// Hook do Stockfish
 	const { analyze, isReady } = useStockfish();
+
+	// Hook para controle de zoom do tabuleiro
+	const { boardWidth, zoomIn, zoomOut, canZoomIn, canZoomOut } = useBoardSize();
 
 	// const isBlackTurn = () => game.turn() === 'b';
 
@@ -221,6 +225,10 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
         canRedo={!!save[variant] && save[variant][actualFen]?.nextFen.length > 0}
         downloadData={save}
         downloadDisabled={Object.keys(save).length === 0}
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        canZoomIn={canZoomIn}
+        canZoomOut={canZoomOut}
       />
 
 			{/* Seleção de cor da abertura */}
@@ -288,7 +296,7 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 					minWidth: '320px',
 					maxWidth: '600px'
 				}}>
-					<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} />
+					<ChessGame invertedBoard={invertedBoard} game={game} onDropCallback={handleDrop} boardWidth={boardWidth} />
 				</div>
 			</div>
 

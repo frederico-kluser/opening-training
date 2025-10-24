@@ -15,6 +15,7 @@ const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
   onPieceDrop,
   orientation = 'white',
   isDraggable = true,
+  width = 'min(500px, 90vw, 70vh)',
   style = {}
 }) => {
   const containerStyle: React.CSSProperties = {
@@ -24,9 +25,11 @@ const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
   };
 
   const boardStyle: React.CSSProperties = {
-    width: 'min(500px, 90vw, 70vh)', // Usa o menor valor entre 500px, 90% da largura e 70% da altura
+    width: width, // Usa o width fornecido ou padrão
     aspectRatio: '1/1' // Mantém o tabuleiro quadrado
   };
+
+  const arePiecesDraggable = typeof isDraggable === 'boolean' ? isDraggable : true;
 
   return (
     <div style={containerStyle}>
@@ -35,7 +38,7 @@ const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
           position={position}
           onPieceDrop={onPieceDrop}
           boardOrientation={orientation}
-          arePiecesDraggable={isDraggable}
+          arePiecesDraggable={arePiecesDraggable}
         />
       </div>
     </div>

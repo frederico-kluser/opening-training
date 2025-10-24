@@ -11,6 +11,7 @@ import GlobalStats from '../PuzzleSession/GlobalStats';
 import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
 import EvaluationBar from '../EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
+import useBoardSize from '../../hooks/useBoardSize';
 import { formatTime, getElapsedTime } from '../../utils/timeUtils';
 import { convertUCItoSAN, moveToUCI } from '../../utils/chessUtils';
 
@@ -63,6 +64,9 @@ const PuzzleTrainer: React.FC = () => {
 
   // Hook do Stockfish
   const { analyze, isReady } = useStockfish();
+
+  // Hook para controle de zoom do tabuleiro
+  const { boardWidth, zoomIn, zoomOut, canZoomIn, canZoomOut } = useBoardSize();
 
   // Carregar puzzles quando o modo mudar
   useEffect(() => {
@@ -626,6 +630,7 @@ const PuzzleTrainer: React.FC = () => {
                   onPieceDrop={onDrop}
                   orientation={boardOrientation}
                   isDraggable={canDragPiece}
+                  width={boardWidth}
                 />
               </div>
             </div>
@@ -648,6 +653,10 @@ const PuzzleTrainer: React.FC = () => {
                 onExit={() => window.location.reload()}
                 showNext={showNextButton}
                 disableSkip={showFeedback === 'correct' || showNextButton}
+                onZoomIn={zoomIn}
+                onZoomOut={zoomOut}
+                canZoomIn={canZoomIn}
+                canZoomOut={canZoomOut}
               />
             </div>
           </Card.Body>
