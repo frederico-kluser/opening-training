@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Card, Alert, Modal } from 'react-bootstrap';
+import { Button, Card, Alert, Modal, Form } from 'react-bootstrap';
 import { FaSearchPlus, FaSearchMinus, FaWindowMinimize, FaWindowMaximize } from 'react-icons/fa';
 import TypeStorage from '../../types/TypeStorage';
 import openingTrainerService from '../../services/OpeningTrainerService';
@@ -75,6 +75,8 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
   const [isModalMinimized, setIsModalMinimized] = useState(false);
   const [modalType, setModalType] = useState<'correct' | 'failed'>('correct');
   const [reachedPositionComment, setReachedPositionComment] = useState<string>('');
+  const [editableComment, setEditableComment] = useState<string>('');
+  const [reachedPositionFen, setReachedPositionFen] = useState<string>(''); // Para salvar o comentário editado
 
   // Estados para Evaluation Bar
   const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
@@ -277,7 +279,20 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     try {
       const position = session.currentPosition;
 
-      // Valida o movimento
+      // Primeiro, tenta fazer o movimento no game
+      const gameCopy = new Chess(game.fen());
+      const move = gameCopy.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q'
+      });
+
+      if (!move) {
+        // Movimento inválido pelas regras do xadrez
+        return false;
+      }
+
+      // Valida se o movimento está nas variantes corretas
       const validation = validateMove(
         game.fen(),
         position.color,
@@ -286,11 +301,16 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       );
 
       if (!validation.isValid) {
+        // Movimento válido no xadrez, mas não está nas variantes
+        // Aplica o movimento para mostrar visualmente
+        setGame(gameCopy);
         handleIncorrectMove();
-        return false;
+        return true;
       }
 
-      // Movimento correto - busca comentário da posição resultante
+      // Movimento correto - aplica ao game e busca comentário da posição resultante
+      setGame(gameCopy);
+
       if (validation.resultingFen) {
         // Busca o comentário da posição alcançada
         const opening = openingService.getOpeningByName(variant);
@@ -304,10 +324,12 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         }
 
         setReachedPositionComment(comment);
+        setEditableComment(comment);
+        setReachedPositionFen(validation.resultingFen);
       }
 
       handleCorrectMove();
-      return false; // Sempre retorna false para não mover a peça até validar
+      return true;
     } catch (error) {
       console.error('Erro ao processar movimento:', error);
       return false;
@@ -382,21 +404,53 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
         setShowAnnotationModal(true);
       }, 500);
     } else {
-      // Limpa feedback após 2 segundos
+      // Limpa feedback e reseta posição após 2 segundos
       setTimeout(() => {
         setShowFeedback(null);
         setBackgroundStyle({});
+        // Reseta o tabuleiro para a posição original
+        if (session.currentPosition) {
+          setGame(new Chess(session.currentPosition.fen));
+        }
       }, 2000);
+    }
+  };
+
+  // Salvar comentário editado
+  const handleSaveComment = () => {
+    if (reachedPositionFen && session.openingId) {
+      // Salva no OpeningService
+      const opening = openingService.getOpeningByName(variant);
+      if (opening) {
+        const updatedPositions = {
+          ...opening.positions,
+          [reachedPositionFen]: {
+            ...opening.positions[reachedPositionFen],
+            comment: editableComment
+          }
+        };
+        openingService.updateOpening(session.openingId, {
+          positions: updatedPositions
+        });
+        console.log('💾 Comentário salvo com sucesso');
+      }
     }
   };
 
   // Fechar modal e ir para próxima posição
   const handleModalNext = () => {
+    // Salva o comentário antes de fechar
+    if (editableComment !== reachedPositionComment) {
+      handleSaveComment();
+    }
+
     setShowAnnotationModal(false);
     setIsModalMinimized(false); // Reset minimize state
     setShowFeedback(null);
     setBackgroundStyle({});
     setReachedPositionComment(''); // Limpa comentário da posição anterior
+    setEditableComment('');
+    setReachedPositionFen('');
 
     // Pequeno delay antes de carregar próxima posição
     setTimeout(() => {
@@ -703,21 +757,33 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
         </Modal.Header>
 
         <Modal.Body>
-          {modalType === 'correct' && reachedPositionComment ? (
+          {modalType === 'correct' && (
             <div>
               <h6>📝 Anotações da Posição Alcançada:</h6>
-              <p className="mb-0">{reachedPositionComment}</p>
+              <Form.Control
+                as="textarea"
+                rows={5}
+                value={editableComment}
+                onChange={(e) => setEditableComment(e.target.value)}
+                placeholder="Adicione suas anotações sobre esta posição..."
+              />
+              <small className="text-muted mt-2 d-block">
+                💡 Suas anotações serão salvas automaticamente ao avançar
+              </small>
             </div>
-          ) : modalType === 'correct' ? (
-            <p className="text-muted mb-0">Sem anotações para esta posição.</p>
-          ) : null}
+          )}
 
           {modalType === 'failed' && (
             <>
               {session.currentPosition?.comment && (
                 <div className="mb-3">
                   <h6>💡 Dica para esta posição:</h6>
-                  <p className="mb-0">{session.currentPosition.comment}</p>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={session.currentPosition.comment}
+                    readOnly
+                  />
                 </div>
               )}
               <Alert variant="warning" className="mb-0">
