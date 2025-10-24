@@ -74,10 +74,116 @@ h1, h2, h3, h4, h5, h6 {
 	border-color: var(--border-color) !important;
 }
 
+/* Placeholders - suporte para todos os navegadores */
+.form-control::placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+.form-control::-webkit-input-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+.form-control::-moz-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+.form-control:-ms-input-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+/* Textarea específico */
+textarea.form-control::placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+textarea.form-control::-webkit-input-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+textarea.form-control::-moz-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
+textarea.form-control:-ms-input-placeholder {
+	color: var(--text-secondary) !important;
+	opacity: 1 !important;
+}
+
 /* Alerts */
 .alert {
-	color: var(--text-primary) !important;
 	border-color: var(--border-color) !important;
+}
+
+/* Alert Warning - ajustado para tema dark */
+.alert-warning {
+	background-color: #664d03 !important;
+	color: #ffc107 !important;
+	border-color: #997404 !important;
+}
+
+[data-theme="light"] .alert-warning {
+	background-color: #fff3cd !important;
+	color: #664d03 !important;
+	border-color: #ffecb5 !important;
+}
+
+.alert-warning h4 {
+	color: inherit !important;
+}
+
+.alert-warning p {
+	color: inherit !important;
+	opacity: 0.9;
+}
+
+/* Alert Info */
+.alert-info {
+	background-color: #055160 !important;
+	color: #0dcaf0 !important;
+	border-color: #087990 !important;
+}
+
+[data-theme="light"] .alert-info {
+	background-color: #cff4fc !important;
+	color: #055160 !important;
+	border-color: #b6effb !important;
+}
+
+.alert-info h4, .alert-info strong {
+	color: inherit !important;
+}
+
+/* Alert Danger */
+.alert-danger {
+	background-color: #58151c !important;
+	color: #ea868f !important;
+	border-color: #842029 !important;
+}
+
+[data-theme="light"] .alert-danger {
+	background-color: #f8d7da !important;
+	color: #58151c !important;
+	border-color: #f5c2c7 !important;
+}
+
+/* Alert Success */
+.alert-success {
+	background-color: #0a3622 !important;
+	color: #75b798 !important;
+	border-color: #0f5132 !important;
+}
+
+[data-theme="light"] .alert-success {
+	background-color: #d1e7dd !important;
+	color: #0a3622 !important;
+	border-color: #badbcc !important;
 }
 
 /* ListGroup items */
