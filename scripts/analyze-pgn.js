@@ -343,7 +343,7 @@ ${colors.blue}━━━━━━━━━━━━━━━━━━━━━━
         ...this.stats,
         timeElapsed: ((Date.now() - this.stats.startTime) / 1000).toFixed(2) + 's',
       },
-      puzzles: this.puzzles
+      blunders: this.puzzles
     };
 
     fs.writeFileSync(this.outputFile, JSON.stringify(output, null, 2));
