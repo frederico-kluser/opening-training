@@ -8,6 +8,7 @@ import NavigationBar from '../../components/TrainingControls/NavigationBar';
 import openingService from '../../services/OpeningService';
 import EvaluationBar from '../../components/EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
+import { populateEmptyComment, syncCommentToAllFens } from '../../utils/fenSyncUtils';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -124,7 +125,9 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 				comment,
 				nextFen,
 			};
-			return newSave;
+
+			// ✅ Sincroniza comentário para todos os FENs iguais na árvore
+			return syncCommentToAllFens(variant, actualFen, comment, newSave);
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, variant]);
@@ -135,6 +138,16 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 		if (save[variant] && save[variant][actualFen]) {
 			comment = save[variant][actualFen]?.comment || '';
+
+			// ✅ Se comentário estiver vazio, busca em FENs duplicados na árvore
+			if (!comment || comment.trim().length === 0) {
+				const [updatedSave, foundComment] = populateEmptyComment(variant, actualFen, save);
+				if (foundComment && foundComment.trim().length > 0) {
+					comment = foundComment;
+					// Atualiza o save com o comentário populado
+					setSave(updatedSave);
+				}
+			}
 		}
 
 		setComment(comment);
