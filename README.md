@@ -4,7 +4,7 @@
 
 ### Sistema Completo de Treinamento de Xadrez com IA
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.6.2-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
@@ -28,9 +28,17 @@
 
 ## 🎯 Visão Geral
 
-Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.0.0** traz melhorias revolucionárias em UX, performance e inteligência do sistema de treinamento.
+Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.1.0** traz melhorias significativas em UX, adaptabilidade e experiência visual.
 
-### 🌟 Diferenciais da v3.0.0
+### 🌟 Novidades da v3.1.0
+
+- **🔍 Zoom Avançado**: Controle total do tamanho do tabuleiro (até 1000px, 7 níveis)
+- **📱 Barra Adaptativa**: Avaliação horizontal automática em telas portrait
+- **💬 Comentários Contextuais**: Aparecem APÓS o movimento, não antes (melhor pedagogia)
+- **🌙 Modais Dark**: Suporte completo ao tema escuro em todos os modais
+- **🎨 Interface Limpa**: Barra de avaliação sem marcador numérico (visual mais limpo)
+
+### 🌟 Destaques da v3.0.0
 
 - **🚫 Sistema Anti-Dancing**: Algoritmo inteligente que evita repetição de posições recém-praticadas
 - **🔄 Sincronização de Anotações**: Comentários compartilhados entre transposições (mesmo FEN)
@@ -46,7 +54,7 @@ Plataforma completa para treino de xadrez que combina análise automatizada de p
 ## 📋 Table of Contents
 
 - [Quick Start](#-quick-start)
-- [Features v3.0.0](#-features-v300)
+- [Features v3.1.0](#-features-v310)
 - [CLI Tool - Análise Ultra-Rápida](#-cli-tool-análise-ultra-rápida)
 - [Instalação](#-instalação)
 - [Uso - Interface Web](#-uso---interface-web)
@@ -81,9 +89,130 @@ npm run analyze:user hikaru
 
 ---
 
-## ✨ Features v3.0.0
+## ✨ Features v3.1.0
 
-### 🚫 Sistema Anti-Dancing (NOVO!)
+### 🔍 Sistema de Zoom Avançado (NOVO v3.1.0!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Controle total do tamanho do tabuleiro com 7 níveis de zoom personalizáveis.
+
+#### Níveis de Zoom Disponíveis
+- **xs**: 350px (Extra pequeno)
+- **sm**: 400px (Pequeno)
+- **md**: 500px (Médio - padrão)
+- **lg**: 600px (Grande)
+- **xl**: 700px (Extra grande)
+- **2xl**: 850px (2X grande)
+- **3xl**: 1000px (3X grande)
+
+#### Funcionalidades
+- ✅ Botões de zoom em todas as telas de treino (Register, OpeningTrainer, PuzzleTrainer)
+- ✅ Ícones intuitivos: 🔍+ (aumentar) e 🔍- (diminuir)
+- ✅ Persistência no localStorage (preferência salva entre sessões)
+- ✅ Responsivo: mantém `min(Npx, 90vw, 70vh)` para telas pequenas
+- ✅ Estados desabilitados nos limites (xs mínimo, 3xl máximo)
+- ✅ Hook customizado `useBoardSize` para fácil integração
+
+#### Implementação
+```typescript
+const { boardWidth, zoomIn, zoomOut, canZoomIn, canZoomOut } = useBoardSize();
+// boardWidth: "min(500px, 90vw, 70vh)" - pronto para usar!
+```
+
+</details>
+
+### 📱 Barra de Avaliação Adaptativa (NOVO v3.1.0!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Detecção automática de orientação da tela com barra horizontal em dispositivos portrait.
+
+#### Comportamento Inteligente
+**Tela Landscape (horizontal - desktop/tablet):**
+- 📊 Barra vertical ao lado do tabuleiro
+- ⬜ Brancas embaixo, ⬛ Pretas em cima
+
+**Tela Portrait (vertical - celular em pé):**
+- 📊 Barra horizontal acima do tabuleiro
+- ⬜ Brancas à esquerda, ⬛ Pretas à direita
+
+#### Funcionalidades
+- ✅ Detecção automática via `useScreenOrientation` hook
+- ✅ Listeners de resize e screen.orientation
+- ✅ Transições suaves (GPU-accelerated)
+- ✅ Linha central adaptativa (horizontal ou vertical)
+- ✅ Suporte a `scaleX` e `scaleY` para performance
+- ✅ CSS adaptativo para ambas orientações
+
+#### Visual Limpo
+- ❌ Removido marcador numérico de vantagem
+- ✅ Apenas cores (branco/preto) para interface mais limpa
+- ✅ Foco no visual, não em números
+
+</details>
+
+### 💬 Comentários Contextuais Melhorados (NOVO v3.1.0!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Comentários agora aparecem no momento pedagogicamente correto: APÓS o movimento.
+
+#### Antes (Problemático)
+```
+Posição → [Comentário da posição atual] → Usuário faz movimento
+         ↑ Spoiler! O usuário lê antes de pensar
+```
+
+#### Depois (Correto)
+```
+Posição → Usuário faz movimento → [Comentário da posição alcançada]
+                                   ↑ Explicação do que acabou de fazer
+```
+
+#### Comportamento
+**Movimento Correto:**
+- ✅ Modal aparece mostrando "📝 Anotações da Posição Alcançada"
+- ✅ Exibe comentário do FEN resultante (não do FEN atual)
+- ✅ Reforça aprendizado: "por que esse movimento é bom?"
+
+**Movimento Errado (3 tentativas):**
+- ✅ Modal aparece mostrando "💡 Dica para esta posição"
+- ✅ Exibe comentário da posição atual como ajuda
+- ✅ Contexto útil após falhar
+
+**Durante o jogo:**
+- ❌ Não mostra mais dicas antes do movimento
+- ✅ Interface limpa, foco no raciocínio
+
+</details>
+
+### 🌙 Tema Dark para Modais (NOVO v3.1.0!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Todos os modais agora respeitam o tema dark/light escolhido.
+
+#### Correções Implementadas
+- ✅ `modal-content`, `modal-header`, `modal-body`, `modal-footer` adaptados
+- ✅ Cores de texto e fundo usando variáveis CSS (`--bg-card`, `--text-primary`)
+- ✅ Bordas temáticas (`--border-color`)
+- ✅ Backdrop mais escuro no tema dark (rgba(0,0,0,0.7))
+- ✅ Botão de fechar (X) invertido no tema dark
+- ✅ Títulos e parágrafos com cores corretas
+
+#### Modais Afetados
+- OpeningTrainer: Modal de anotações
+- GameAnalyzer: Modais de seleção de cor, partidas, sucesso, Chess.com
+- Todos os futuros modais do sistema
+
+</details>
+
+### 🚫 Sistema Anti-Dancing (v3.0.0)
 
 <details>
 <summary><strong>Ver detalhes completos</strong></summary>
@@ -801,6 +930,54 @@ R: Automático! Ao anotar uma posição, todas as ocorrências do mesmo FEN rece
 ---
 
 ## 📝 Changelog
+
+### [v3.1.0](https://github.com/frederico-kluser/opening-training/releases/tag/v3.1.0) - 2025-01-24 🎨
+
+#### ✨ Melhorias de UX e Interface
+
+**🔍 Sistema de Zoom Avançado**
+- ✅ 7 níveis de zoom (350px a 1000px)
+- ✅ Botões de zoom em Register, OpeningTrainer e PuzzleTrainer
+- ✅ Hook customizado `useBoardSize` com persistência no localStorage
+- ✅ Ícones intuitivos: 🔍+ (aumentar) e 🔍- (diminuir)
+- ✅ Estados desabilitados nos limites (xs e 3xl)
+- ✅ Responsivo: `min(Npx, 90vw, 70vh)`
+
+**📱 Barra de Avaliação Adaptativa**
+- ✅ Detecção automática de orientação da tela
+- ✅ Hook `useScreenOrientation` com listeners de resize e screen.orientation
+- ✅ Barra horizontal automática em telas portrait (celular em pé)
+- ✅ Barra vertical em telas landscape (desktop/tablet)
+- ✅ Transform scaleX/scaleY para performance (GPU-accelerated)
+- ✅ Linha central adaptativa (horizontal ou vertical)
+- ✅ CSS adaptativo em `EvaluationBar.css`
+- ✅ Removido marcador numérico (interface mais limpa)
+
+**💬 Timing Correto de Comentários**
+- ✅ Estado `reachedPositionComment` para armazenar comentário da posição alcançada
+- ✅ onDrop modificado para buscar comentário do FEN resultante
+- ✅ Modal de movimento correto mostra comentário da posição alcançada
+- ✅ Modal de movimento errado (3 tentativas) mostra comentário como dica
+- ✅ Removida exibição de dica antes do movimento (UI limpa)
+- ✅ Limpeza de estado ao avançar para próxima posição
+- ✅ Pedagogicamente correto: comentário APÓS ação, não antes
+
+**🌙 Tema Dark para Modais**
+- ✅ Estilos adaptados em `App.css` para `.modal-content`, `.modal-header`, `.modal-body`, `.modal-footer`
+- ✅ Variáveis CSS respeitadas (`--bg-card`, `--text-primary`, `--border-color`)
+- ✅ Backdrop escuro no tema dark: `rgba(0,0,0,0.7)`
+- ✅ Botão de fechar (X) invertido no tema dark
+- ✅ Títulos e parágrafos com cores corretas
+- ✅ Todos os modais do sistema (OpeningTrainer, GameAnalyzer) funcionais
+
+#### 🔧 Melhorias Técnicas
+- 12 arquivos modificados (+517 linhas, -68 linhas)
+- 2 novos hooks: `useBoardSize.ts` e `useScreenOrientation.ts`
+- Modificação em ChessBoardWrapper para aceitar `width` prop
+- Atualização de NavigationBar e PuzzleControls com botões de zoom
+- CSS responsivo para orientações vertical e horizontal
+
+---
 
 ### [v3.0.0](https://github.com/frederico-kluser/opening-training/releases/tag/v3.0.0) - 2025-01-24 🚀
 
