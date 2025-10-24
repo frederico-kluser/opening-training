@@ -4,7 +4,7 @@
 
 ### Sistema Completo de Treinamento de Xadrez com IA
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
+[![Version](https://img.shields.io/badge/version-3.1.1-blue.svg)](https://github.com/frederico-kluser/opening-training)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.6.2-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
@@ -28,9 +28,17 @@
 
 ## 🎯 Visão Geral
 
-Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.1.0** traz melhorias significativas em UX, adaptabilidade e experiência visual.
+Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.1.1** traz melhorias importantes na interatividade, edição de anotações e responsividade.
 
-### 🌟 Novidades da v3.1.0
+### 🌟 Novidades da v3.1.1
+
+- **✏️ Anotações Editáveis**: Edite comentários diretamente no modal com salvamento automático
+- **🎯 Feedback Visual Completo**: Tabuleiro atualiza visualmente mesmo em movimentos incorretos
+- **📱 Layout Ultra-Responsivo**: Botões com quebra automática, barra de avaliação adaptativa
+- **🪟 Modal Minimizável**: Minimize anotações com botão flutuante para maximizar
+- **🎨 Melhor Contraste**: Badge "Brancas" com texto escuro no tema dark (acessibilidade)
+
+### 🌟 Destaques da v3.1.0
 
 - **🔍 Zoom Avançado**: Controle total do tamanho do tabuleiro (até 1000px, 7 níveis)
 - **📱 Barra Adaptativa**: Avaliação horizontal automática em telas portrait
@@ -86,6 +94,96 @@ npm run dev
 # OU use a CLI ultra-rápida (requer Stockfish instalado)
 npm run analyze:user hikaru
 ```
+
+---
+
+## ✨ Features v3.1.1
+
+### ✏️ Anotações Editáveis com Salvamento Automático (NOVO v3.1.1!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Sistema completo de edição e salvamento de anotações de posições durante o treino.
+
+**Funcionalidades:**
+- **Textarea editável** no modal de movimento correto (5 linhas)
+- **Salvamento automático** ao avançar para próxima posição
+- **Persistência** no OpeningService (localStorage)
+- **Dicas em textarea somente leitura** no modal de erro
+- **Limpeza de estados** ao avançar
+
+**Exemplo de uso:**
+1. Faça movimento correto
+2. Modal aparece com textarea editável
+3. Edite ou adicione suas anotações
+4. Clique "Próximo Movimento" → salvo automaticamente
+
+</details>
+
+### 🎯 Feedback Visual Completo (NOVO v3.1.1!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Tabuleiro agora mostra visualmente todos os movimentos antes da validação.
+
+**Comportamentos:**
+- **✅ Movimento correto**: Peça fica na posição + fundo verde + modal
+- **❌ Movimento incorreto (1ª-2ª tentativa)**: Peça fica 2s + fundo vermelho + reset
+- **❌ Movimento incorreto (3ª tentativa)**: Peça fica + fundo vermelho + modal com dica
+
+**Benefícios:**
+- Feedback visual imediato
+- Usuário vê o erro cometido
+- Melhor compreensão de movimentos incorretos
+- Experiência mais natural e intuitiva
+
+</details>
+
+### 🪟 Modal Minimizável com Botão Flutuante (NOVO v3.1.1!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Modal de anotações pode ser minimizado liberando espaço na tela.
+
+**Funcionalidades:**
+- **Botão minimizar** no header do modal (ícone `-`)
+- **Modal fullscreen** para melhor visualização
+- **Botão flutuante circular** no canto inferior direito quando minimizado
+- **Restauração** com um clique no botão flutuante
+
+**Design:**
+- Botão flutuante: 60x60px, circular, com sombra
+- Z-index 9999 para ficar sempre visível
+- Ícone de maximizar para indicar ação
+- Posicionamento fixo (não move com scroll)
+
+</details>
+
+### 📱 Layout Ultra-Responsivo (NOVO v3.1.1!)
+
+<details>
+<summary><strong>Ver detalhes completos</strong></summary>
+
+Interface totalmente adaptável para todos os tamanhos de tela.
+
+**Melhorias:**
+- **Botões com quebra automática** (flexWrap em Gap horizontal)
+- **Barra de avaliação responsiva** (largura adaptativa em portrait)
+- **Texto "Analisando..." oculto** quando barra está horizontal
+- **Header com flex-wrap** para quebrar em telas pequenas
+- **Card.Body sem overflow** horizontal
+- **Melhor contraste** no badge "Brancas" no tema dark
+
+**Otimizações CSS:**
+- `maxWidth: 90vw` na barra horizontal
+- `overflowX: hidden` nos cards
+- `flex-wrap gap-2` nos headers
+- Badge com `text="dark"/"light"` para contraste
+
+</details>
 
 ---
 
@@ -930,6 +1028,63 @@ R: Automático! Ao anotar uma posição, todas as ocorrências do mesmo FEN rece
 ---
 
 ## 📝 Changelog
+
+### [v3.1.1](https://github.com/frederico-kluser/opening-training/releases/tag/v3.1.1) - 2025-10-24 ✏️
+
+#### ✨ Melhorias de Interatividade e UX
+
+**✏️ Sistema de Anotações Editáveis**
+- ✅ Modal com `Form.Control as="textarea"` editável (5 linhas)
+- ✅ Estado `editableComment` para edição em tempo real
+- ✅ Salvamento automático ao clicar em "Próximo Movimento"
+- ✅ Integração com `OpeningService` para persistência
+- ✅ Campo somente leitura para dicas (modal de erro)
+- ✅ Mensagem informativa: "💡 Suas anotações serão salvas automaticamente ao avançar"
+- ✅ Limpeza de estados ao avançar (`editableComment`, `reachedPositionFen`)
+
+**🎯 Feedback Visual de Movimentos**
+- ✅ Tabuleiro atualiza visualmente ANTES da validação
+- ✅ Movimento correto: peça fica na nova posição + fundo verde + modal
+- ✅ Movimento incorreto: peça fica na nova posição + fundo vermelho por 2s
+- ✅ Reset automático após erro (1ª e 2ª tentativa)
+- ✅ Mantém posição visível no modal de erro (3ª tentativa)
+- ✅ Lógica melhorada em `onDrop`: move primeiro, valida depois
+- ✅ Retorna `true` para atualizar o tabuleiro visualmente
+
+**📱 Melhorias de Responsividade**
+- ✅ Componente `Gap` com `flexWrap: 'wrap'` em modo horizontal
+- ✅ Botões de treino quebram linha automaticamente em telas pequenas
+- ✅ Header com `flex-wrap gap-2` para melhor adaptação
+- ✅ Card.Body com `overflowX: 'hidden'` para prevenir scroll horizontal
+- ✅ Container do tabuleiro com `maxWidth: '100%'`
+- ✅ Barra de avaliação com altura adaptativa: `Math.min(500, window.innerWidth * 0.85)`
+- ✅ Texto "Analisando..." oculto quando barra está horizontal (portrait)
+
+**🪟 Modal Minimizável com Botão Flutuante**
+- ✅ Estado `isModalMinimized` para controlar minimização
+- ✅ Modal com prop `fullscreen` para ocupar tela inteira
+- ✅ Botão de minimizar (`FaWindowMinimize`) no header do modal
+- ✅ Modal.show atualizado: `showAnnotationModal && !isModalMinimized`
+- ✅ Botão flutuante circular para maximizar (canto inferior direito)
+- ✅ Estilização: `position: fixed`, `borderRadius: 50%`, `zIndex: 9999`
+- ✅ Ícone `FaWindowMaximize` para restaurar modal
+- ✅ Reset do estado ao fechar modal
+
+**🎨 Melhorias de Acessibilidade**
+- ✅ Badge "Brancas" com `text="dark"` para contraste no tema dark
+- ✅ Badge "Pretas" com `text="light"` para legibilidade
+- ✅ Label de cor com `opacity: 0.8` ao invés de `text-muted` (funciona em ambos os temas)
+- ✅ Melhor contraste visual em componentes de estatísticas
+
+#### 🔧 Melhorias Técnicas
+- 6 arquivos modificados (~320 linhas modificadas)
+- 3 novos estados: `editableComment`, `reachedPositionFen`, `isModalMinimized`
+- Nova função `handleSaveComment` para persistência
+- Importado componente `Form` do react-bootstrap
+- Refatoração de `onDrop` para melhor fluxo visual
+- Refatoração de `handleIncorrectMove` com reset de posição
+
+---
 
 ### [v3.1.0](https://github.com/frederico-kluser/opening-training/releases/tag/v3.1.0) - 2025-01-24 🎨
 
