@@ -24,19 +24,21 @@ class SoundService {
   }
 
   /**
-   * Toca um som de movimento normal
+   * Toca um som de movimento normal (estilo Lichess/Chess.com - clique curto)
    */
   playMoveSound() {
     if (!this.enabled) return;
-    this.playTone(200, 0.05, 'sine');
+    // Som de "clique" tipo peça batendo no tabuleiro
+    this.playClickSound(800, 0.04);
   }
 
   /**
-   * Toca um som de captura
+   * Toca um som de captura (mais grave que movimento normal)
    */
   playCaptureSound() {
     if (!this.enabled) return;
-    this.playTone(150, 0.08, 'square');
+    // Som mais "sólido" para captura
+    this.playClickSound(600, 0.06);
   }
 
   /**
@@ -44,7 +46,48 @@ class SoundService {
    */
   playCheckSound() {
     if (!this.enabled) return;
-    this.playTone(400, 0.15, 'sawtooth');
+    this.playTone(600, 0.12, 'sine');
+  }
+
+  /**
+   * Som de "clique" realista para movimento de peça
+   */
+  private playClickSound(frequency: number, duration: number) {
+    if (!this.audioContext) {
+      this.initAudioContext();
+    }
+
+    if (!this.audioContext) return;
+
+    try {
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
+
+      // Noise node para criar som de "clique"
+      const bufferSize = this.audioContext.sampleRate * duration;
+      const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      // Gera ruído filtrado que simula um clique
+      for (let i = 0; i < bufferSize; i++) {
+        const envelope = Math.exp(-i / (this.audioContext.sampleRate * 0.01)); // Decay rápido
+        data[i] = (Math.random() * 2 - 1) * envelope * this.volume;
+      }
+
+      const source = this.audioContext.createBufferSource();
+      const filter = this.audioContext.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = frequency;
+      filter.Q.value = 1.5;
+
+      source.buffer = buffer;
+      source.connect(filter);
+      filter.connect(this.audioContext.destination);
+      source.start();
+    } catch (error) {
+      console.error('Erro ao tocar som de clique:', error);
+    }
   }
 
   /**

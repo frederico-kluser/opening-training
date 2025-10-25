@@ -229,6 +229,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       // Avaliar posição de contexto
       evaluatePosition(position.fenContext);
 
+      // Tocar som do movimento do adversário
+      soundService.playMoveSound();
+
       // Após 1 segundo, mostra a posição onde o usuário deve jogar
       setTimeout(() => {
         const newGame = new Chess(position.fen);
