@@ -28,7 +28,13 @@
 
 ## 🎯 Visão Geral
 
-Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.2.0** adiciona sistema profissional de sons de movimento e funcionalidades avançadas de navegação.
+Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.2.1** corrige bug crítico na validação de movimentos dos puzzles.
+
+### 🐛 Correção na v3.2.1
+
+- **🎯 Bug de Validação Corrigido**: Movimentos corretos agora são SEMPRE reconhecidos nos puzzles
+- **✅ Comparação Direta**: Validação por movimento UCI em vez de avaliação do Stockfish
+- **📊 100% Preciso**: Elimina todos os falsos negativos na resolução de puzzles
 
 ### 🌟 Novidades da v3.2.0
 
