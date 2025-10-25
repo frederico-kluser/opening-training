@@ -12,6 +12,7 @@ import useBoardSize from '../../hooks/useBoardSize';
 import useScreenOrientation from '../../hooks/useScreenOrientation';
 import { populateEmptyComment, syncCommentToAllFens } from '../../utils/fenSyncUtils';
 import MoveSelectionModal from '../../components/MoveSelectionModal';
+import soundService from '../../services/SoundService';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -201,6 +202,18 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 		const newMove = gameCopy.move(move);
 		if (newMove) {
+			// Tocar som baseado no tipo de movimento
+			if (newMove.captured) {
+				soundService.playCaptureSound();
+			} else {
+				soundService.playMoveSound();
+			}
+
+			// Verificar se é xeque
+			if (gameCopy.isCheck()) {
+				setTimeout(() => soundService.playCheckSound(), 100);
+			}
+
 			updateActualFen(gameCopy.fen());
 		} else {
 			console.log('Invalid move');

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 import { Button, Card, Alert, Form } from 'react-bootstrap';
 import puzzleService from '../../services/PuzzleService';
+import soundService from '../../services/SoundService';
 import { Puzzle } from '../../types/Puzzle';
 import Gap from '../Gap';
 import SessionStats from '../PuzzleSession/SessionStats';
@@ -246,6 +247,18 @@ const PuzzleTrainer: React.FC = () => {
 
       if (!move) return false;
 
+      // Tocar som baseado no tipo de movimento
+      if (move.captured) {
+        soundService.playCaptureSound();
+      } else {
+        soundService.playMoveSound();
+      }
+
+      // Verificar se é xeque
+      if (game.isCheck()) {
+        setTimeout(() => soundService.playCheckSound(), 100);
+      }
+
       // Converter movimento para notação UCI
       const uciMove = moveToUCI(sourceSquare, targetSquare, move.promotion);
 
@@ -331,6 +344,9 @@ const PuzzleTrainer: React.FC = () => {
       transition: 'background-color 0.5s'
     });
 
+    // Tocar som de sucesso
+    soundService.playSuccessSound();
+
     // Atualizar estatísticas
     setSession(prev => ({
       ...prev,
@@ -356,6 +372,9 @@ const PuzzleTrainer: React.FC = () => {
       backgroundColor: '#FFB6C1',
       transition: 'background-color 0.5s'
     });
+
+    // Tocar som de erro
+    soundService.playIncorrectSound();
 
     // Atualizar estatísticas e contador de tentativas
     setSession(prev => ({
