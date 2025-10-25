@@ -86,16 +86,6 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
         extensions: [{ class: Arrows }, { class: Markers }]
       });
 
-      // Habilitar input de movimento se draggable
-      if (isDraggable && onMove) {
-        boardRef.current.enableMoveInput((event) => {
-          if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
-            return onMove(event.squareFrom!, event.squareTo!) ?? true;
-          }
-          return true;
-        }, COLOR.white);
-      }
-
       return () => {
         boardRef.current?.destroy();
         boardRef.current = null;
@@ -171,6 +161,14 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
     useEffect(() => {
       if (!boardRef.current) return;
 
+      // Sempre desabilita primeiro para evitar erro "moveInput already enabled"
+      try {
+        boardRef.current.disableMoveInput();
+      } catch (e) {
+        // Ignora erro se moveInput não estava habilitado
+      }
+
+      // Habilita novamente se necessário
       if (isDraggable && onMove) {
         boardRef.current.enableMoveInput((event) => {
           if (event.type === INPUT_EVENT_TYPE.validateMoveInput) {
@@ -178,8 +176,6 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
           }
           return true;
         }, COLOR.white);
-      } else {
-        boardRef.current.disableMoveInput();
       }
     }, [isDraggable, onMove]);
 
