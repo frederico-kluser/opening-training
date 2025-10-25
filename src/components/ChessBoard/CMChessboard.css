@@ -1,0 +1,41 @@
+/* CM Chessboard Styles */
+@import 'cm-chessboard/assets/chessboard.css';
+@import 'cm-chessboard/assets/extensions/arrows/arrows.css';
+@import 'cm-chessboard/assets/extensions/markers/markers.css';
+
+/* Custom overrides for integration */
+.cm-chessboard {
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom colors to match the existing theme */
+.cm-chessboard .square.dark {
+  background-color: #779952;
+}
+
+.cm-chessboard .square.light {
+  background-color: #edeed1;
+}
+
+/* Marker styles */
+.cm-chessboard .marker.frame {
+  background: rgba(255, 255, 0, 0.3);
+  border: 2px solid rgba(255, 255, 0, 0.8);
+}
+
+/* Arrow styles */
+.cm-chessboard .arrow.default {
+  fill: rgba(255, 170, 0, 0.8);
+  stroke: rgba(255, 170, 0, 1);
+}
+
+.cm-chessboard .arrow.pointy {
+  fill: rgba(0, 170, 255, 0.8);
+  stroke: rgba(0, 170, 255, 1);
+}
+
+.cm-chessboard .arrow.danger {
+  fill: rgba(255, 0, 0, 0.8);
+  stroke: rgba(255, 0, 0, 1);
+}

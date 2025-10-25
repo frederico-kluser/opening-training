@@ -306,8 +306,9 @@ class StockfishService extends EventEmitter {
       // Se receber bestmove, está ok
       const originalHandler = this.worker?.onmessage;
       if (this.worker) {
+        const worker = this.worker;
         this.worker.onmessage = (e) => {
-          if (originalHandler) originalHandler(e);
+          if (originalHandler && worker) originalHandler.call(worker, e);
           if (e.data.startsWith('bestmove')) {
             clearTimeout(timeout);
             resolve();

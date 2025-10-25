@@ -22,7 +22,6 @@ import {
   shouldShowOpponentMove,
   validateMove,
   parseFenInfo,
-  getBoardOrientation,
   recordPositionShown
 } from '../../utils/trainerUtils';
 

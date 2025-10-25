@@ -1,5 +1,5 @@
-import React from 'react';
-import { Chessboard } from 'react-chessboard';
+import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import CMChessboardWrapper, { CMChessboardHandle, ArrowConfig, MarkerConfig } from './CMChessboardWrapper';
 
 interface ChessBoardWrapperProps {
   position: string;
@@ -8,41 +8,66 @@ interface ChessBoardWrapperProps {
   isDraggable?: boolean | ((args: { piece: string; sourceSquare: string }) => boolean);
   width?: number | string;
   style?: React.CSSProperties;
+  arrows?: ArrowConfig[];
+  markers?: MarkerConfig[];
+  lastMove?: [string, string] | null;
+  showCoordinates?: boolean;
 }
 
-const ChessBoardWrapper: React.FC<ChessBoardWrapperProps> = ({
-  position,
-  onPieceDrop,
-  orientation = 'white',
-  isDraggable = true,
-  width = 'min(500px, 90vw, 70vh)',
-  style = {}
-}) => {
-  const containerStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    ...style
-  };
+export interface ChessBoardWrapperHandle extends CMChessboardHandle {}
 
-  const boardStyle: React.CSSProperties = {
-    width: width, // Usa o width fornecido ou padrão
-    aspectRatio: '1/1' // Mantém o tabuleiro quadrado
-  };
+const ChessBoardWrapper = forwardRef<ChessBoardWrapperHandle, ChessBoardWrapperProps>(
+  (
+    {
+      position,
+      onPieceDrop,
+      orientation = 'white',
+      isDraggable = true,
+      width = 'min(500px, 90vw, 70vh)',
+      style = {},
+      arrows = [],
+      markers = [],
+      lastMove,
+      showCoordinates = true
+    },
+    ref
+  ) => {
+    const boardRef = useRef<CMChessboardHandle>(null);
 
-  const arePiecesDraggable = typeof isDraggable === 'boolean' ? isDraggable : true;
+    useImperativeHandle(ref, () => ({
+      setPosition: (fen: string, animated = true) => boardRef.current?.setPosition(fen, animated),
+      getPosition: () => boardRef.current?.getPosition() ?? position,
+      addArrow: (from: string, to: string, type?: 'default' | 'pointy' | 'danger') =>
+        boardRef.current?.addArrow(from, to, type),
+      clearArrows: () => boardRef.current?.clearArrows(),
+      addMarker: (square: string, type?: 'frame' | 'circle' | 'dot' | 'square') =>
+        boardRef.current?.addMarker(square, type),
+      clearMarkers: () => boardRef.current?.clearMarkers(),
+      flip: () => boardRef.current?.flip(),
+      setOrientation: (color: 'white' | 'black') => boardRef.current?.setOrientation(color)
+    }));
 
-  return (
-    <div style={containerStyle}>
-      <div style={boardStyle}>
-        <Chessboard
-          position={position}
-          onPieceDrop={onPieceDrop}
-          boardOrientation={orientation}
-          arePiecesDraggable={arePiecesDraggable}
-        />
-      </div>
-    </div>
-  );
-};
+    // Converter isDraggable para boolean simples
+    const isDraggableBoolean = typeof isDraggable === 'boolean' ? isDraggable : true;
+
+    return (
+      <CMChessboardWrapper
+        ref={boardRef}
+        position={position}
+        onMove={onPieceDrop}
+        orientation={orientation}
+        isDraggable={isDraggableBoolean}
+        width={width}
+        style={style}
+        arrows={arrows}
+        markers={markers}
+        lastMove={lastMove}
+        showCoordinates={showCoordinates}
+      />
+    );
+  }
+);
+
+ChessBoardWrapper.displayName = 'ChessBoardWrapper';
 
 export default ChessBoardWrapper;

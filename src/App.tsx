@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Gap from './components/Gap';
 import Upload from './components/Upload';
-import { Button, Card, Badge } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import TypeStorage from './types/TypeStorage';
 import './App.css';
 import isValidTypeStorage from './utils/isValidTypeStorage';
