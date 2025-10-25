@@ -16,18 +16,21 @@ import packageJson from '../package.json';
 
 function App() {
 	const [variant, setVariant] = useState<string>('');
-	const [data, setData] = useState<TypeStorage>({});
+	const [selectedOpeningId, setSelectedOpeningId] = useState<string>('');
 	const [mode, setMode] = useState<'edit' | 'train' | ''>('');
 	const [darkMode, setDarkMode] = useState<boolean>(() => {
 		const saved = localStorage.getItem('darkMode');
 		return saved ? JSON.parse(saved) : false;
 	});
+	// Estado para gerenciar os dados da abertura sendo editada
+	const [currentOpeningData, setCurrentOpeningData] = useState<TypeStorage>({});
+	// Estado para forçar re-renderização quando aberturas mudarem
+	const [, setRefreshKey] = useState(0);
 
-	useEffect(() => {
-		if (Object.keys(data).length > 0) {
-			localStorage.setItem('data', JSON.stringify(data));
-		}
-	}, [data]);
+	// Função para forçar atualização da lista de aberturas
+	const refreshOpeningsList = () => {
+		setRefreshKey(prev => prev + 1);
+	};
 
 	useEffect(() => {
 		document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
@@ -38,22 +41,84 @@ function App() {
 		setDarkMode(!darkMode);
 	};
 
+	// Inicializar dados da abertura quando variant muda
+	// ⚠️ IMPORTANTE: useEffect deve ser chamado ANTES de qualquer return condicional
+	useEffect(() => {
+		if (variant && variant !== 'game-analyzer' && variant !== 'puzzle-trainer' && variant !== 'show-openings' && variant !== 'stockfish-test') {
+			const opening = openingService.getOpeningByName(variant);
+			if (opening) {
+				setCurrentOpeningData({ [variant]: opening.positions });
+			} else {
+				setCurrentOpeningData({ [variant]: {} });
+			}
+		}
+	}, [variant]);
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleLoadData = (data: any) => {
-		console.log('data :', data);
+		console.log('data importado:', data);
 
 		if (isValidTypeStorage(data)) {
-			setData(data);
-			// Não define variant automaticamente, deixa o usuário escolher
+			// Importar cada variante como uma abertura separada no OpeningService
+			Object.keys(data).forEach(variantName => {
+				const existing = openingService.getOpeningByName(variantName);
+				if (existing) {
+					console.log(`⚠️ Abertura "${variantName}" já existe, atualizando...`);
+					openingService.updateOpening(existing.id, {
+						positions: data[variantName]
+					});
+				} else {
+					// Criar nova abertura (cor padrão: white)
+					openingService.createOpening({
+						name: variantName,
+						color: 'white',
+						positions: data[variantName]
+					});
+					console.log(`✅ Abertura "${variantName}" importada com sucesso!`);
+				}
+			});
+
+			refreshOpeningsList();
+			alert('Aberturas importadas com sucesso!');
 		} else {
-			alert('Invalid data');
+			alert('Formato de dados inválido');
 		}
 	};
 
 	const handleExist = () => {
 		setVariant('');
-		setData({});
+		setSelectedOpeningId('');
 		setMode('');
+		setCurrentOpeningData({});
+		refreshOpeningsList();
+	};
+
+	// Download de abertura
+	const handleDownloadOpening = (openingId: string) => {
+		const opening = openingService.getOpeningById(openingId);
+		if (!opening) {
+			alert('Abertura não encontrada');
+			return;
+		}
+
+		const json = openingService.exportOpening(openingId);
+		if (!json) {
+			alert('Erro ao exportar abertura');
+			return;
+		}
+
+		// Criar blob e fazer download
+		const blob = new Blob([json], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `${opening.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.json`;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+
+		console.log(`✅ Abertura "${opening.name}" exportada com sucesso`);
 	};
 
 	// Deletar abertura
@@ -61,26 +126,22 @@ function App() {
 		const confirmed = window.confirm(`Tem certeza que deseja deletar a abertura "${variantName}"?`);
 		if (!confirmed) return;
 
-		// Deletar do formato v2.0.0 (OpeningService)
 		const opening = openingService.getOpeningByName(variantName);
 		if (opening) {
 			openingService.deleteOpening(opening.id);
-			console.log(`✅ Abertura "${variantName}" deletada do OpeningService`);
+			console.log(`✅ Abertura "${variantName}" deletada com sucesso`);
+			refreshOpeningsList();
+			alert(`Abertura "${variantName}" foi deletada com sucesso!`);
+		} else {
+			alert(`Abertura "${variantName}" não encontrada`);
 		}
-
-		// Deletar do formato legado (localStorage 'data')
-		const newData = { ...data };
-		delete newData[variantName];
-		setData(newData);
-		localStorage.setItem('data', JSON.stringify(newData));
-		console.log(`✅ Abertura "${variantName}" deletada do formato legado`);
-
-		alert(`Abertura "${variantName}" foi deletada com sucesso!`);
 	};
 
-	// Tela de seleção de modo quando há dados carregados mas nenhum modo selecionado
-	if (Object.keys(data).length > 0 && !variant && !mode) {
-		const variants = Object.keys(data);
+	// Obter todas as aberturas
+	const allOpenings = openingService.getOpenings();
+
+	// Tela de lista de aberturas (apenas quando explicitamente solicitado)
+	if (variant === 'show-openings' && !mode) {
 		return (
 			<>
 				<div className="theme-toggle" onClick={toggleDarkMode}>
@@ -95,36 +156,33 @@ function App() {
 
 								{/* Lista de aberturas */}
 								<div className="mb-4">
-									{variants.map((variantName, index) => {
-										const opening = openingService.getOpeningByName(variantName);
-										const positionCount = opening
-											? opening.stats?.totalPositions || 0
-											: Object.keys(data[variantName]).length;
-										const color = opening?.color || 'white';
-										const colorIcon = color === 'white' ? '⬜' : '⬛';
+									{allOpenings.map((opening, index) => {
+										const positionCount = opening.stats?.totalPositions || 0;
+										const colorIcon = opening.color === 'white' ? '⬜' : '⬛';
 
 										return (
-											<Card key={index} className="mb-3 shadow-sm">
+											<Card key={opening.id} className="mb-3 shadow-sm">
 												<Card.Body className="p-3">
 													<div className="d-flex justify-content-between align-items-center">
 														<div className="flex-grow-1">
 															<h5 className="mb-1">
-																{colorIcon} {variantName}
+																{colorIcon} {opening.name}
 															</h5>
 															<div className="text-muted small">
 																{positionCount} posições disponíveis
-																{opening && opening.stats && (
+																{opening.stats && (
 																	<> • {Math.round(opening.stats.accuracy)}% de acerto</>
 																)}
 															</div>
 														</div>
 
-														<div className="d-flex gap-2">
+														<div className="d-flex gap-2 flex-wrap">
 															<Button
 																variant="success"
 																size="sm"
 																onClick={() => {
-																	setVariant(variantName);
+																	setVariant(opening.name);
+																	setSelectedOpeningId(opening.id);
 																	setMode('train');
 																}}
 																title="Treinar esta abertura"
@@ -136,7 +194,8 @@ function App() {
 																variant="info"
 																size="sm"
 																onClick={() => {
-																	setVariant(variantName);
+																	setVariant(opening.name);
+																	setSelectedOpeningId(opening.id);
 																	setMode('edit');
 																}}
 																title="Editar esta abertura"
@@ -145,9 +204,18 @@ function App() {
 															</Button>
 
 															<Button
+																variant="primary"
+																size="sm"
+																onClick={() => handleDownloadOpening(opening.id)}
+																title="Baixar abertura em JSON"
+															>
+																💾 Download
+															</Button>
+
+															<Button
 																variant="danger"
 																size="sm"
-																onClick={() => handleDeleteOpening(variantName)}
+																onClick={() => handleDeleteOpening(opening.name)}
 																title="Deletar esta abertura"
 															>
 																🗑️
@@ -181,7 +249,7 @@ function App() {
 	}
 
 	if (!variant) {
-		const hasLocalData = !!localStorage.getItem('data');
+		const hasLocalData = allOpenings.length > 0;
 
 		return (
 			<>
@@ -279,11 +347,11 @@ function App() {
 													variant="primary"
 													size="sm"
 													onClick={() => {
-														const data = localStorage.getItem('data');
-														handleLoadData(data ? JSON.parse(data) : {});
+														// Mostrar lista de aberturas salvas
+														setVariant('show-openings');
 													}}
 												>
-													💾 Continuar
+													💾 Minhas Aberturas ({allOpenings.length})
 												</Button>
 											)}
 
@@ -291,14 +359,28 @@ function App() {
 												variant="outline-primary"
 												size="sm"
 												onClick={() => {
-													const trainingName = prompt('Nome do repertório:', 'caro-kann');
-													if (trainingName) {
-														setVariant(trainingName);
-														setMode('edit');
+													const trainingName = prompt('Nome da nova abertura:', 'Siciliana Dragão');
+													if (trainingName && trainingName.trim()) {
+														// Verificar se já existe
+														const existing = openingService.getOpeningByName(trainingName);
+														if (existing) {
+															const loadExisting = window.confirm(
+																`A abertura "${trainingName}" já existe. Deseja editá-la?`
+															);
+															if (loadExisting) {
+																setVariant(trainingName);
+																setSelectedOpeningId(existing.id);
+																setMode('edit');
+															}
+														} else {
+															// Criar nova abertura vazia
+															setVariant(trainingName);
+															setMode('edit');
+														}
 													}
 												}}
 											>
-												➕ Novo
+												➕ Nova Abertura
 											</Button>
 
 											<Upload onFileUpload={handleLoadData} />
@@ -377,12 +459,26 @@ function App() {
 	}
 
 	// Modo de treinamento de abertura
-	if (mode === 'train' && variant && data[variant]) {
-		return <OpeningTrainer variant={variant} data={data} onExit={handleExist} />;
+	if (mode === 'train' && selectedOpeningId) {
+		const opening = openingService.getOpeningById(selectedOpeningId);
+		if (opening) {
+			// Converter para formato legado temporariamente (compatibilidade)
+			const legacyData: TypeStorage = {
+				[opening.name]: opening.positions
+			};
+			return <OpeningTrainer variant={opening.name} data={legacyData} onExit={handleExist} />;
+		}
 	}
 
 	// Modo de edição (Register)
-	return <Register variant={variant} save={data} setSave={setData} handleExist={handleExist} />;
+	return (
+		<Register
+			variant={variant}
+			save={currentOpeningData}
+			setSave={setCurrentOpeningData}
+			handleExist={handleExist}
+		/>
+	);
 }
 
 export default App;
