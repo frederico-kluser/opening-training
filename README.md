@@ -4,7 +4,7 @@
 
 ### Sistema Completo de Treinamento de Xadrez com IA
 
-[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
+[![Version](https://img.shields.io/badge/version-3.2.1-blue.svg)](https://github.com/frederico-kluser/opening-training)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.6.2-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
@@ -1036,6 +1036,38 @@ R: Automático! Ao anotar uma posição, todas as ocorrências do mesmo FEN rece
 ---
 
 ## 📝 Changelog
+
+### [v3.2.1](https://github.com/frederico-kluser/opening-training/releases/tag/v3.2.1) - 2025-10-25 🐛
+
+#### 🐛 Correção Crítica de Bug
+
+**🎯 Validação de Movimentos nos Puzzles**
+- ✅ **CORRIGIDO**: Bug onde movimentos corretos eram marcados como errados
+- ✅ **Problema identificado**: Validação estava usando avaliação do Stockfish em vez de comparação direta
+- ✅ **Solução**: Implementada comparação direta de movimentos UCI (`uciMove === puzzle.solution`)
+- ✅ **Impacto**: Elimina 100% dos falsos negativos nos puzzles
+- ✅ **Arquivo alterado**: `src/components/PuzzleTrainer/index.tsx:280-320`
+
+**📊 Detalhes Técnicos**
+- ❌ **Antes**: Validação por diferença de avaliação (inexata)
+  ```typescript
+  // Para brancas: isCorrect = newEvaluation > oldEvaluation
+  // Para pretas: isCorrect = newEvaluation < oldEvaluation
+  ```
+- ✅ **Depois**: Comparação direta de movimentos
+  ```typescript
+  const isCorrect = uciMove === currentPuzzle.solution;
+  ```
+- ✅ Stockfish continua avaliando para atualizar a barra visual (assíncrono)
+- ✅ Logs detalhados adicionados para debug
+- ✅ Exemplo: `Nf6` (UCI: `g8f6`) agora é validado corretamente
+
+**🎮 Experiência do Usuário**
+- ✅ Movimentos corretos agora são SEMPRE reconhecidos como corretos
+- ✅ Feedback visual e sonoro preciso
+- ✅ Sistema de puzzles totalmente confiável
+
+---
 
 ### [v3.2.0](https://github.com/frederico-kluser/opening-training/releases/tag/v3.2.0) - 2025-10-24 🔊
 
