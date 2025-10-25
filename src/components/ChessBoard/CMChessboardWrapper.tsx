@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react
 import { Chessboard, COLOR, INPUT_EVENT_TYPE, FEN } from 'cm-chessboard';
 import { Arrows, ARROW_TYPE } from 'cm-chessboard/src/extensions/arrows/Arrows.js';
 import { Markers, MARKER_TYPE } from 'cm-chessboard/src/extensions/markers/Markers.js';
+import { RightClickAnnotator } from 'cm-chessboard/src/extensions/right-click-annotator/RightClickAnnotator.js';
 
 // Import CSS do cm-chessboard
 import './CMChessboard.css';
@@ -85,19 +86,14 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
           url: '/cm-chessboard/pieces/standard.svg',
           cache: true
         },
-        extensions: [{ class: Arrows }, { class: Markers }]
+        extensions: [
+          { class: Arrows },
+          { class: Markers },
+          { class: RightClickAnnotator } // Habilita desenho interativo de setas/marcadores
+        ]
       });
 
-      // Prevenir menu de contexto no tabuleiro
-      const preventContextMenu = (e: MouseEvent) => {
-        e.preventDefault();
-        return false;
-      };
-
-      container.addEventListener('contextmenu', preventContextMenu);
-
       return () => {
-        container.removeEventListener('contextmenu', preventContextMenu);
         boardRef.current?.destroy();
         boardRef.current = null;
       };

@@ -24,7 +24,7 @@
   border: 2px solid rgba(255, 255, 0, 0.8);
 }
 
-/* Arrow styles */
+/* Arrow styles - Programmatic API */
 .cm-chessboard .arrow.default {
   fill: rgba(255, 170, 0, 0.8);
   stroke: rgba(255, 170, 0, 1);
@@ -38,4 +38,50 @@
 .cm-chessboard .arrow.danger {
   fill: rgba(255, 0, 0, 0.8);
   stroke: rgba(255, 0, 0, 1);
+}
+
+/* Arrow styles - RightClickAnnotator (interactive) */
+.cm-chessboard .arrow-success {
+  fill: rgba(21, 180, 76, 0.8);
+  stroke: rgba(21, 180, 76, 1);
+}
+
+.cm-chessboard .arrow-info {
+  fill: rgba(0, 136, 204, 0.8);
+  stroke: rgba(0, 136, 204, 1);
+}
+
+.cm-chessboard .arrow-danger {
+  fill: rgba(217, 83, 79, 0.8);
+  stroke: rgba(217, 83, 79, 1);
+}
+
+.cm-chessboard .arrow-warning {
+  fill: rgba(240, 173, 78, 0.8);
+  stroke: rgba(240, 173, 78, 1);
+}
+
+/* Marker circle styles - RightClickAnnotator (interactive) */
+.cm-chessboard .marker-circle-success {
+  fill: rgba(21, 180, 76, 0.4);
+  stroke: rgba(21, 180, 76, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-info {
+  fill: rgba(0, 136, 204, 0.4);
+  stroke: rgba(0, 136, 204, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-danger {
+  fill: rgba(217, 83, 79, 0.4);
+  stroke: rgba(217, 83, 79, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-warning {
+  fill: rgba(240, 173, 78, 0.4);
+  stroke: rgba(240, 173, 78, 0.9);
+  stroke-width: 3;
 }

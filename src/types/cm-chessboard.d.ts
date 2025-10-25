@@ -109,3 +109,23 @@ declare module 'cm-chessboard/src/extensions/accessibility/Accessibility.js' {
     constructor(board: any, props?: any);
   }
 }
+
+declare module 'cm-chessboard/src/extensions/right-click-annotator/RightClickAnnotator.js' {
+  export class RightClickAnnotator {
+    constructor(board: any, props?: any);
+  }
+
+  export const ARROW_TYPE: {
+    success: { class: string };
+    warning: { class: string };
+    info: { class: string };
+    danger: { class: string };
+  };
+
+  export const MARKER_TYPE: {
+    success: { class: string; slice: string };
+    warning: { class: string; slice: string };
+    info: { class: string; slice: string };
+    danger: { class: string; slice: string };
+  };
+}
