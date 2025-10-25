@@ -125,26 +125,31 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		}
 	};
 
+	// Debounce para salvar comentários (evita loop e bug de digitação)
 	useEffect(() => {
-		setSave((prevSave) => {
-			const newSave = { ...prevSave };
-			if (!newSave[variant]) {
-				newSave[variant] = {};
-			}
-			const prevFen = newSave[variant][actualFen]?.prevFen || '';
-			const nextFen = newSave[variant][actualFen]?.nextFen || [];
+		const debounceTimer = setTimeout(() => {
+			setSave((prevSave) => {
+				const newSave = { ...prevSave };
+				if (!newSave[variant]) {
+					newSave[variant] = {};
+				}
+				const prevFen = newSave[variant][actualFen]?.prevFen || '';
+				const nextFen = newSave[variant][actualFen]?.nextFen || [];
 
-			newSave[variant][actualFen] = {
-				prevFen,
-				comment,
-				nextFen,
-			};
+				newSave[variant][actualFen] = {
+					prevFen,
+					comment,
+					nextFen,
+				};
 
-			// ✅ Sincroniza comentário para todos os FENs iguais na árvore
-			return syncCommentToAllFens(variant, actualFen, comment, newSave);
-		});
+				// ✅ Sincroniza comentário para todos os FENs iguais na árvore
+				return syncCommentToAllFens(variant, actualFen, comment, newSave);
+			});
+		}, 500); // Aguarda 500ms após parar de digitar
+
+		return () => clearTimeout(debounceTimer);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [comment, variant]);
+	}, [comment, variant, actualFen]);
 
 	useEffect(() => {
 		setGame(new Chess(actualFen));

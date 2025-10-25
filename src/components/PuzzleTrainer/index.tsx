@@ -266,7 +266,8 @@ const PuzzleTrainer: React.FC = () => {
         move: move.san,
         uci: uciMove,
         playerColor: session.currentPuzzle.color,
-        fenAfterMove: game.fen().substring(0, 30) + '...'
+        fenAfterMove: game.fen().substring(0, 30) + '...',
+        solutionExpected: session.currentPuzzle.solution
       });
 
       // Salvar informações do movimento
@@ -276,57 +277,47 @@ const PuzzleTrainer: React.FC = () => {
       // Salvar referência do puzzle atual
       const currentPuzzle = session.currentPuzzle;
 
-      // Avaliar a nova posição após o movimento (de forma assíncrona)
+      // ✅ COMPARAÇÃO DIRETA: Verificar se o movimento UCI corresponde à solução
+      const isCorrect = uciMove === currentPuzzle.solution;
+
+      console.log('🎯 VALIDAÇÃO DE MOVIMENTO:', {
+        movimentoFeito: uciMove,
+        solucaoEsperada: currentPuzzle.solution,
+        resultado: isCorrect ? '✅ CORRETO' : '❌ INCORRETO'
+      });
+
+      // Avaliar a nova posição após o movimento (de forma assíncrona para atualizar a barra)
       (async () => {
         if (!currentPuzzle) return;
 
         const result = await analyze(fenAfterMove, 20);
 
-        if (!result) {
-          console.error('❌ Falha ao avaliar movimento');
-          return;
-        }
-
-        const newEvaluation = result.evaluation;
-        const oldEvaluation = initialEvaluation;
-
-        console.log('📊 COMPARAÇÃO DE AVALIAÇÕES:', {
-          antes: oldEvaluation,
-          depois: newEvaluation,
-          diferença: newEvaluation - oldEvaluation,
-          playerColor: currentPuzzle.color
-        });
-
-        // Determinar se o movimento melhorou a posição
-        let isCorrect = false;
-
-        if (currentPuzzle.color === 'white') {
-          // Brancas: movimento correto se avaliação aumentou (ficou mais positivo)
-          isCorrect = newEvaluation > oldEvaluation;
-          console.log(`⬜ BRANCAS: ${oldEvaluation} → ${newEvaluation} = ${isCorrect ? '✅ MELHOROU' : '❌ PIOROU'}`);
-        } else {
-          // Pretas: movimento correto se avaliação diminuiu (ficou mais negativo)
-          isCorrect = newEvaluation < oldEvaluation;
-          console.log(`⬛ PRETAS: ${oldEvaluation} → ${newEvaluation} = ${isCorrect ? '✅ MELHOROU' : '❌ PIOROU'}`);
-        }
-
-        // Atualizar avaliação na barra
-        setCurrentEvaluation(newEvaluation);
-
-        if (isCorrect) {
-          console.log('✅ MOVIMENTO CORRETO! Posição melhorou.');
-          handleCorrectMove();
-        } else {
-          console.log('❌ MOVIMENTO INCORRETO! Posição piorou.');
-          // Salvar movimento errado antes de desfazer
-          setLastWrongMove(moveSan);
-          setWrongMovesHistory(prev => [...prev, moveSan]);
-          handleIncorrectMove();
-          // Desfaz o movimento errado
-          game.undo();
-          setGame(new Chess(game.fen())); // Force re-render
+        if (result) {
+          const newEvaluation = result.evaluation;
+          console.log('📊 AVALIAÇÃO DA NOVA POSIÇÃO:', {
+            avaliacaoAnterior: initialEvaluation,
+            avaliacaoNova: newEvaluation,
+            diferenca: newEvaluation - initialEvaluation
+          });
+          // Atualizar avaliação na barra
+          setCurrentEvaluation(newEvaluation);
         }
       })();
+
+      // Processar resultado do movimento
+      if (isCorrect) {
+        console.log('✅ MOVIMENTO CORRETO! Solução encontrada.');
+        handleCorrectMove();
+      } else {
+        console.log('❌ MOVIMENTO INCORRETO! Não corresponde à solução.');
+        // Salvar movimento errado antes de desfazer
+        setLastWrongMove(moveSan);
+        setWrongMovesHistory(prev => [...prev, moveSan]);
+        handleIncorrectMove();
+        // Desfaz o movimento errado
+        game.undo();
+        setGame(new Chess(game.fen())); // Force re-render
+      }
 
       return true;
     } catch (error) {
