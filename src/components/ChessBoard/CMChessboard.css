@@ -1,0 +1,108 @@
+/* CM Chessboard Styles */
+@import 'cm-chessboard/assets/chessboard.css';
+@import 'cm-chessboard/assets/extensions/arrows/arrows.css';
+@import 'cm-chessboard/assets/extensions/markers/markers.css';
+
+/* Custom overrides for integration */
+.cm-chessboard {
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom colors to match the existing theme */
+.cm-chessboard .square.dark {
+  background-color: #779952;
+}
+
+.cm-chessboard .square.light {
+  background-color: #edeed1;
+}
+
+/* Marker styles */
+.cm-chessboard .marker.frame {
+  background: rgba(255, 255, 0, 0.3);
+  border: 2px solid rgba(255, 255, 0, 0.8);
+}
+
+/* Arrow styles - Programmatic API */
+.cm-chessboard .arrow.default {
+  fill: rgba(255, 170, 0, 0.8);
+  stroke: rgba(255, 170, 0, 1);
+}
+
+.cm-chessboard .arrow.pointy {
+  fill: rgba(0, 170, 255, 0.8);
+  stroke: rgba(0, 170, 255, 1);
+}
+
+.cm-chessboard .arrow.danger {
+  fill: rgba(255, 0, 0, 0.8);
+  stroke: rgba(255, 0, 0, 1);
+}
+
+/* Arrow styles - RightClickAnnotator (interactive) */
+.cm-chessboard .arrow-success {
+  fill: rgba(21, 180, 76, 0.8);
+  stroke: rgba(21, 180, 76, 1);
+}
+
+.cm-chessboard .arrow-info {
+  fill: rgba(0, 136, 204, 0.8);
+  stroke: rgba(0, 136, 204, 1);
+}
+
+.cm-chessboard .arrow-danger {
+  fill: rgba(217, 83, 79, 0.8);
+  stroke: rgba(217, 83, 79, 1);
+}
+
+.cm-chessboard .arrow-warning {
+  fill: rgba(240, 173, 78, 0.8);
+  stroke: rgba(240, 173, 78, 1);
+}
+
+/* Marker circle styles - RightClickAnnotator (interactive) */
+.cm-chessboard .marker-circle-success {
+  fill: rgba(21, 180, 76, 0.4);
+  stroke: rgba(21, 180, 76, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-info {
+  fill: rgba(0, 136, 204, 0.4);
+  stroke: rgba(0, 136, 204, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-danger {
+  fill: rgba(217, 83, 79, 0.4);
+  stroke: rgba(217, 83, 79, 0.9);
+  stroke-width: 3;
+}
+
+.cm-chessboard .marker-circle-warning {
+  fill: rgba(240, 173, 78, 0.4);
+  stroke: rgba(240, 173, 78, 0.9);
+  stroke-width: 3;
+}
+
+/* Marker square styles - Custom RightClickAnnotator (casa inteira) */
+.cm-chessboard .marker-square-success {
+  fill: rgba(15, 195, 65, 0.55);
+  fill-opacity: 0.55;
+}
+
+.cm-chessboard .marker-square-info {
+  fill: rgba(50, 150, 250, 0.55);
+  fill-opacity: 0.55;
+}
+
+.cm-chessboard .marker-square-danger {
+  fill: rgba(235, 70, 65, 0.55);
+  fill-opacity: 0.55;
+}
+
+.cm-chessboard .marker-square-warning {
+  fill: rgba(255, 170, 50, 0.55);
+  fill-opacity: 0.55;
+}

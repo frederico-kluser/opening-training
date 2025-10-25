@@ -1,16 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo } from 'react';
+import { useRef } from 'react';
 import { Chess, Move } from 'chess.js';
-import { Chessboard } from 'react-chessboard';
+import CMChessboardWrapper, { CMChessboardHandle, ArrowConfig, MarkerConfig } from '../ChessBoard/CMChessboardWrapper';
 
 interface ChessGameProps {
 	invertedBoard: boolean;
 	game: Chess;
 	onDropCallback: (move: Move) => void;
 	boardWidth?: string;
+	arrows?: ArrowConfig[];
+	markers?: MarkerConfig[];
+	lastMove?: [string, string] | null;
 }
 
-const ChessGame = ({ invertedBoard, game, onDropCallback, boardWidth = 'min(500px, 90vw, 70vh)' }: ChessGameProps) => {
+const ChessGame = ({
+	invertedBoard,
+	game,
+	onDropCallback,
+	boardWidth = 'min(500px, 90vw, 70vh)',
+	arrows = [],
+	markers = [],
+	lastMove
+}: ChessGameProps) => {
+	const boardRef = useRef<CMChessboardHandle>(null);
+
 	const makeAMove = (move: any) => {
 		const gameCopy = new Chess();
 		gameCopy.load(game.fen());
@@ -37,46 +50,22 @@ const ChessGame = ({ invertedBoard, game, onDropCallback, boardWidth = 'min(500p
 		return true;
 	};
 
-	const customPieces = useMemo(() => {
-		const pieces = ['wP', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'];
-		const pieceComponents: any = {};
-		pieces.forEach((piece) => {
-			pieceComponents[piece] = ({ squareWidth }: any) => (
-				<div
-					style={{
-						width: squareWidth,
-						height: squareWidth,
-						backgroundImage: `url(/assets/${piece}.png)`,
-						backgroundSize: '100%',
-					}}
-				/>
-			);
-		});
-		return pieceComponents;
-	}, []);
-
 	return (
-		<div style={{ display: 'flex', justifyContent: 'center' }}>
-			<div style={{ width: boardWidth, aspectRatio: '1/1' }}>
-				<Chessboard
-					id="BasicBoard"
-					boardOrientation={invertedBoard ? 'black' : 'white'}
-					position={game.fen()}
-					onPieceDrop={onDrop}
-					customPieces={customPieces}
-					customBoardStyle={{
-						borderRadius: '4px',
-						boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-					}}
-					customDarkSquareStyle={{
-						backgroundColor: '#779952',
-					}}
-					customLightSquareStyle={{
-						backgroundColor: '#edeed1',
-					}}
-				/>
-			</div>
-		</div>
+		<CMChessboardWrapper
+			ref={boardRef}
+			position={game.fen()}
+			orientation={invertedBoard ? 'black' : 'white'}
+			onMove={onDrop}
+			width={boardWidth}
+			arrows={arrows}
+			markers={markers}
+			lastMove={lastMove}
+			showCoordinates={true}
+			style={{
+				borderRadius: '4px',
+				boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+			}}
+		/>
 	);
 };
 

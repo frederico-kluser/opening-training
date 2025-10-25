@@ -38,7 +38,7 @@ function throttle<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let lastCall = 0;
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: number | null = null;
 
   return (...args: Parameters<T>) => {
     const now = Date.now();
@@ -204,9 +204,6 @@ export const useEvaluationBar = (fen: string, enabled: boolean = true) => {
 
   // Debounce FEN changes (300ms)
   const debouncedFen = useDebounce(fen, 300);
-
-  // ID do jogo para ucinewgame
-  const gameIdRef = useRef<string>('');
 
   useEffect(() => {
     if (!enabled || !isReady || !debouncedFen) return;
