@@ -11,6 +11,8 @@ import useStockfish from '../../hooks/useStockfish';
 import useBoardSize from '../../hooks/useBoardSize';
 import useScreenOrientation from '../../hooks/useScreenOrientation';
 import { populateEmptyComment, syncCommentToAllFens } from '../../utils/fenSyncUtils';
+import MoveSelectionModal from '../../components/MoveSelectionModal';
+import soundService from '../../services/SoundService';
 
 const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -32,6 +34,10 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 	// Estados para Evaluation Bar
 	const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
 	const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
+
+	// Estados para o modal de seleção de movimentos
+	const [showMoveSelectionModal, setShowMoveSelectionModal] = useState(false);
+	const [availableMoves, setAvailableMoves] = useState<string[]>([]);
 
 	// Ref para rastrear o último FEN avaliado
 	const lastEvaluatedFen = useRef<string>('');
@@ -196,6 +202,18 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
 		const newMove = gameCopy.move(move);
 		if (newMove) {
+			// Tocar som baseado no tipo de movimento
+			if (newMove.captured) {
+				soundService.playCaptureSound();
+			} else {
+				soundService.playMoveSound();
+			}
+
+			// Verificar se é xeque
+			if (gameCopy.isCheck()) {
+				setTimeout(() => soundService.playCheckSound(), 100);
+			}
+
 			updateActualFen(gameCopy.fen());
 		} else {
 			console.log('Invalid move');
@@ -212,9 +230,21 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 
   const handleRedo = () => {
     if (save[variant][actualFen]?.nextFen.length > 0) {
-      // TODO: Implementar a seleção de variações
-      setActualFen(save[variant][actualFen]?.nextFen[0]);
+      const nextFens = save[variant][actualFen]?.nextFen;
+
+      // Se houver apenas um avanço, vai direto
+      if (nextFens.length === 1) {
+        setActualFen(nextFens[0]);
+      } else {
+        // Se houver múltiplos avanços, mostra o modal
+        setAvailableMoves(nextFens);
+        setShowMoveSelectionModal(true);
+      }
     }
+  };
+
+  const handleMoveSelection = (selectedFen: string) => {
+    setActualFen(selectedFen);
   };
 
 	return (
@@ -328,6 +358,44 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 					</Form>
 				</div>
 			</div>
+
+			{/* Exibição do FEN atual */}
+			<div style={{ display: 'flex', justifyContent: 'center' }}>
+				<div style={{ width: 'min(500px, 90vw, 70vh)' }}>
+					<Form.Group>
+						<Form.Label className="fw-bold">FEN Atual:</Form.Label>
+						<Form.Control
+							type="text"
+							value={actualFen}
+							readOnly
+							onClick={(e) => {
+								const target = e.target as HTMLInputElement;
+								target.select();
+								navigator.clipboard.writeText(actualFen);
+							}}
+							style={{
+								fontFamily: 'monospace',
+								fontSize: '12px',
+								cursor: 'pointer',
+								backgroundColor: '#f8f9fa'
+							}}
+							title="Clique para copiar o FEN"
+						/>
+						<Form.Text className="text-muted">
+							Clique para copiar o FEN para a área de transferência
+						</Form.Text>
+					</Form.Group>
+				</div>
+			</div>
+
+			{/* Modal de seleção de movimentos */}
+			<MoveSelectionModal
+				show={showMoveSelectionModal}
+				currentFen={actualFen}
+				nextFens={availableMoves}
+				onSelectMove={handleMoveSelection}
+				onHide={() => setShowMoveSelectionModal(false)}
+			/>
 		</Gap>
 	);
 };

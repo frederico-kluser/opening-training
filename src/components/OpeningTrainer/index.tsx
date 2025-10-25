@@ -13,6 +13,7 @@ import ChessBoardWrapper from '../ChessBoard/ChessBoardWrapper';
 import EvaluationBar from '../EvaluationBar';
 import useStockfish from '../../hooks/useStockfish';
 import useBoardSize from '../../hooks/useBoardSize';
+import soundService from '../../services/SoundService';
 import useScreenOrientation from '../../hooks/useScreenOrientation';
 import { getElapsedTime } from '../../utils/timeUtils';
 import {
@@ -228,6 +229,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       // Avaliar posição de contexto
       evaluatePosition(position.fenContext);
 
+      // Tocar som do movimento do adversário
+      soundService.playMoveSound();
+
       // Após 1 segundo, mostra a posição onde o usuário deve jogar
       setTimeout(() => {
         const newGame = new Chess(position.fen);
@@ -311,6 +315,18 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       // Movimento correto - aplica ao game e busca comentário da posição resultante
       setGame(gameCopy);
 
+      // Tocar som baseado no tipo de movimento
+      if (move.captured) {
+        soundService.playCaptureSound();
+      } else {
+        soundService.playMoveSound();
+      }
+
+      // Verificar se é xeque
+      if (gameCopy.isCheck()) {
+        setTimeout(() => soundService.playCheckSound(), 100);
+      }
+
       if (validation.resultingFen) {
         // Busca o comentário da posição alcançada
         const opening = openingService.getOpeningByName(variant);
@@ -344,6 +360,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       transition: 'background-color 0.5s'
     });
 
+    // Tocar som de feedback positivo
+    soundService.playCorrectSound();
+
     const newStreak = session.streak + 1;
     setSession(prev => ({
       ...prev,
@@ -376,6 +395,9 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
       backgroundColor: '#FFB6C1',
       transition: 'background-color 0.5s'
     });
+
+    // Tocar som de feedback negativo
+    soundService.playIncorrectSound();
 
     setSession(prev => ({
       ...prev,
@@ -722,6 +744,33 @@ Taxa de acerto: ${Math.round(accuracy)}%`);
                   <FaSearchPlus />
                 </Button>
               </Gap>
+            </div>
+
+            {/* Exibição do FEN atual */}
+            <div className="mt-3">
+              <Form.Group>
+                <Form.Label className="fw-bold">FEN Atual:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={game.fen()}
+                  readOnly
+                  onClick={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    target.select();
+                    navigator.clipboard.writeText(game.fen());
+                  }}
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    backgroundColor: '#f8f9fa'
+                  }}
+                  title="Clique para copiar o FEN"
+                />
+                <Form.Text className="text-muted">
+                  Clique para copiar o FEN para a área de transferência
+                </Form.Text>
+              </Form.Group>
             </div>
           </Card.Body>
         </Card>
