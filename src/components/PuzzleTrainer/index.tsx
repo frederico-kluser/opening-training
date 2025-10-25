@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
-import { Button, Card, Alert } from 'react-bootstrap';
+import { Button, Card, Alert, Form } from 'react-bootstrap';
 import puzzleService from '../../services/PuzzleService';
 import { Puzzle } from '../../types/Puzzle';
 import Gap from '../Gap';
@@ -667,6 +667,33 @@ const PuzzleTrainer: React.FC = () => {
                 canZoomIn={canZoomIn}
                 canZoomOut={canZoomOut}
               />
+            </div>
+
+            {/* Exibição do FEN atual */}
+            <div className="mt-3">
+              <Form.Group>
+                <Form.Label className="fw-bold">FEN Atual:</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={game.fen()}
+                  readOnly
+                  onClick={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    target.select();
+                    navigator.clipboard.writeText(game.fen());
+                  }}
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    backgroundColor: '#f8f9fa'
+                  }}
+                  title="Clique para copiar o FEN"
+                />
+                <Form.Text className="text-muted">
+                  Clique para copiar o FEN para a área de transferência
+                </Form.Text>
+              </Form.Group>
             </div>
           </Card.Body>
         </Card>

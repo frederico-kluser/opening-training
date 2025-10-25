@@ -346,6 +346,35 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 				</div>
 			</div>
 
+			{/* Exibição do FEN atual */}
+			<div style={{ display: 'flex', justifyContent: 'center' }}>
+				<div style={{ width: 'min(500px, 90vw, 70vh)' }}>
+					<Form.Group>
+						<Form.Label className="fw-bold">FEN Atual:</Form.Label>
+						<Form.Control
+							type="text"
+							value={actualFen}
+							readOnly
+							onClick={(e) => {
+								const target = e.target as HTMLInputElement;
+								target.select();
+								navigator.clipboard.writeText(actualFen);
+							}}
+							style={{
+								fontFamily: 'monospace',
+								fontSize: '12px',
+								cursor: 'pointer',
+								backgroundColor: '#f8f9fa'
+							}}
+							title="Clique para copiar o FEN"
+						/>
+						<Form.Text className="text-muted">
+							Clique para copiar o FEN para a área de transferência
+						</Form.Text>
+					</Form.Group>
+				</div>
+			</div>
+
 			{/* Modal de seleção de movimentos */}
 			<MoveSelectionModal
 				show={showMoveSelectionModal}
