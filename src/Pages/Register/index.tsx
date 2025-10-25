@@ -24,12 +24,15 @@ interface RegisterProps {
 }
 
 const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.Element => {
-	const [actualFen, setActualFen] = useState(initialFen);
+	// Inicializar cor da abertura ANTES de montar o componente
+	const existingOpening = openingService.getOpeningByName(variant);
+	const initialColor = existingOpening?.color || 'white';
 
-	const [invertedBoard, setInvertedBoard] = useState(false);
+	const [actualFen, setActualFen] = useState(initialFen);
+	const [invertedBoard, setInvertedBoard] = useState(initialColor === 'black');
 	const [game, setGame] = useState(new Chess());
 	const [comment, setComment] = useState('');
-	const [openingColor, setOpeningColor] = useState<'white' | 'black'>('white');
+	const [openingColor, setOpeningColor] = useState<'white' | 'black'>(initialColor);
 
 	// Estados para Evaluation Bar
 	const [currentEvaluation, setCurrentEvaluation] = useState<number>(0);
@@ -80,14 +83,15 @@ const Register = ({ variant, save, setSave, handleExist }: RegisterProps): JSX.E
 		console.log('save :', save);
 	}, [save]);
 
-	// Carregar cor da abertura se já existir no OpeningService
+	// Atualizar cor quando variant muda (para navegação entre diferentes aberturas)
 	useEffect(() => {
 		const existing = openingService.getOpeningByName(variant);
-		if (existing) {
+		if (existing && existing.color !== openingColor) {
 			setOpeningColor(existing.color);
+			setInvertedBoard(existing.color === 'black');
 			console.log(`✅ Abertura "${variant}" carregada com cor: ${existing.color}`);
 		}
-	}, [variant]);
+	}, [variant, openingColor]);
 
 	// 🎯 Sincronizar orientação do tabuleiro com a cor escolhida
 	useEffect(() => {
