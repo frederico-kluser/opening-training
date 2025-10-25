@@ -10,6 +10,7 @@ O tabuleiro agora suporta desenho interativo de setas e marcadores usando o mous
 1. **Pressione o botão direito** em uma casa de origem
 2. **Arraste** até a casa de destino (mantendo pressionado)
 3. **Solte** o botão para criar a seta
+4. **Preview em tempo real** enquanto arrasta
 
 ### Cores das Setas (com modificadores de teclado)
 
@@ -18,18 +19,23 @@ O tabuleiro agora suporta desenho interativo de setas e marcadores usando o mous
 - **Vermelho (Shift + Clique Direito)**: Movimentos ruins/perigosos
 - **Laranja (Shift + Alt + Clique Direito)**: Movimentos de atenção
 
-## Desenhar Círculos/Marcadores
+✅ **Setas agora possuem pontas triangulares** para melhor visualização da direção!
+
+## Destacar Casas Inteiras
 
 ### Clique Direito na Casa
 1. **Clique direito** em uma casa (sem arrastar)
-2. Um círculo colorido aparecerá na casa
+2. **A casa inteira mudará de cor** com transparência
+3. Peças permanecem visíveis sobre a cor
 
-### Cores dos Círculos (com modificadores de teclado)
+### Cores das Casas (com modificadores de teclado)
 
-- **Verde (Clique Direito simples)**
-- **Azul (Alt + Clique Direito)**
-- **Vermelho (Shift + Clique Direito)**
-- **Laranja (Shift + Alt + Clique Direito)**
+- **Verde (Clique Direito simples)**: Casas controladas/seguras
+- **Azul (Alt + Clique Direito)**: Casas interessantes/alternativas
+- **Vermelho (Shift + Clique Direito)**: Casas fracas/perigosas
+- **Laranja (Shift + Alt + Clique Direito)**: Casas de atenção
+
+✅ **Casas agora são pintadas inteiras** (não apenas círculos), facilitando a visualização!
 
 ## Remover Anotações
 
