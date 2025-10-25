@@ -4,7 +4,7 @@
 
 ### Sistema Completo de Treinamento de Xadrez com IA
 
-[![Version](https://img.shields.io/badge/version-3.1.1-blue.svg)](https://github.com/frederico-kluser/opening-training)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/frederico-kluser/opening-training)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/react-18.3.1-61dafb.svg?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.6.2-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
@@ -28,7 +28,15 @@
 
 ## 🎯 Visão Geral
 
-Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.1.1** traz melhorias importantes na interatividade, edição de anotações e responsividade.
+Plataforma completa para treino de xadrez que combina análise automatizada de partidas com **Stockfish 17**, geração inteligente de puzzles táticos personalizados e sistema avançado de repertório de aberturas. A **v3.2.0** adiciona sistema profissional de sons de movimento e funcionalidades avançadas de navegação.
+
+### 🌟 Novidades da v3.2.0
+
+- **🔊 Sistema de Sons Realísticos**: Sons profissionais de movimento estilo Lichess/Chess.com com Web Audio API
+- **🎵 Sons para Todos os Movimentos**: Feedback auditivo para seus movimentos E dos adversários
+- **🎯 Modal de Seleção de Variações**: Escolha entre múltiplos avanços cadastrados de forma intuitiva
+- **📋 Exibição de FEN**: Copie o FEN atual com um clique em todos os modos
+- **🎨 Sons Sintéticos Inteligentes**: Cliques realísticos tipo "peça batendo no tabuleiro"
 
 ### 🌟 Novidades da v3.1.1
 
@@ -1029,6 +1037,103 @@ R: Automático! Ao anotar uma posição, todas as ocorrências do mesmo FEN rece
 
 ## 📝 Changelog
 
+### [v3.2.0](https://github.com/frederico-kluser/opening-training/releases/tag/v3.2.0) - 2025-10-24 🔊
+
+#### ✨ Sistema de Sons Profissional
+
+**🔊 SoundService com Web Audio API**
+- ✅ Serviço completo de áudio (`src/services/SoundService.ts`) usando Web Audio API
+- ✅ Sons sintéticos realísticos tipo "clique" (peça batendo no tabuleiro)
+- ✅ Geração de ruído branco com filtro passa-banda para som natural
+- ✅ Envelope de decaimento exponencial para sons orgânicos
+- ✅ Persistência de preferências no localStorage (volume, ativado/desativado)
+- ✅ Controle de volume (0.0 a 1.0) configurável
+
+**🎵 Tipos de Sons Implementados**
+- ✅ `playMoveSound()` - Clique agudo em 800Hz (movimento normal)
+- ✅ `playCaptureSound()` - Clique grave em 600Hz (captura)
+- ✅ `playCheckSound()` - Tom sustentado em 600Hz (xeque)
+- ✅ `playCorrectSound()` - Feedback positivo (tons duplos ascendentes)
+- ✅ `playIncorrectSound()` - Feedback negativo (tom descendente)
+- ✅ `playSuccessSound()` - Som de vitória (sequência de 3 tons)
+
+**🎮 Integração Completa em Todos os Modos**
+- ✅ **Modo Edição (Register)**: Som ao mover peças, capturar e dar xeque
+- ✅ **Modo Treinamento (OpeningTrainer)**:
+  - Som nos movimentos do jogador (movimento, captura, xeque)
+  - Som automático nos movimentos do adversário
+  - Feedback sonoro ao acertar/errar
+- ✅ **Modo Puzzles (PuzzleTrainer)**:
+  - Som ao mover e capturar
+  - Som de sucesso ao resolver puzzle
+  - Som de erro ao falhar
+
+#### 🎯 Modal de Seleção de Variações
+
+**📋 MoveSelectionModal Component**
+- ✅ Novo componente `src/components/MoveSelectionModal/index.tsx`
+- ✅ Modal que aparece quando há múltiplos avanços possíveis
+- ✅ Lista interativa de movimentos em notação SAN (ex: e4, Nf3, O-O)
+- ✅ Detecção automática do movimento a partir de FENs
+- ✅ Backdrop estático para evitar cliques acidentais
+- ✅ Botões grandes e clicáveis para cada variação
+
+**🔀 Integração no Modo Edição**
+- ✅ Função `handleRedo()` atualizada com detecção de múltiplos avanços
+- ✅ Se 1 avanço: navega diretamente (comportamento anterior mantido)
+- ✅ Se 2+ avanços: abre modal para seleção
+- ✅ Estados gerenciados: `showMoveSelectionModal`, `availableMoves`
+
+#### 📋 Exibição de FEN em Todos os Modos
+
+**💾 Campo FEN Clicável**
+- ✅ Campo de texto somente leitura com FEN atual
+- ✅ Clique para selecionar e copiar automaticamente
+- ✅ Fonte monoespaçada para melhor legibilidade
+- ✅ Tooltip informativo: "Clique para copiar o FEN"
+- ✅ Mensagem de ajuda: "Clique para copiar o FEN para a área de transferência"
+- ✅ Estilo otimizado: fundo cinza claro, cursor pointer, 12px
+
+**🎯 Integração Completa**
+- ✅ **Register (Edição)**: Campo após comentários (`src/Pages/Register/index.tsx:349-376`)
+- ✅ **OpeningTrainer (Treino)**: Campo após controles (`src/components/OpeningTrainer/index.tsx:727-752`)
+- ✅ **PuzzleTrainer (Puzzles)**: Campo após controles (`src/components/PuzzleTrainer/index.tsx:672-697`)
+
+#### 🔧 Melhorias Técnicas
+
+**Arquivos Criados (3)**
+- ✅ `src/services/SoundService.ts` - Serviço de áudio completo (~200 linhas)
+- ✅ `src/components/MoveSelectionModal/index.tsx` - Modal de seleção de variações
+- ✅ `public/sounds/` - Diretório para sons (vazio, sons são sintéticos)
+
+**Arquivos Modificados (4)**
+- ✅ `src/Pages/Register/index.tsx` - Import SoundService, sons nos movimentos, campo FEN, modal de seleção
+- ✅ `src/components/OpeningTrainer/index.tsx` - Import SoundService, sons em movimentos (jogador e adversário), feedback, campo FEN
+- ✅ `src/components/PuzzleTrainer/index.tsx` - Import SoundService, sons em puzzles, campo FEN
+- ✅ `package.json` - Versão atualizada para 3.2.0
+
+#### 🎨 Características Técnicas Avançadas
+
+**Web Audio API**
+- ✅ AudioContext para síntese de som
+- ✅ BiquadFilter (bandpass) para filtrar frequências
+- ✅ BufferSource para playback de ruído gerado
+- ✅ Envelope ADSR simples para naturalidade
+- ✅ Síntese procedural de cliques (sem arquivos externos)
+
+**Performance**
+- ✅ Sons gerados em tempo real (zero latência)
+- ✅ Nenhum arquivo de áudio externo necessário
+- ✅ ~5KB de código JavaScript apenas
+- ✅ Funciona 100% offline
+
+**Compatibilidade**
+- ✅ Todos os navegadores modernos com Web Audio API
+- ✅ Política de autoplay respeitada (resume on interaction)
+- ✅ Fallback gracioso se áudio não disponível
+
+---
+
 ### [v3.1.1](https://github.com/frederico-kluser/opening-training/releases/tag/v3.1.1) - 2025-10-24 ✏️
 
 #### ✨ Melhorias de Interatividade e UX
@@ -1286,6 +1391,6 @@ Este projeto não seria possível sem:
 
 ---
 
-**Última atualização**: 24/01/2025 | **Versão**: 3.0.0 🚀
+**Última atualização**: 24/10/2025 | **Versão**: 3.2.0 🔊
 
 </div>
