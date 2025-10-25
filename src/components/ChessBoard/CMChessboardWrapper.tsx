@@ -65,7 +65,9 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
     useEffect(() => {
       if (!containerRef.current || boardRef.current) return;
 
-      boardRef.current = new Chessboard(containerRef.current, {
+      const container = containerRef.current;
+
+      boardRef.current = new Chessboard(container, {
         position,
         orientation: orientation === 'white' ? COLOR.white : COLOR.black,
         style: {
@@ -86,7 +88,16 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
         extensions: [{ class: Arrows }, { class: Markers }]
       });
 
+      // Prevenir menu de contexto no tabuleiro
+      const preventContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+        return false;
+      };
+
+      container.addEventListener('contextmenu', preventContextMenu);
+
       return () => {
+        container.removeEventListener('contextmenu', preventContextMenu);
         boardRef.current?.destroy();
         boardRef.current = null;
       };
