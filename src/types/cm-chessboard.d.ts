@@ -23,6 +23,8 @@ declare module 'cm-chessboard' {
       size?: number;
       cache?: boolean;
     };
+    assetsUrl?: string;
+    assetsCache?: boolean;
     extensions?: Array<{ class: any; props?: any }>;
   }
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react
 import { Chessboard, COLOR, INPUT_EVENT_TYPE, FEN } from 'cm-chessboard';
 import { Arrows, ARROW_TYPE } from 'cm-chessboard/src/extensions/arrows/Arrows.js';
 import { Markers, MARKER_TYPE } from 'cm-chessboard/src/extensions/markers/Markers.js';
-import { RightClickAnnotator } from 'cm-chessboard/src/extensions/right-click-annotator/RightClickAnnotator.js';
+import { CustomRightClickAnnotator } from './CustomRightClickAnnotator.js';
 
 // Import CSS do cm-chessboard
 import './CMChessboard.css';
@@ -86,10 +86,11 @@ const CMChessboardWrapper = forwardRef<CMChessboardHandle, CMChessboardProps>(
           url: '/cm-chessboard/pieces/standard.svg',
           cache: true
         },
+        assetsUrl: '/cm-chessboard/', // Caminho base para sprites de extensões
         extensions: [
           { class: Arrows },
           { class: Markers },
-          { class: RightClickAnnotator } // Habilita desenho interativo de setas/marcadores
+          { class: CustomRightClickAnnotator } // Habilita desenho interativo customizado
         ]
       });
 
