@@ -156,7 +156,7 @@ function App() {
 
 								{/* Lista de aberturas */}
 								<div className="mb-4">
-									{allOpenings.map((opening, index) => {
+									{allOpenings.map((opening) => {
 										const positionCount = opening.stats?.totalPositions || 0;
 										const colorIcon = opening.color === 'white' ? '⬜' : '⬛';
 

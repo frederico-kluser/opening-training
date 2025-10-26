@@ -48,6 +48,10 @@ interface OpeningTrainerProps {
 }
 
 const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }) => {
+  // Inicializar cor da abertura ANTES de montar o componente
+  const existingOpening = openingService.getOpeningByName(variant);
+  const initialColor = existingOpening?.color || 'white';
+
   const [session, setSession] = useState<OpeningSession>({
     currentPosition: null,
     positionIndex: 0,
@@ -60,14 +64,14 @@ const OpeningTrainer: React.FC<OpeningTrainerProps> = ({ variant, data, onExit }
     attemptCount: 0,
     trainingPositions: [],
     showHint: false,
-    openingColor: 'white'
+    openingColor: initialColor
   });
 
   const [game, setGame] = useState(new Chess());
   const [showFeedback, setShowFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
-  const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
+  const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>(initialColor);
   const [showingContext, setShowingContext] = useState(false);
 
   // Modal de anotações
