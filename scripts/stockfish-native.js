@@ -245,18 +245,18 @@ class StockfishNative {
       let mateIn = 0;
       let receivedBestMove = false;
 
-      // Timeout de 15 segundos
+      // Timeout de 2 minutos
       const timeout = setTimeout(() => {
         if (!receivedBestMove) {
           if (this.process && this.process.stdout) {
             this.process.stdout.removeListener('data', dataHandler);
           }
           this.isAnalyzing = false;
-          console.error(`\n❌ [Análise #${analyzeId}] TIMEOUT após 15s!`);
+          console.error(`\n❌ [Análise #${analyzeId}] TIMEOUT após 2 minutos!`);
           console.error(`   FEN: ${fen}`);
-          reject(new Error(`Análise timeout após 15s`));
+          reject(new Error(`Análise timeout após 2 minutos`));
         }
-      }, 15000);
+      }, 120000);
 
       const dataHandler = (data) => {
         const output = data.toString();
